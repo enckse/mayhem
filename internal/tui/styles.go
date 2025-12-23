@@ -12,9 +12,7 @@ var (
 	stackTableWidth = 26 // 22: column width + 2*2: column padding
 	taskTableWidth  = 67 // 59: column widths + 2*4: column paddings
 	dash            = "–"
-)
 
-var (
 	stackBorderColor     = lipgloss.Color("#019187")
 	taskBorderColor      = lipgloss.Color("#f1b44c")
 	detailsBorderColor   = lipgloss.Color("#6192bc")
@@ -29,9 +27,7 @@ var (
 	inputFormColor             = lipgloss.Color("#5ac7c7")
 	timeFocusColor             = lipgloss.Color("#FFFF00")
 	unfocusedColor             = lipgloss.Color("#898989")
-)
 
-var (
 	selectedBoxStyle        = lipgloss.NewStyle().BorderStyle(lipgloss.ThickBorder())
 	selectedStackBoxStyle   = selectedBoxStyle.BorderForeground(stackBorderColor)
 	selectedTaskBoxStyle    = selectedBoxStyle.BorderForeground(taskBorderColor)

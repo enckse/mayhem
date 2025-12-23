@@ -12,56 +12,60 @@ import (
 	"github.com/enckse/mayhem/internal/entities"
 )
 
-type detailsBox struct {
-	taskData          entities.Task
-	viewport          viewport.Model
-	preserveOffset    bool
-	oldViewportOffset int
-	focusIndex        int
-	isBoxFocused      bool
-	scrollData        scrollData
-}
+type (
+	detailsBox struct {
+		taskData          entities.Task
+		viewport          viewport.Model
+		preserveOffset    bool
+		oldViewportOffset int
+		focusIndex        int
+		isBoxFocused      bool
+		scrollData        scrollData
+	}
 
-type scrollData struct {
-	title       int
-	description int
-	priority    int
-	deadline    int
-}
+	scrollData struct {
+		title       int
+		description int
+		priority    int
+		deadline    int
+	}
+)
 
-var taskDetailsKeys = keyMap{
-	Edit: key.NewBinding(
-		key.WithKeys("e"),
-		key.WithHelp("'e'", "edit field 📝"),
-	),
-}
+var (
+	taskDetailsKeys = keyMap{
+		Edit: key.NewBinding(
+			key.WithKeys("e"),
+			key.WithHelp("'e'", "edit field 📝"),
+		),
+	}
 
-var detailsNavigationKeys = keyMap{
-	Up: key.NewBinding(
-		key.WithKeys("up", "k"),
-		key.WithHelp("'↑/k'", "up"),
-	),
-	Down: key.NewBinding(
-		key.WithKeys("down", "j"),
-		key.WithHelp("'↓/j'", "down"),
-	),
-	GotoTop: key.NewBinding(
-		key.WithKeys("g"),
-		key.WithHelp("'g'", "jump to top"),
-	),
-	GotoBottom: key.NewBinding(
-		key.WithKeys("G"),
-		key.WithHelp("'G'", "jump to bottom"),
-	),
-	Help: key.NewBinding(
-		key.WithKeys("?"),
-		key.WithHelp("'?'", "toggle help"),
-	),
-	Quit: key.NewBinding(
-		key.WithKeys("q"),
-		key.WithHelp("'q'", "quit"),
-	),
-}
+	detailsNavigationKeys = keyMap{
+		Up: key.NewBinding(
+			key.WithKeys("up", "k"),
+			key.WithHelp("'↑/k'", "up"),
+		),
+		Down: key.NewBinding(
+			key.WithKeys("down", "j"),
+			key.WithHelp("'↓/j'", "down"),
+		),
+		GotoTop: key.NewBinding(
+			key.WithKeys("g"),
+			key.WithHelp("'g'", "jump to top"),
+		),
+		GotoBottom: key.NewBinding(
+			key.WithKeys("G"),
+			key.WithHelp("'G'", "jump to bottom"),
+		),
+		Help: key.NewBinding(
+			key.WithKeys("?"),
+			key.WithHelp("'?'", "toggle help"),
+		),
+		Quit: key.NewBinding(
+			key.WithKeys("q"),
+			key.WithHelp("'q'", "quit"),
+		),
+	}
+)
 
 func (m *detailsBox) buildDetailsBox(data entities.Task, preserveOffset bool) {
 	m.taskData = data

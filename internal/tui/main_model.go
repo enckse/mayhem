@@ -10,36 +10,38 @@ import (
 	"github.com/enckse/mayhem/internal/entities"
 )
 
-// ModelWrapper provides a wrapper around a backing TUI model
-type ModelWrapper struct {
-	Backing *model
-}
+type (
+	// ModelWrapper provides a wrapper around a backing TUI model
+	ModelWrapper struct {
+		Backing *model
+	}
 
-type model struct {
-	data            []entities.Stack
-	stackTable      table.Model
-	taskTable       table.Model
-	taskDetails     detailsBox
-	help            helpModel
-	input           inputForm
-	showTasks       bool
-	showDetails     bool
-	showInput       bool
-	showHelp        bool
-	customInput     tea.Model
-	customInputType string
-	showCustomInput bool
-	navigationKeys  keyMap
-	preInputFocus   string // useful for reverting back when input box is closed
-	firstRender     bool
-	prevState       preserveState
-}
+	model struct {
+		data            []entities.Stack
+		stackTable      table.Model
+		taskTable       table.Model
+		taskDetails     detailsBox
+		help            helpModel
+		input           inputForm
+		showTasks       bool
+		showDetails     bool
+		showInput       bool
+		showHelp        bool
+		customInput     tea.Model
+		customInputType string
+		showCustomInput bool
+		navigationKeys  keyMap
+		preInputFocus   string // useful for reverting back when input box is closed
+		firstRender     bool
+		prevState       preserveState
+	}
 
-type preserveState struct {
-	retainState bool
-	stackID     uint
-	taskID      uint
-}
+	preserveState struct {
+		retainState bool
+		stackID     uint
+		taskID      uint
+	}
+)
 
 // InitializeMainModel will startup the core application model
 func InitializeMainModel() ModelWrapper {

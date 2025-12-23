@@ -9,72 +9,76 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// textinput.Model doesn't implement tea.Model interface
-type timePicker struct {
-	currTime   time.Time
-	focusIndex int
-}
+type (
+	// textinput.Model doesn't implement tea.Model interface
+	timePicker struct {
+		currTime   time.Time
+		focusIndex int
+	}
 
-type timeUnit struct {
-	title     string
-	tag       string
-	charWidth int
-}
+	timeUnit struct {
+		title     string
+		tag       string
+		charWidth int
+	}
+)
 
-var timePickerKeys = keyMap{
-	Up: key.NewBinding(
-		key.WithKeys("up", "k"),
-		key.WithHelp("'↑/k'", "increase"),
-	),
-	Down: key.NewBinding(
-		key.WithKeys("down", "j"),
-		key.WithHelp("'↓/j'", "decrease"),
-	),
-	Left: key.NewBinding(
-		key.WithKeys("left", "h"),
-		key.WithHelp("'←/h'", "move left"),
-	),
-	Right: key.NewBinding(
-		key.WithKeys("right", "l"),
-		key.WithHelp("'→/l'", "move right"),
-	),
-	Enter: key.NewBinding(
-		key.WithKeys("enter"),
-		key.WithHelp("'enter'", "save"),
-	),
-	Return: key.NewBinding(
-		key.WithKeys("esc"),
-		key.WithHelp("'esc'", "return"),
-	),
-}
+var (
+	timePickerKeys = keyMap{
+		Up: key.NewBinding(
+			key.WithKeys("up", "k"),
+			key.WithHelp("'↑/k'", "increase"),
+		),
+		Down: key.NewBinding(
+			key.WithKeys("down", "j"),
+			key.WithHelp("'↓/j'", "decrease"),
+		),
+		Left: key.NewBinding(
+			key.WithKeys("left", "h"),
+			key.WithHelp("'←/h'", "move left"),
+		),
+		Right: key.NewBinding(
+			key.WithKeys("right", "l"),
+			key.WithHelp("'→/l'", "move right"),
+		),
+		Enter: key.NewBinding(
+			key.WithKeys("enter"),
+			key.WithHelp("'enter'", "save"),
+		),
+		Return: key.NewBinding(
+			key.WithKeys("esc"),
+			key.WithHelp("'esc'", "return"),
+		),
+	}
 
-var timeUnitMap = map[int]timeUnit{
-	0: {
-		title:     "Hour",
-		tag:       "hh",
-		charWidth: 2,
-	},
-	1: {
-		title:     "Minute",
-		tag:       "mm",
-		charWidth: 2,
-	},
-	2: {
-		title:     "Day",
-		tag:       "DD",
-		charWidth: 2,
-	},
-	3: {
-		title:     "Month",
-		tag:       "MM",
-		charWidth: 2,
-	},
-	4: {
-		title:     "Year",
-		tag:       "YYYY",
-		charWidth: 4,
-	},
-}
+	timeUnitMap = map[int]timeUnit{
+		0: {
+			title:     "Hour",
+			tag:       "hh",
+			charWidth: 2,
+		},
+		1: {
+			title:     "Minute",
+			tag:       "mm",
+			charWidth: 2,
+		},
+		2: {
+			title:     "Day",
+			tag:       "DD",
+			charWidth: 2,
+		},
+		3: {
+			title:     "Month",
+			tag:       "MM",
+			charWidth: 2,
+		},
+		4: {
+			title:     "Year",
+			tag:       "YYYY",
+			charWidth: 4,
+		},
+	}
+)
 
 func initializeTimePicker(currTime time.Time) tea.Model {
 	t := timePicker{

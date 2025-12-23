@@ -12,80 +12,82 @@ import (
 	"github.com/enckse/mayhem/internal/entities"
 )
 
-var stackKeys = keyMap{
-	New: key.NewBinding(
-		key.WithKeys("n"),
-		key.WithHelp("'n'", "new stack 🌟"),
-	),
-	Edit: key.NewBinding(
-		key.WithKeys("e"),
-		key.WithHelp("'e'", "edit 📝"),
-	),
-	Delete: key.NewBinding(
-		key.WithKeys("x"),
-		key.WithHelp("'x'", "delete 🗑"),
-	),
-}
+var (
+	stackKeys = keyMap{
+		New: key.NewBinding(
+			key.WithKeys("n"),
+			key.WithHelp("'n'", "new stack 🌟"),
+		),
+		Edit: key.NewBinding(
+			key.WithKeys("e"),
+			key.WithHelp("'e'", "edit 📝"),
+		),
+		Delete: key.NewBinding(
+			key.WithKeys("x"),
+			key.WithHelp("'x'", "delete 🗑"),
+		),
+	}
 
-var taskKeys = keyMap{
-	Toggle: key.NewBinding(
-		key.WithKeys("tab"),
-		key.WithHelp("'tab'", "check/uncheck 🔄"),
-	),
-	New: key.NewBinding(
-		key.WithKeys("n"),
-		key.WithHelp("'n'", "new task 🌟"),
-	),
-	Edit: key.NewBinding(
-		key.WithKeys("e"),
-		key.WithHelp("'e'", "edit 📝"),
-	),
-	Delete: key.NewBinding(
-		key.WithKeys("x"),
-		key.WithHelp("'x'", "delete 🗑"),
-	),
-	Move: key.NewBinding(
-		key.WithKeys("m"),
-		key.WithHelp("'m'", "change stack 📤"),
-	),
-}
+	taskKeys = keyMap{
+		Toggle: key.NewBinding(
+			key.WithKeys("tab"),
+			key.WithHelp("'tab'", "check/uncheck 🔄"),
+		),
+		New: key.NewBinding(
+			key.WithKeys("n"),
+			key.WithHelp("'n'", "new task 🌟"),
+		),
+		Edit: key.NewBinding(
+			key.WithKeys("e"),
+			key.WithHelp("'e'", "edit 📝"),
+		),
+		Delete: key.NewBinding(
+			key.WithKeys("x"),
+			key.WithHelp("'x'", "delete 🗑"),
+		),
+		Move: key.NewBinding(
+			key.WithKeys("m"),
+			key.WithHelp("'m'", "change stack 📤"),
+		),
+	}
 
-var tableNavigationKeys = keyMap{
-	Up: key.NewBinding(
-		key.WithKeys("up", "k"),
-		key.WithHelp("'↑/k'", "up"),
-	),
-	Down: key.NewBinding(
-		key.WithKeys("down", "j"),
-		key.WithHelp("'↓/j'", "down"),
-	),
-	GotoTop: key.NewBinding(
-		key.WithKeys("g"),
-		key.WithHelp("'g'", "jump to top"),
-	),
-	GotoBottom: key.NewBinding(
-		key.WithKeys("G"),
-		key.WithHelp("'G'", "jump to bottom"),
-	),
-	Left: key.NewBinding(
-		key.WithKeys("left", "h"),
-		key.WithHelp("'←/h'", "left"),
-	),
-	Right: key.NewBinding(
-		key.WithKeys("right", "l"),
-		key.WithHelp("'→/l'", "right"),
-	),
-	Help: key.NewBinding(
-		key.WithKeys("?"),
-		key.WithHelp("'?'", "toggle help"),
-	),
-	Quit: key.NewBinding(
-		key.WithKeys("q"),
-		key.WithHelp("'q'", "quit"),
-	),
-}
+	tableNavigationKeys = keyMap{
+		Up: key.NewBinding(
+			key.WithKeys("up", "k"),
+			key.WithHelp("'↑/k'", "up"),
+		),
+		Down: key.NewBinding(
+			key.WithKeys("down", "j"),
+			key.WithHelp("'↓/j'", "down"),
+		),
+		GotoTop: key.NewBinding(
+			key.WithKeys("g"),
+			key.WithHelp("'g'", "jump to top"),
+		),
+		GotoBottom: key.NewBinding(
+			key.WithKeys("G"),
+			key.WithHelp("'G'", "jump to bottom"),
+		),
+		Left: key.NewBinding(
+			key.WithKeys("left", "h"),
+			key.WithHelp("'←/h'", "left"),
+		),
+		Right: key.NewBinding(
+			key.WithKeys("right", "l"),
+			key.WithHelp("'→/l'", "right"),
+		),
+		Help: key.NewBinding(
+			key.WithKeys("?"),
+			key.WithHelp("'?'", "toggle help"),
+		),
+		Quit: key.NewBinding(
+			key.WithKeys("q"),
+			key.WithHelp("'q'", "quit"),
+		),
+	}
 
-var taskFinishStatus = map[uint]bool{}
+	taskFinishStatus = map[uint]bool{}
+)
 
 func stackColumns() []table.Column {
 	return []table.Column{

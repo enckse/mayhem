@@ -6,17 +6,19 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type listSelector struct {
-	options    []keyVal
-	focusIndex int
-	maxIndex   int
-	responder  func(any) tea.Cmd
-}
+type (
+	listSelector struct {
+		options    []keyVal
+		focusIndex int
+		maxIndex   int
+		responder  func(any) tea.Cmd
+	}
 
-type keyVal struct {
-	key uint
-	val string
-}
+	keyVal struct {
+		key uint
+		val string
+	}
+)
 
 var listSelectorKeys = keyMap{
 	Up: key.NewBinding(

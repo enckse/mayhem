@@ -11,26 +11,28 @@ import (
 	"github.com/enckse/mayhem/internal/entities"
 )
 
-type inputForm struct {
-	focusIndex    int
-	data          entities.Entity
-	dataType      string
-	fieldMap      map[int]field
-	isInvalid     bool
-	invalidPrompt string
-	isNewTask     bool
-	helpKeys      keyMap
-}
+type (
+	inputForm struct {
+		focusIndex    int
+		data          entities.Entity
+		dataType      string
+		fieldMap      map[int]field
+		isInvalid     bool
+		invalidPrompt string
+		isNewTask     bool
+		helpKeys      keyMap
+	}
 
-type field struct {
-	name             string
-	prompt           string
-	model            tea.Model
-	isRequired       bool
-	nilValue         string
-	validationPrompt string
-	helpKeys         keyMap
-}
+	field struct {
+		name             string
+		prompt           string
+		model            tea.Model
+		isRequired       bool
+		nilValue         string
+		validationPrompt string
+		helpKeys         keyMap
+	}
+)
 
 const (
 	stackTitleIndex int = iota
