@@ -133,10 +133,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case goToMainMsg:
 				m.showCustomInput = false
 
-				if m.preInputFocus == "stack" {
+				switch m.preInputFocus {
+				case "stack":
 					m.stackTable.Focus()
 					m.help = initializeHelp(stackKeys)
-				} else if m.preInputFocus == "task" {
+				case "task":
 					m.taskTable.Focus()
 					m.help = initializeHelp(taskKeys)
 				}
@@ -686,8 +687,7 @@ func (m *model) stackView() string {
 }
 
 func (m *model) stackFooter() string {
-	stackFooterStyle := footerContainerStyle.Copy().
-		Width(stackTableWidth)
+	stackFooterStyle := footerContainerStyle.Width(stackTableWidth)
 
 	info := footerInfoStyle.Render(fmt.Sprintf("%d/%d", m.stackTable.Cursor()+1, len(m.stackTable.Rows())))
 
@@ -700,8 +700,7 @@ func (m *model) taskView() string {
 }
 
 func (m *model) taskFooter() string {
-	taskFooterStyle := footerContainerStyle.Copy().
-		Width(taskTableWidth)
+	taskFooterStyle := footerContainerStyle.Width(taskTableWidth)
 
 	if len(m.taskTable.Rows()) == 0 {
 		return taskFooterStyle.Render("Press 'n' to create a new task")

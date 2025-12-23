@@ -11,7 +11,7 @@ type textInput struct {
 	input textinput.Model
 	// Since textinput field can be used in multiple places,
 	// responder is required to determine the receiver of the message emitted by textinput field
-	responder func(interface{}) tea.Cmd
+	responder func(any) tea.Cmd
 }
 
 var textInputKeys = keyMap{
@@ -25,7 +25,7 @@ var textInputKeys = keyMap{
 	),
 }
 
-func initializeTextInput(value, placeholder string, charLimit int, responder func(interface{}) tea.Cmd) tea.Model {
+func initializeTextInput(value, placeholder string, charLimit int, responder func(any) tea.Cmd) tea.Model {
 	t := textinput.New()
 	t.SetValue(value)
 
