@@ -11,7 +11,7 @@ setup:
 	@mkdir -p $(TARGET)
 
 $(OBJECT):
-	go build $(GOFLAGS) -ldflags "$(LDFLAGS) -X main.version=$(VERSION)" -o "$(OBJECT)" main.go
+	go build $(GOFLAGS) -ldflags "$(LDFLAGS) -X main.version=$(VERSION)" -o "$(OBJECT)" cmd/mayhem.go
 
 clean:
 	rm -f "$(OBJECT)"
