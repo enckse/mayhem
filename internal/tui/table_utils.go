@@ -36,10 +36,6 @@ var taskKeys = keyMap{
 		key.WithKeys("n"),
 		key.WithHelp("'n'", "new task 🌟"),
 	),
-	NewRecur: key.NewBinding(
-		key.WithKeys("r"),
-		key.WithHelp("'r'", "new recurring task 🌟"),
-	),
 	Edit: key.NewBinding(
 		key.WithKeys("e"),
 		key.WithHelp("'e'", "edit 📝"),
@@ -89,10 +85,7 @@ var tableNavigationKeys = keyMap{
 	),
 }
 
-var (
-	taskFinishStatus = map[uint]bool{}
-	recurDeadlines   = map[uint]time.Time{}
-)
+var taskFinishStatus = map[uint]bool{}
 
 func stackColumns() []table.Column {
 	return []table.Column{

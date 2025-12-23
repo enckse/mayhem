@@ -11,11 +11,8 @@ import (
 
 // textinput.Model doesn't implement tea.Model interface
 type timePicker struct {
-	currTime         time.Time
-	focusIndex       int
-	isDurationPicker bool // Show all fields, else only show days
-	isMomentPicker   bool // Show only min+hr fields
-	dayCount         int  // Used in duration picker mode
+	currTime   time.Time
+	focusIndex int
 }
 
 type timeUnit struct {
@@ -87,25 +84,6 @@ func initializeTimePicker(currTime time.Time) tea.Model {
 	return t
 }
 
-func initializeDurationPicker(recurrenceInterval int) tea.Model {
-	t := timePicker{
-		dayCount:         recurrenceInterval,
-		isDurationPicker: true,
-		focusIndex:       2,
-	}
-
-	return t
-}
-
-func initializeMomentPicker(currTime time.Time) tea.Model {
-	t := timePicker{
-		currTime:       currTime,
-		isMomentPicker: true,
-	}
-
-	return t
-}
-
 func (m timePicker) Init() tea.Cmd {
 	return nil
 }
@@ -116,68 +94,51 @@ func (m timePicker) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 
 		case key.Matches(msg, Keys.Up):
-			if m.isDurationPicker {
-				m.dayCount++
-			} else {
-				switch m.focusIndex {
-				case 0:
-					hourDuration, _ := time.ParseDuration("60m")
-					m.currTime = m.currTime.Add(hourDuration)
-				case 1:
-					minuteDuration, _ := time.ParseDuration("1m")
-					m.currTime = m.currTime.Add(minuteDuration)
-				case 2:
-					m.currTime = m.currTime.AddDate(0, 0, 1)
-				case 3:
-					m.currTime = m.currTime.AddDate(0, 1, 0)
-				case 4:
-					m.currTime = m.currTime.AddDate(1, 0, 0)
-				}
+			switch m.focusIndex {
+			case 0:
+				hourDuration, _ := time.ParseDuration("60m")
+				m.currTime = m.currTime.Add(hourDuration)
+			case 1:
+				minuteDuration, _ := time.ParseDuration("1m")
+				m.currTime = m.currTime.Add(minuteDuration)
+			case 2:
+				m.currTime = m.currTime.AddDate(0, 0, 1)
+			case 3:
+				m.currTime = m.currTime.AddDate(0, 1, 0)
+			case 4:
+				m.currTime = m.currTime.AddDate(1, 0, 0)
 			}
 			return m, nil
 
 		case key.Matches(msg, Keys.Down):
-			if m.isDurationPicker {
-				if m.dayCount > 1 {
-					m.dayCount--
-				}
-			} else {
-				switch m.focusIndex {
-				case 0:
-					hourDuration, _ := time.ParseDuration("60m")
-					m.currTime = m.currTime.Add(-hourDuration)
-				case 1:
-					minuteDuration, _ := time.ParseDuration("1m")
-					m.currTime = m.currTime.Add(-minuteDuration)
-				case 2:
-					m.currTime = m.currTime.AddDate(0, 0, -1)
-				case 3:
-					m.currTime = m.currTime.AddDate(0, -1, 0)
-				case 4:
-					m.currTime = m.currTime.AddDate(-1, 0, 0)
-				}
+			switch m.focusIndex {
+			case 0:
+				hourDuration, _ := time.ParseDuration("60m")
+				m.currTime = m.currTime.Add(-hourDuration)
+			case 1:
+				minuteDuration, _ := time.ParseDuration("1m")
+				m.currTime = m.currTime.Add(-minuteDuration)
+			case 2:
+				m.currTime = m.currTime.AddDate(0, 0, -1)
+			case 3:
+				m.currTime = m.currTime.AddDate(0, -1, 0)
+			case 4:
+				m.currTime = m.currTime.AddDate(-1, 0, 0)
 			}
 			return m, nil
 
 		case key.Matches(msg, Keys.Right):
-			if !m.isDurationPicker {
-				if m.focusIndex < len(timeUnitMap)-1 {
-					m.focusIndex++
-				}
-				return m, nil
+			if m.focusIndex < len(timeUnitMap)-1 {
+				m.focusIndex++
 			}
+			return m, nil
 
 		case key.Matches(msg, Keys.Left):
-			if !m.isDurationPicker {
-				if m.focusIndex > 0 {
-					m.focusIndex--
-				}
-				return m, nil
+			if m.focusIndex > 0 {
+				m.focusIndex--
 			}
+			return m, nil
 		case key.Matches(msg, Keys.Enter):
-			if m.isDurationPicker {
-				return m, goToFormWithVal(m.dayCount)
-			}
 			return m, goToFormWithVal(m.currTime)
 		}
 	}
@@ -188,31 +149,6 @@ func (m timePicker) View() string {
 	var timeUnitLabel string
 	var timeValue string
 
-	if m.isDurationPicker {
-		return lipgloss.JoinHorizontal(lipgloss.Center, m.renderUnitCol(2, m.dayCount), " Day(s)")
-	} else if m.isMomentPicker {
-		timeUnitLabel = lipgloss.JoinHorizontal(lipgloss.Center,
-			m.renderUnitTag(0),
-			" ",
-			m.renderUnitTag(1),
-			" ",
-			"  ",
-		)
-
-		timeValue = lipgloss.JoinHorizontal(lipgloss.Center,
-			m.renderUnitCol(0, formatHour(m.currTime.Hour())),
-			":",
-			m.renderUnitCol(1, m.currTime.Minute()),
-			" ",
-			renderMidDayInfo(m.currTime.Hour()),
-		)
-
-		return lipgloss.JoinVertical(lipgloss.Center,
-			timeValue,
-			timeUnitLabel,
-		)
-
-	}
 	// Empty spaces are added to align the label and value rows
 	timeUnitLabel = lipgloss.JoinHorizontal(lipgloss.Center,
 		m.renderUnitTag(0),

@@ -32,9 +32,22 @@ type field struct {
 	helpKeys         keyMap
 }
 
+const (
+	stackTitleIndex int = iota
+)
+
+const (
+	taskTitleIndex int = iota
+	taskDescriptionIndex
+	taskPriorityIndex
+	taskDeadlineIndex
+)
+
+const taskLastIndex = taskDeadlineIndex
+
 var (
 	stackFields = map[int]field{
-		0: {
+		stackTitleIndex: {
 			name:             "Title",
 			prompt:           "Stack Title",
 			isRequired:       true,
@@ -45,7 +58,7 @@ var (
 	}
 
 	taskFields = map[int]field{
-		0: {
+		taskTitleIndex: {
 			name:             "Title",
 			prompt:           "Task Title",
 			isRequired:       true,
@@ -53,45 +66,21 @@ var (
 			helpKeys:         textInputKeys,
 			validationPrompt: "Task title field can not be empty❗",
 		},
-		1: {
+		taskDescriptionIndex: {
 			name:     "Description",
 			prompt:   "Task Description",
 			helpKeys: textAreaKeys,
 		},
-		2: {
+		taskPriorityIndex: {
 			name:     "Priority",
 			prompt:   "Task Priority",
 			helpKeys: listSelectorKeys,
 		},
-		3: {
+		taskDeadlineIndex: {
 			name:     "Deadline",
 			prompt:   "Task Deadline",
 			helpKeys: timePickerKeys,
 		},
-		4: {
-			name:     "StartAt",
-			prompt:   "Task Start Time",
-			helpKeys: timePickerKeys,
-		},
-		5: {
-			name:     "RecurrenceInterval",
-			prompt:   "Task Recurrence Interval",
-			helpKeys: timePickerKeys,
-		},
-	}
-	// StackFieldIndex are stack field index mappings
-	StackFieldIndex = map[string]int{
-		"Title": 0,
-	}
-
-	// TaskFieldIndex are task field index mappings
-	TaskFieldIndex = map[string]int{
-		"Title":              0,
-		"Description":        1,
-		"Priority":           2,
-		"Deadline":           3,
-		"StartAt":            4,
-		"RecurrenceInterval": 5,
 	}
 )
 
@@ -128,18 +117,20 @@ func initializeInput(selectedTable string, data entities.Entity, fieldIndex int)
 		task := data.(entities.Task)
 
 		switch fieldIndex {
-		case 0:
+		case taskTitleIndex:
 			targetField.model = initializeTextInput(task.Title, "", 60, goToFormWithVal)
-		case 1:
+		case taskDescriptionIndex:
 			targetField.model = initializeTextArea(task.Description)
-		case 2:
+		case taskPriorityIndex:
 			opts := []keyVal{
-				{val: "0"},
 				{val: "1"},
 				{val: "2"},
+				{val: "3"},
+				{val: "4"},
+				{val: "5"},
 			}
 			targetField.model = initializeListSelector(opts, strconv.Itoa(task.Priority), goToFormWithVal)
-		case 3:
+		case taskDeadlineIndex:
 			if task.Deadline.IsZero() {
 				currDate := time.Now().String()[0:10]
 				startOfToday, _ := time.Parse(time.DateOnly, currDate)
@@ -187,7 +178,7 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			stack := m.data.(entities.Stack)
 
 			switch m.focusIndex {
-			case 0:
+			case stackTitleIndex:
 				stack.Title = selectedValue.(string)
 			}
 
@@ -197,21 +188,18 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			task := m.data.(entities.Task)
 
 			switch m.focusIndex {
-			case 0:
+			case taskTitleIndex:
 				task.Title = selectedValue.(string)
 
 				if task.CreatedAt.IsZero() {
 					m.isNewTask = true
 				}
 
-			case 1:
+			case taskDescriptionIndex:
 				task.Description = selectedValue.(string)
-			case 2:
-				// We save tasks independently (in steps-editor itself) & not as task associations
-				return m, goToMainWithVal("refresh")
-			case 3:
+			case taskPriorityIndex:
 				task.Priority, _ = strconv.Atoi(selectedValue.(keyVal).val)
-			case 4:
+			case taskDeadlineIndex:
 				task.Deadline = selectedValue.(time.Time)
 
 			}

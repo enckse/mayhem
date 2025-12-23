@@ -1,3 +1,5 @@
+// Package app provides common application definitions
 package app
 
-const ENV_PREFIX = "MAYHEM_"
+// EnvPrefix is the environment prefix for os.Getenv calls
+const EnvPrefix = "MAYHEM_"

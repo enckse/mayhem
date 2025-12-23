@@ -11,7 +11,6 @@ type keyMap struct {
 	Left           key.Binding
 	Right          key.Binding
 	New            key.Binding
-	NewRecur       key.Binding
 	Edit           key.Binding
 	Move           key.Binding
 	Enter          key.Binding
@@ -58,10 +57,6 @@ var Keys = keyMap{
 	New: key.NewBinding(
 		key.WithKeys("n"),
 		key.WithHelp("'n'", "new"),
-	),
-	NewRecur: key.NewBinding(
-		key.WithKeys("r"),
-		key.WithHelp("'r'", "new recurring"),
 	),
 	Edit: key.NewBinding(
 		key.WithKeys("e"),
@@ -113,7 +108,6 @@ func (k keyMap) ShortHelp() []key.Binding {
 		k.Toggle,
 		k.ReverseToggle,
 		k.New,
-		k.NewRecur,
 		k.Edit,
 		k.Enter,
 		k.Save,

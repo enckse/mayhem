@@ -23,12 +23,10 @@ type detailsBox struct {
 }
 
 type scrollData struct {
-	title              int
-	description        int
-	priority           int
-	deadline           int
-	startTime          int
-	recurrenceInterval int
+	title       int
+	description int
+	priority    int
+	deadline    int
 }
 
 var taskDetailsKeys = keyMap{
@@ -94,22 +92,17 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, Keys.Up):
 			var scrollDistance int
 			switch m.focusIndex {
-			case 0:
+			case taskTitleIndex:
 				m.viewport.GotoBottom()
 				m.End()
 				return m, nil
-			case 1:
+			case taskDescriptionIndex:
 				scrollDistance = m.scrollData.description
 				m.Previous()
-			case 2:
+			case taskPriorityIndex:
 				scrollDistance = m.scrollData.priority
 				m.Previous()
-			case 3:
-				m.Previous()
-			case 4:
-				scrollDistance = m.scrollData.startTime
-				m.Previous()
-			case 5:
+			case taskDeadlineIndex:
 				m.Previous()
 			}
 
@@ -118,23 +111,15 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, Keys.Down):
 			var scrollDistance int
 			switch m.focusIndex {
-			case 0:
+			case taskTitleIndex:
 				m.Next()
-			case 1:
+			case taskDescriptionIndex:
 				scrollDistance = m.scrollData.description
 				m.Next()
-			case 2:
+			case taskPriorityIndex:
 				scrollDistance = m.scrollData.priority
 				m.Next()
-			case 3:
-				scrollDistance = m.scrollData.deadline
-				m.viewport.GotoTop()
-				m.Start()
-				return m, nil
-			case 4:
-				scrollDistance = m.scrollData.startTime
-				m.Next()
-			case 5:
+			case taskDeadlineIndex:
 				m.viewport.GotoTop()
 				m.Start()
 				return m, nil
@@ -171,20 +156,18 @@ func (m detailsBox) Focused() bool {
 }
 
 func (m *detailsBox) Next() {
-	var length int
-	length = 5
+	length := taskLastIndex + 1
 	m.focusIndex = (m.focusIndex + 1) % length
 	m.renderContent()
 }
 
 func (m *detailsBox) End() {
-	m.focusIndex = 4
+	m.focusIndex = taskLastIndex
 	m.renderContent()
 }
 
 func (m *detailsBox) Previous() {
-	var length int
-	length = 5
+	length := taskLastIndex + 1
 	val := (m.focusIndex - 1) % length
 	if val < 0 {
 		val = val + length
@@ -199,9 +182,7 @@ func (m *detailsBox) Start() {
 }
 
 func (m *detailsBox) renderContent() {
-	var content []string
-
-	content = []string{
+	content := []string{
 		m.titleBlock(),
 		m.descriptionBlock(),
 		m.priorityBlock(),
@@ -227,7 +208,7 @@ func newBlock(b *strings.Builder, title string, isFocus bool) {
 
 func (m *detailsBox) titleBlock() string {
 	var b strings.Builder
-	isFocused := (m.focusIndex == 0)
+	isFocused := (m.focusIndex == taskTitleIndex)
 	newBlock(&b, "Title", isFocused)
 	b.WriteString(m.taskData.Title)
 
@@ -238,7 +219,7 @@ func (m *detailsBox) titleBlock() string {
 
 func (m *detailsBox) descriptionBlock() string {
 	var b strings.Builder
-	isFocused := (m.focusIndex == 1)
+	isFocused := (m.focusIndex == taskDescriptionIndex)
 	newBlock(&b, "Description", isFocused)
 
 	if m.taskData.Description == "" {
@@ -254,7 +235,7 @@ func (m *detailsBox) descriptionBlock() string {
 
 func (m *detailsBox) priorityBlock() string {
 	var b strings.Builder
-	isFocused := (m.focusIndex == 2)
+	isFocused := (m.focusIndex == taskPriorityIndex)
 	newBlock(&b, "Priority", isFocused)
 	b.WriteString(strconv.Itoa(m.taskData.Priority))
 
@@ -265,7 +246,7 @@ func (m *detailsBox) priorityBlock() string {
 
 func (m *detailsBox) deadlineBlock() string {
 	var b strings.Builder
-	isFocused := (m.focusIndex == 3)
+	isFocused := (m.focusIndex == taskDeadlineIndex)
 	newBlock(&b, "Deadline", isFocused)
 
 	if m.taskData.Deadline.IsZero() {

@@ -10,12 +10,12 @@ import (
 // Task defines task-based entities for work
 type Task struct {
 	gorm.Model
-	Title              string `gorm:"notnull"`
-	Description        string
-	Deadline           time.Time
-	Priority           int // 3: High, 2: Mid, 1: Low, 0: No Priority
-	IsFinished         bool
-	StackID            uint
+	Title       string `gorm:"notnull"`
+	Description string
+	Deadline    time.Time
+	Priority    int // 3: High, 2: Mid, 1: Low, 0: No Priority
+	IsFinished  bool
+	StackID     uint
 }
 
 // Save will store the task

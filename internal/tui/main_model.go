@@ -2,7 +2,6 @@ package tui
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
@@ -438,26 +437,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			return m, nil
 
-		case key.Matches(msg, Keys.NewRecur):
-			if m.taskTable.Focused() {
-				m.preInputFocus = "task"
-				newTask := entities.Task{
-					StackID:            m.data[m.stackTable.Cursor()].ID,
-					Deadline:           time.Now(),
-				}
-				m.input = initializeInput("task", newTask, 0)
-
-				m.stackTable.Blur()
-				m.taskTable.Blur()
-				m.taskDetails.Blur()
-
-				m.updateViewDimensions(14)
-
-				m.showInput = true
-
-				return m, nil
-			}
-
 		case key.Matches(msg, Keys.Edit):
 			if m.stackTable.Focused() {
 				if len(m.stackTable.Rows()) == 0 {
@@ -530,19 +509,19 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					currTask = stack.Tasks[taskIndex]
 
 					// For recurring tasks we toggle the status of latest recur task entry
-						currTask.IsFinished = !currTask.IsFinished
-						currTask.Save()
+					currTask.IsFinished = !currTask.IsFinished
+					currTask.Save()
 
-						if currTask.IsFinished {
-							stack.PendingTaskCount--
-							stack.Save()
-						} else {
-							stack.PendingTaskCount++
-							stack.Save()
-						}
+					if currTask.IsFinished {
+						stack.PendingTaskCount--
+						stack.Save()
+					} else {
+						stack.PendingTaskCount++
+						stack.Save()
+					}
 
-						stack.Tasks[taskIndex] = currTask
-						m.data[stackIndex] = stack
+					stack.Tasks[taskIndex] = currTask
+					m.data[stackIndex] = stack
 
 					// Changing finish status will lead to reordering, so state has to be preserved
 					m.preserveState()

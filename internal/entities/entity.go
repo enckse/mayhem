@@ -23,7 +23,7 @@ type Entity interface {
 var DB *gorm.DB
 
 func getStorageDir() (string, error) {
-	path := os.Getenv(app.ENV_PREFIX + "DB_PATH")
+	path := os.Getenv(app.EnvPrefix + "DB_PATH")
 	if path != "" {
 		return path, nil
 	}

@@ -42,7 +42,7 @@ func run() error {
 	if _, err := p.Run(); err != nil {
 		return err
 	}
-	cmd := os.Getenv(app.ENV_PREFIX + "ON_EXIT")
+	cmd := os.Getenv(app.EnvPrefix + "ON_EXIT")
 	if cmd != "" {
 		return exec.Command("/bin/sh", "-c", cmd).Run()
 	}
