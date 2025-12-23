@@ -149,7 +149,7 @@ func (c calendar) renderBox(val string, color lipgloss.Color, border bool) strin
 	return style.Render(val)
 }
 
-func (c calendar) getBoxValue(rowIndex int, colIndex int) string {
+func (c calendar) getBoxValue(rowIndex, colIndex int) string {
 	value := colIndex + 7*rowIndex - c.startOffset
 	if value <= 0 || value > c.totalDays {
 		return "  "

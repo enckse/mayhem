@@ -277,7 +277,7 @@ func incompleteTaskTag(count int) string {
 	}
 }
 
-func min(x int, y int) int {
+func min(x, y int) int {
 	if x < y {
 		return x
 	} else {

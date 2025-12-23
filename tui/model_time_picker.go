@@ -249,7 +249,7 @@ func (m timePicker) View() string {
 	}
 }
 
-func (m timePicker) renderUnitCol(index int, val int) string {
+func (m timePicker) renderUnitCol(index, val int) string {
 	value := fmt.Sprintf("%0*d", timeUnitMap[index].charWidth, val)
 
 	var color lipgloss.Color
