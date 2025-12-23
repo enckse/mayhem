@@ -43,6 +43,10 @@ func InitializeDB() error {
 		return err
 	}
 
+	if err := os.MkdirAll(path, os.ModePerm); err != nil {
+		return err
+	}
+
 	db, err := gorm.Open(sqlite.Open(filepath.Join(path, "tasks.db")), &gorm.Config{
 		// Silent mode ensures that errors logs don't interfere with the view
 		Logger: logger.Default.LogMode(logger.Silent),

@@ -29,7 +29,9 @@ func run() error {
 		}
 		return fmt.Errorf("invalid arguments: %s", arg)
 	}
-	entities.InitializeDB()
+	if err := entities.InitializeDB(); err != nil {
+		return err
+	}
 
 	model := tui.InitializeMainModel()
 	p := tea.NewProgram(model, tea.WithAltScreen())
