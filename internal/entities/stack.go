@@ -28,7 +28,7 @@ func InitializeStacks() (Stack, error) {
 // FetchAllStacks will retrieve all stacks
 func FetchAllStacks() ([]Stack, error) {
 	var stacks []Stack
-	result := DB.Model(&Stack{}).Preload("Tasks").Preload("Tasks.Steps").Find(&stacks)
+	result := DB.Model(&Stack{}).Preload("Tasks").Find(&stacks)
 
 	if len(stacks) == 0 {
 		stack, err := InitializeStacks()

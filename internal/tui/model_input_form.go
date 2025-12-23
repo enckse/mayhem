@@ -59,26 +59,21 @@ var (
 			helpKeys: textAreaKeys,
 		},
 		2: {
-			name:     "Steps",
-			prompt:   "Task Steps",
-			helpKeys: stepsEditorKeys,
-		},
-		3: {
 			name:     "Priority",
 			prompt:   "Task Priority",
 			helpKeys: listSelectorKeys,
 		},
-		4: {
+		3: {
 			name:     "Deadline",
 			prompt:   "Task Deadline",
 			helpKeys: timePickerKeys,
 		},
-		5: {
+		4: {
 			name:     "StartAt",
 			prompt:   "Task Start Time",
 			helpKeys: timePickerKeys,
 		},
-		6: {
+		5: {
 			name:     "RecurrenceInterval",
 			prompt:   "Task Recurrence Interval",
 			helpKeys: timePickerKeys,
@@ -93,11 +88,10 @@ var (
 	TaskFieldIndex = map[string]int{
 		"Title":              0,
 		"Description":        1,
-		"Steps":              2,
-		"Priority":           3,
-		"Deadline":           4,
-		"StartAt":            5,
-		"RecurrenceInterval": 6,
+		"Priority":           2,
+		"Deadline":           3,
+		"StartAt":            4,
+		"RecurrenceInterval": 5,
 	}
 )
 
@@ -139,15 +133,13 @@ func initializeInput(selectedTable string, data entities.Entity, fieldIndex int)
 		case 1:
 			targetField.model = initializeTextArea(task.Description)
 		case 2:
-			targetField.model = initializeStepsEditor(task.Steps, task.ID)
-		case 3:
 			opts := []keyVal{
 				{val: "0"},
 				{val: "1"},
 				{val: "2"},
 			}
 			targetField.model = initializeListSelector(opts, strconv.Itoa(task.Priority), goToFormWithVal)
-		case 4:
+		case 3:
 			if task.Deadline.IsZero() {
 				currDate := time.Now().String()[0:10]
 				startOfToday, _ := time.Parse(time.DateOnly, currDate)
@@ -155,9 +147,9 @@ func initializeInput(selectedTable string, data entities.Entity, fieldIndex int)
 			} else {
 				targetField.model = initializeTimePicker(task.Deadline)
 			}
-		case 5:
+		case 4:
 			targetField.model = initializeMomentPicker(task.StartTime)
-		case 6:
+		case 5:
 			targetField.model = initializeDurationPicker(task.RecurrenceInterval)
 		}
 		m.helpKeys = targetField.helpKeys
@@ -178,11 +170,6 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, Keys.Return):
-			if m.focusIndex == TaskFieldIndex["Steps"] {
-				// In case of steps editor the steps are saved at the time of editing itself,
-				// so returning from steps editor should update the data
-				return m, goToMainWithVal("refresh")
-			}
 			return m, goToMainCmd
 
 		case key.Matches(msg, Keys.Exit):

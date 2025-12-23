@@ -12,7 +12,6 @@ type Task struct {
 	gorm.Model
 	Title              string `gorm:"notnull"`
 	Description        string
-	Steps              []Step
 	Deadline           time.Time
 	Priority           int // 3: High, 2: Mid, 1: Low, 0: No Priority
 	IsFinished         bool

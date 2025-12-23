@@ -28,13 +28,3 @@ func goToFormWithVal(value any) tea.Cmd {
 		return goToFormMsg{value: value}
 	}
 }
-
-type goToStepsMsg struct {
-	value any
-}
-
-func goToStepsWithVal(value any) tea.Cmd {
-	return func() tea.Msg {
-		return goToStepsMsg{value: value}
-	}
-}

@@ -25,7 +25,6 @@ type detailsBox struct {
 type scrollData struct {
 	title              int
 	description        int
-	steps              int
 	priority           int
 	deadline           int
 	startTime          int
@@ -103,20 +102,17 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				scrollDistance = m.scrollData.description
 				m.Previous()
 			case 2:
-				scrollDistance = m.scrollData.steps
-				m.Previous()
-			case 3:
 				scrollDistance = m.scrollData.priority
 				m.Previous()
-			case 4:
+			case 3:
 				if m.taskData.IsRecurring {
 					scrollDistance = m.scrollData.deadline
 				}
 				m.Previous()
-			case 5:
+			case 4:
 				scrollDistance = m.scrollData.startTime
 				m.Previous()
-			case 6:
+			case 5:
 				m.Previous()
 			}
 
@@ -131,12 +127,9 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				scrollDistance = m.scrollData.description
 				m.Next()
 			case 2:
-				scrollDistance = m.scrollData.steps
-				m.Next()
-			case 3:
 				scrollDistance = m.scrollData.priority
 				m.Next()
-			case 4:
+			case 3:
 				scrollDistance = m.scrollData.deadline
 				if m.taskData.IsRecurring {
 					m.Next()
@@ -145,10 +138,10 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.Start()
 					return m, nil
 				}
-			case 5:
+			case 4:
 				scrollDistance = m.scrollData.startTime
 				m.Next()
-			case 6:
+			case 5:
 				m.viewport.GotoTop()
 				m.Start()
 				return m, nil
@@ -231,7 +224,6 @@ func (m *detailsBox) renderContent() {
 		content = []string{
 			m.titleBlock(),
 			m.descriptionBlock(),
-			m.stepsBlock(),
 			m.priorityBlock(),
 			m.deadlineBlock(),
 			m.startTimeBlock(),
@@ -241,7 +233,6 @@ func (m *detailsBox) renderContent() {
 		content = []string{
 			m.titleBlock(),
 			m.descriptionBlock(),
-			m.stepsBlock(),
 			m.priorityBlock(),
 			m.deadlineBlock(),
 		}
@@ -284,20 +275,6 @@ func (m *detailsBox) descriptionBlock() string {
 
 	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).Render(b.String()))
 	m.scrollData.description = lipgloss.Height(data)
-	return data
-}
-
-func (m *detailsBox) stepsBlock() string {
-	var b strings.Builder
-
-	b.WriteString(highlightedTextStyle.Render("Steps:"))
-	b.WriteString("\n\n")
-	b.WriteString(renderSteps(m.taskData.Steps))
-
-	isFocused := (m.focusIndex == 2)
-
-	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).Render(b.String()))
-	m.scrollData.steps = lipgloss.Height(data)
 	return data
 }
 
@@ -365,42 +342,4 @@ func (m *detailsBox) footerView() string {
 	scrollInfoStyle := footerContainerStyle.Width(m.viewport.Width).Align(lipgloss.Right)
 	info := footerInfoStyle.Render(fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
 	return scrollInfoStyle.Render(info)
-}
-
-func renderSteps(steps []entities.Step) string {
-	var res []string
-
-	if len(steps) == 0 {
-		return dash
-	}
-	for _, val := range steps {
-		if val.IsFinished {
-			value := lipgloss.JoinHorizontal(
-				lipgloss.Center,
-				boxedValue("✘"),
-				" ",
-				val.Title,
-			)
-			res = append(res, value)
-		} else {
-			value := lipgloss.JoinHorizontal(
-				lipgloss.Center,
-				boxedValue(" "),
-				" ",
-				val.Title,
-			)
-			res = append(res, value)
-		}
-	}
-
-	return lipgloss.JoinVertical(lipgloss.Left, res...)
-}
-
-func boxedValue(value string) string {
-	style := lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		Padding(0, 1).
-		Render(value)
-
-	return style
 }
