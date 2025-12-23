@@ -5,11 +5,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// func FontColor(str, color string) string {
-// 	var term = termenv.ColorProfile()
-// 	return termenv.String(str).Foreground(term.Color(color)).Bold().String()
-// }
-
 var (
 	screenWidth     int
 	screenHeight    int
@@ -34,7 +29,6 @@ var (
 	inputFormColor             = lipgloss.Color("#5ac7c7")
 	timeFocusColor             = lipgloss.Color("#FFFF00")
 	unfocusedColor             = lipgloss.Color("#898989")
-	whiteColor                 = lipgloss.Color("#ffffff")
 )
 
 var (

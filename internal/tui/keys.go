@@ -25,6 +25,7 @@ type keyMap struct {
 	Exit           key.Binding
 }
 
+// Keys are the associated key mappings
 var Keys = keyMap{
 	CalendarToggle: key.NewBinding(
 		key.WithKeys("c"),

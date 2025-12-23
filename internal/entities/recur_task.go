@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// RecurTask is a recuring task
 type RecurTask struct {
 	gorm.Model
 	Deadline   time.Time `gorm:"index:idx_member"`
@@ -14,6 +15,7 @@ type RecurTask struct {
 	TaskID     uint
 }
 
+// Save will save the task
 func (r RecurTask) Save() {
 	DB.Save(&r)
 }

@@ -149,8 +149,6 @@ func taskRows(tasks []entities.Task) []table.Row {
 	for i, val := range tasks {
 		if val.IsRecurring {
 			deadline = formatTime(recurDeadlines[val.ID], true)
-			// prefix = "𝑹"
-			// prefix = "🅁 Ⓡ 🄬"
 		} else {
 			deadline = formatTime(val.Deadline, true)
 		}
@@ -189,36 +187,36 @@ func sortTasks(t []entities.Task) {
 	// Sort by finish status, then deadline, then priority, then title
 	sort.Slice(t, func(i, j int) bool {
 		if taskFinishStatus[t[i].ID] == taskFinishStatus[t[j].ID] {
-			var deadline_i time.Time
+			var iDeadline time.Time
 			if t[i].IsRecurring {
-				deadline_i = recurDeadlines[t[i].ID]
+				iDeadline = recurDeadlines[t[i].ID]
 			} else {
-				deadline_i = t[i].Deadline
+				iDeadline = t[i].Deadline
 			}
 
-			var deadline_j time.Time
+			var jDeadline time.Time
 			if t[j].IsRecurring {
-				deadline_j = recurDeadlines[t[j].ID]
+				jDeadline = recurDeadlines[t[j].ID]
 			} else {
-				deadline_j = t[j].Deadline
+				jDeadline = t[j].Deadline
 			}
 
-			if deadline_i.Equal(deadline_j) {
+			if iDeadline.Equal(jDeadline) {
 				if t[i].Priority == t[j].Priority {
 					return strings.ToLower(t[i].Title) < strings.ToLower(t[j].Title)
 				}
 				return t[i].Priority > t[j].Priority
 			}
 
-			if deadline_i.IsZero() {
+			if iDeadline.IsZero() {
 				return false
 			}
 
-			if deadline_j.IsZero() {
+			if jDeadline.IsZero() {
 				return true
 			}
 
-			return deadline_i.Before(deadline_j)
+			return iDeadline.Before(jDeadline)
 		}
 		return !taskFinishStatus[t[i].ID]
 	})
@@ -229,7 +227,6 @@ func buildTable(columns []table.Column, tableType string) table.Model {
 		table.WithHeight(tableViewHeight),
 		table.WithColumns(columns),
 		table.WithKeyMap(table.DefaultKeyMap()),
-		// table.WithFocused(true),
 	)
 
 	s := getTableStyle(tableType)
@@ -273,25 +270,9 @@ func incompleteTaskTag(count int) string {
 	return ""
 }
 
-func min(x, y int) int {
-	if x < y {
-		return x
-	}
-	return y
-}
-
-func findStackIndex(arr []entities.Stack, id uint) int {
+func findIndex[T interface{ EntityID() uint }](arr []T, id uint) int {
 	for i, val := range arr {
-		if val.ID == id {
-			return i
-		}
-	}
-	return -1
-}
-
-func findTaskIndex(arr []entities.Task, id uint) int {
-	for i, val := range arr {
-		if val.ID == id {
+		if val.EntityID() == id {
 			return i
 		}
 	}

@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-// Skipping priority field, just sort them alphabetically
+// Stack is a set of tasks, sorted alphabetically
 type Stack struct {
 	gorm.Model
 	Title            string `gorm:"notnull"`
@@ -13,12 +13,18 @@ type Stack struct {
 	Tasks            []Task
 }
 
+func (s Stack) EntityID() uint {
+	return s.ID
+}
+
+// InitializeStacks will initialize the initial stack set
 func InitializeStacks() (Stack, error) {
 	stack := Stack{Title: "New Stack"}
 	result := DB.Create(&stack)
 	return stack, result.Error
 }
 
+// FetchAllStacks will retrieve all stacks
 func FetchAllStacks() ([]Stack, error) {
 	var stacks []Stack
 	result := DB.Model(&Stack{}).Preload("Tasks").Preload("Tasks.Steps").Find(&stacks)
@@ -31,6 +37,7 @@ func FetchAllStacks() ([]Stack, error) {
 	return stacks, result.Error
 }
 
+// IncPendingCount will add to the pending task count
 func IncPendingCount(id uint) {
 	stack := Stack{}
 	DB.Find(&stack, id)
@@ -38,6 +45,7 @@ func IncPendingCount(id uint) {
 	stack.Save()
 }
 
+// PendingRecurringCount will get the count of pending, recurring items
 func (s Stack) PendingRecurringCount() int {
 	recurTasks := []RecurTask{}
 	// localtime modifier has to be added to DATE other wise UTC time would be used
@@ -45,11 +53,13 @@ func (s Stack) PendingRecurringCount() int {
 	return int(result.RowsAffected)
 }
 
+// Save will save the entity
 func (s Stack) Save() Entity {
 	DB.Save(&s)
 	return s
 }
 
+// Delete will remove the entity
 func (s Stack) Delete() {
 	// Unscoped() is used to ensure hard delete, where stack will be removed from db instead of being just marked as "deleted"
 	// DB.Unscoped().Delete(&s)

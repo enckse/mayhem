@@ -38,14 +38,6 @@ var taskDetailsKeys = keyMap{
 		key.WithKeys("e"),
 		key.WithHelp("'e'", "edit field 📝"),
 	),
-	// Toggle: key.NewBinding(
-	// 	key.WithKeys("tab"),
-	// 	key.WithHelp("'tab'", "next 🔽"),
-	// ),
-	// ReverseToggle: key.NewBinding(
-	// 	key.WithKeys("shift+tab"),
-	// 	key.WithHelp("'shift+tab'", "previous 🔼"),
-	// ),
 }
 
 var detailsNavigationKeys = keyMap{
@@ -126,7 +118,6 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				scrollDistance = m.scrollData.startTime
 				m.Previous()
 			case 6:
-				// scrollDistance = m.scrollData.recurrenceInterval
 				m.Previous()
 			}
 
@@ -136,7 +127,6 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			var scrollDistance int
 			switch m.focusIndex {
 			case 0:
-				// scrollDistance = m.scrollData.title
 				m.Next()
 			case 1:
 				scrollDistance = m.scrollData.description
@@ -174,12 +164,6 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, Keys.GotoBottom):
 			m.viewport.GotoBottom()
 			m.End()
-
-			// case key.Matches(msg, Keys.Toggle):
-			// 	m.Next()
-
-			// case key.Matches(msg, Keys.ReverseToggle):
-			// 	m.Previous()
 		}
 	}
 	return m, nil

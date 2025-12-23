@@ -4,7 +4,7 @@ package tui
 import tea "github.com/charmbracelet/bubbletea"
 
 type goToMainMsg struct {
-	value interface{}
+	value any
 }
 
 func goToMainCmd() tea.Msg {
@@ -13,27 +13,27 @@ func goToMainCmd() tea.Msg {
 	}
 }
 
-func goToMainWithVal(value interface{}) tea.Cmd {
+func goToMainWithVal(value any) tea.Cmd {
 	return func() tea.Msg {
 		return goToMainMsg{value: value}
 	}
 }
 
 type goToFormMsg struct {
-	value interface{}
+	value any
 }
 
-func goToFormWithVal(value interface{}) tea.Cmd {
+func goToFormWithVal(value any) tea.Cmd {
 	return func() tea.Msg {
 		return goToFormMsg{value: value}
 	}
 }
 
 type goToStepsMsg struct {
-	value interface{}
+	value any
 }
 
-func goToStepsWithVal(value interface{}) tea.Cmd {
+func goToStepsWithVal(value any) tea.Cmd {
 	return func() tea.Msg {
 		return goToStepsMsg{value: value}
 	}

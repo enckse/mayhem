@@ -1,3 +1,4 @@
+// Package main is the core application
 package main
 
 import (

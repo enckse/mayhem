@@ -37,6 +37,7 @@ type preserveState struct {
 	taskID      uint
 }
 
+// InitializeMainModel will startup the core application model
 func InitializeMainModel() *model {
 	stacks, _ := entities.FetchAllStacks()
 
@@ -56,11 +57,13 @@ func InitializeMainModel() *model {
 	return m
 }
 
+// Init initializes the model
 func (m *model) Init() tea.Cmd {
 	m.firstRender = true
 	return nil
 }
 
+// Update will update the model
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// Transfer control to inputForm's Update method
 	if m.showInput {
@@ -156,13 +159,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						if len(m.data[stackIndex].Tasks) > 0 {
 							currTask = m.data[stackIndex].Tasks[taskIndex]
 
-							if currTask.IsRecurring {
-							} else {
-								if !currTask.IsFinished {
-									stack := m.data[stackIndex]
-									stack.PendingTaskCount--
-									stack.Save()
-								}
+							if !currTask.IsRecurring && !currTask.IsFinished {
+								stack := m.data[stackIndex]
+								stack.PendingTaskCount--
+								stack.Save()
 							}
 							if taskIndex == len(m.taskTable.Rows())-1 {
 								m.taskTable.SetCursor(taskIndex - 1)
@@ -611,6 +611,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
+// View handles model view
 func (m *model) View() string {
 	var stackView, taskView, detailView string
 
@@ -632,9 +633,6 @@ func (m *model) View() string {
 		detailView = unselectedBoxStyle.Render(m.taskDetails.View())
 	}
 
-	// if m.isCalenderView {
-	// 	return lipgloss.PlaceHorizontal(screenWidth, lipgloss.Left, initializeCalender(time.Now()).View())
-	// }
 	viewArr := []string{stackView}
 	if m.showTasks {
 		viewArr = append(viewArr, taskView)
@@ -672,9 +670,8 @@ func (m *model) View() string {
 			return lipgloss.JoinVertical(lipgloss.Left, tablesView, m.help.View(), navigationHelp.View())
 		}
 		return lipgloss.JoinVertical(lipgloss.Left, tablesView, m.help.View())
-	} else {
-		return tablesView
 	}
+	return tablesView
 }
 
 func (m *model) stackView() string {
@@ -702,10 +699,9 @@ func (m *model) taskFooter() string {
 
 	if len(m.taskTable.Rows()) == 0 {
 		return taskFooterStyle.Render("Press 'n' to create a new task")
-	} else {
-		info := footerInfoStyle.Render(fmt.Sprintf("%d/%d", m.taskTable.Cursor()+1, len(m.taskTable.Rows())))
-		return taskFooterStyle.Render(info)
 	}
+	info := footerInfoStyle.Render(fmt.Sprintf("%d/%d", m.taskTable.Cursor()+1, len(m.taskTable.Rows())))
+	return taskFooterStyle.Render(info)
 }
 
 // Pull new data from database
@@ -746,7 +742,7 @@ func (m *model) updateStackTableData(retainIndex bool) {
 	m.stackTable.SetRows(stackRows(m.data))
 
 	if retainIndex {
-		newIndex := findStackIndex(m.data, m.prevState.stackID)
+		newIndex := findIndex(m.data, m.prevState.stackID)
 
 		if newIndex != -1 {
 			m.stackTable.SetCursor(newIndex)
@@ -763,7 +759,7 @@ func (m *model) updateTaskTableData(retainIndex bool) {
 	m.taskTable.SetRows(taskRows(currStack.Tasks))
 
 	if retainIndex {
-		newIndex := findTaskIndex(m.data[stackIndex].Tasks, m.prevState.taskID)
+		newIndex := findIndex(m.data[stackIndex].Tasks, m.prevState.taskID)
 		if newIndex != -1 {
 			m.taskTable.SetCursor(newIndex)
 		}

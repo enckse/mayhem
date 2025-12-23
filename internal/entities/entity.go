@@ -11,11 +11,13 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+// Entity is the core DB entity
 type Entity interface {
 	Save() Entity
 	Delete()
 }
 
+// DB is the backing database
 var DB *gorm.DB
 
 func getStorageDir() (string, error) {
@@ -37,6 +39,7 @@ func getStorageDir() (string, error) {
 	return filepath.Join(home, ".cache", appDir), nil
 }
 
+// InitializeDB will setup and ready the backing store
 func InitializeDB() error {
 	path, err := getStorageDir()
 	if err != nil {

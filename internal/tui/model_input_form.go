@@ -33,7 +33,7 @@ type field struct {
 }
 
 var (
-	stackFields map[int]field = map[int]field{
+	stackFields = map[int]field{
 		0: {
 			name:             "Title",
 			prompt:           "Stack Title",
@@ -44,7 +44,7 @@ var (
 		},
 	}
 
-	taskFields map[int]field = map[int]field{
+	taskFields = map[int]field{
 		0: {
 			name:             "Title",
 			prompt:           "Task Title",
@@ -84,14 +84,11 @@ var (
 			helpKeys: timePickerKeys,
 		},
 	}
-)
-
-var (
-	StackFieldIndex map[string]int = map[string]int{
+	StackFieldIndex = map[string]int{
 		"Title": 0,
 	}
 
-	TaskFieldIndex map[string]int = map[string]int{
+	TaskFieldIndex = map[string]int{
 		"Title":              0,
 		"Description":        1,
 		"Steps":              2,
@@ -290,19 +287,6 @@ func (m inputForm) View() string {
 
 	b.WriteString(m.fieldMap[m.focusIndex].model.View())
 	b.WriteRune('\n')
-
-	// blurredButton := fmt.Sprintf("[ %s ]", blurredStyle.Render("Submit"))
-	// focusedButton := focusedStyle.Copy().Render("[ Submit ]")
-
-	// var button *string
-	// if m.focusIndex == len(m.fieldMap) {
-	// 	button = &focusedButton
-	// } else {
-	// 	button = &blurredButton
-	// }
-
-	// fmt.Fprintf(&b, "\n\n%s\n\n", *button)
-
 	return b.String()
 }
 

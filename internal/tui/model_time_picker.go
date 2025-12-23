@@ -213,40 +213,39 @@ func (m timePicker) View() string {
 			timeUnitLabel,
 		)
 
-	} else {
-		// Empty spaces are added to align the label and value rows
-		timeUnitLabel = lipgloss.JoinHorizontal(lipgloss.Center,
-			m.renderUnitTag(0),
-			" ",
-			m.renderUnitTag(1),
-			" ",
-			"  ",
-			"   ",
-			m.renderUnitTag(2),
-			" ",
-			m.renderUnitTag(3),
-			" ",
-			m.renderUnitTag(4),
-		)
-
-		timeValue = lipgloss.JoinHorizontal(lipgloss.Center,
-			m.renderUnitCol(0, formatHour(m.currTime.Hour())),
-			":",
-			m.renderUnitCol(1, m.currTime.Minute()),
-			" ",
-			renderMidDayInfo(m.currTime.Hour()),
-			"   ",
-			m.renderUnitCol(2, m.currTime.Day()),
-			"-",
-			m.renderUnitCol(3, int(m.currTime.Month())),
-			"-",
-			m.renderUnitCol(4, m.currTime.Year()))
-
-		return lipgloss.JoinVertical(lipgloss.Center,
-			timeValue,
-			timeUnitLabel,
-		)
 	}
+	// Empty spaces are added to align the label and value rows
+	timeUnitLabel = lipgloss.JoinHorizontal(lipgloss.Center,
+		m.renderUnitTag(0),
+		" ",
+		m.renderUnitTag(1),
+		" ",
+		"  ",
+		"   ",
+		m.renderUnitTag(2),
+		" ",
+		m.renderUnitTag(3),
+		" ",
+		m.renderUnitTag(4),
+	)
+
+	timeValue = lipgloss.JoinHorizontal(lipgloss.Center,
+		m.renderUnitCol(0, formatHour(m.currTime.Hour())),
+		":",
+		m.renderUnitCol(1, m.currTime.Minute()),
+		" ",
+		renderMidDayInfo(m.currTime.Hour()),
+		"   ",
+		m.renderUnitCol(2, m.currTime.Day()),
+		"-",
+		m.renderUnitCol(3, int(m.currTime.Month())),
+		"-",
+		m.renderUnitCol(4, m.currTime.Year()))
+
+	return lipgloss.JoinVertical(lipgloss.Center,
+		timeValue,
+		timeUnitLabel,
+	)
 }
 
 func (m timePicker) renderUnitCol(index, val int) string {
@@ -288,24 +287,21 @@ func (m timePicker) renderUnitTag(index int) string {
 func renderMidDayInfo(hours int) string {
 	if isBeforeMidDay(hours) {
 		return "am"
-	} else {
-		return "pm"
 	}
+	return "pm"
 }
 
 // Adjust Hour value to 12 hour clock format
 func formatHour(value int) int {
 	if value > 12 {
 		return value - 12
-	} else {
-		return value
 	}
+	return value
 }
 
 func isBeforeMidDay(value int) bool {
 	if value >= 12 {
 		return false
-	} else {
-		return true
 	}
+	return true
 }
