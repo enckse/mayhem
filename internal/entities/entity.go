@@ -3,8 +3,8 @@ package entities
 import (
 	// Using pure-go implementation of GORM driver to avoid CGO issues during cross-compilation
 
-	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
@@ -18,20 +18,40 @@ type Entity interface {
 
 var DB *gorm.DB
 
-func InitializeDB() {
-	dirname, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatal(err)
+func getStorageDir() (string, error) {
+	path := os.Getenv("MAYHEM_DB_PATH")
+	if path != "" {
+		return path, nil
 	}
 
-	db, err := gorm.Open(sqlite.Open(dirname+string(os.PathSeparator)+".todo.db"), &gorm.Config{
+	const appDir = "mayhem"
+	xdg := os.Getenv("XDG_CACHE_HOME")
+	if xdg != "" {
+		return filepath.Join(xdg, appDir), nil
+	}
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(home, ".cache", appDir), nil
+}
+
+func InitializeDB() error {
+	path, err := getStorageDir()
+	if err != nil {
+		return err
+	}
+
+	db, err := gorm.Open(sqlite.Open(filepath.Join(path, "tasks.db")), &gorm.Config{
 		// Silent mode ensures that errors logs don't interfere with the view
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	if err != nil {
-		panic(err)
+		return err
 	}
 	db.AutoMigrate(&Stack{}, &Task{}, &Step{}, &RecurTask{})
 
 	DB = db
+	return nil
 }
