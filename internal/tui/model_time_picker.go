@@ -23,6 +23,14 @@ type (
 	}
 )
 
+const (
+	dayItem int = iota
+	monthItem
+	yearItem
+	hourItem
+	minuteItem
+)
+
 var (
 	timePickerKeys = keyMap{
 		Up: key.NewBinding(
@@ -52,27 +60,27 @@ var (
 	}
 
 	timeUnitMap = map[int]timeUnit{
-		0: {
+		hourItem: {
 			title:     "Hour",
 			tag:       "hh",
 			charWidth: 2,
 		},
-		1: {
+		minuteItem: {
 			title:     "Minute",
 			tag:       "mm",
 			charWidth: 2,
 		},
-		2: {
+		dayItem: {
 			title:     "Day",
 			tag:       "DD",
 			charWidth: 2,
 		},
-		3: {
+		monthItem: {
 			title:     "Month",
 			tag:       "MM",
 			charWidth: 2,
 		},
-		4: {
+		yearItem: {
 			title:     "Year",
 			tag:       "YYYY",
 			charWidth: 4,
@@ -99,34 +107,34 @@ func (m timePicker) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case key.Matches(msg, Keys.Up):
 			switch m.focusIndex {
-			case 0:
+			case hourItem:
 				hourDuration, _ := time.ParseDuration("60m")
 				m.currTime = m.currTime.Add(hourDuration)
-			case 1:
+			case minuteItem:
 				minuteDuration, _ := time.ParseDuration("1m")
 				m.currTime = m.currTime.Add(minuteDuration)
-			case 2:
+			case dayItem:
 				m.currTime = m.currTime.AddDate(0, 0, 1)
-			case 3:
+			case monthItem:
 				m.currTime = m.currTime.AddDate(0, 1, 0)
-			case 4:
+			case yearItem:
 				m.currTime = m.currTime.AddDate(1, 0, 0)
 			}
 			return m, nil
 
 		case key.Matches(msg, Keys.Down):
 			switch m.focusIndex {
-			case 0:
+			case hourItem:
 				hourDuration, _ := time.ParseDuration("60m")
 				m.currTime = m.currTime.Add(-hourDuration)
-			case 1:
+			case minuteItem:
 				minuteDuration, _ := time.ParseDuration("1m")
 				m.currTime = m.currTime.Add(-minuteDuration)
-			case 2:
+			case dayItem:
 				m.currTime = m.currTime.AddDate(0, 0, -1)
-			case 3:
+			case monthItem:
 				m.currTime = m.currTime.AddDate(0, -1, 0)
-			case 4:
+			case yearItem:
 				m.currTime = m.currTime.AddDate(-1, 0, 0)
 			}
 			return m, nil
@@ -155,31 +163,29 @@ func (m timePicker) View() string {
 
 	// Empty spaces are added to align the label and value rows
 	timeUnitLabel = lipgloss.JoinHorizontal(lipgloss.Center,
-		m.renderUnitTag(0),
+		m.renderUnitTag(dayItem),
 		" ",
-		m.renderUnitTag(1),
+		m.renderUnitTag(monthItem),
 		" ",
-		"  ",
-		"   ",
-		m.renderUnitTag(2),
+		m.renderUnitTag(yearItem),
 		" ",
-		m.renderUnitTag(3),
+		m.renderUnitTag(hourItem),
 		" ",
-		m.renderUnitTag(4),
+		m.renderUnitTag(minuteItem),
 	)
 
 	timeValue = lipgloss.JoinHorizontal(lipgloss.Center,
-		m.renderUnitCol(0, formatHour(m.currTime.Hour())),
-		":",
-		m.renderUnitCol(1, m.currTime.Minute()),
+		m.renderUnitCol(dayItem, m.currTime.Day()),
+		"-",
+		m.renderUnitCol(monthItem, int(m.currTime.Month())),
+		"-",
+		m.renderUnitCol(yearItem, m.currTime.Year()),
 		" ",
-		renderMidDayInfo(m.currTime.Hour()),
-		"   ",
-		m.renderUnitCol(2, m.currTime.Day()),
-		"-",
-		m.renderUnitCol(3, int(m.currTime.Month())),
-		"-",
-		m.renderUnitCol(4, m.currTime.Year()))
+		m.renderUnitCol(hourItem, formatHour(m.currTime.Hour())),
+		":",
+		m.renderUnitCol(minuteItem, m.currTime.Minute()),
+		" ",
+		renderMidDayInfo(m.currTime.Hour()))
 
 	return lipgloss.JoinVertical(lipgloss.Center,
 		timeValue,
