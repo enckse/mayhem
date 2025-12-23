@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/BOTbkcd/mayhem/entities"
+	"github.com/enckse/mayhem/entities"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"

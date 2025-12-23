@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/BOTbkcd/mayhem/entities"
+	"github.com/enckse/mayhem/entities"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"

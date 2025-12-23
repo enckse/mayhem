@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/BOTbkcd/mayhem/entities"
+	"github.com/enckse/mayhem/entities"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/viewport"
