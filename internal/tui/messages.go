@@ -1,3 +1,4 @@
+// Package tui requires TUI messages
 package tui
 
 import tea "github.com/charmbracelet/bubbletea"

@@ -183,9 +183,8 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				// In case of steps editor the steps are saved at the time of editing itself,
 				// so returning from steps editor should update the data
 				return m, goToMainWithVal("refresh")
-			} else {
-				return m, goToMainCmd
 			}
+			return m, goToMainCmd
 
 		case key.Matches(msg, Keys.Exit):
 			return m, tea.Quit
@@ -198,9 +197,8 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.isInvalid = true
 			m.invalidPrompt = m.fieldMap[m.focusIndex].validationPrompt
 			return m, nil
-		} else {
-			m.isInvalid = false
 		}
+		m.isInvalid = false
 
 		if m.dataType == "stack" {
 			stack := m.data.(entities.Stack)

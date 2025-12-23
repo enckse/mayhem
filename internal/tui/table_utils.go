@@ -219,9 +219,8 @@ func sortTasks(t []entities.Task) {
 			}
 
 			return deadline_i.Before(deadline_j)
-		} else {
-			return !taskFinishStatus[t[i].ID]
 		}
+		return !taskFinishStatus[t[i].ID]
 	})
 }
 
@@ -253,9 +252,8 @@ func formatTime(time time.Time, fullDate bool) string {
 
 	if fullDate {
 		return days + "-" + month + "-" + year + "  " + hours + ":" + minutes + " " + midDayInfo
-	} else {
-		return hours + ":" + minutes + " " + midDayInfo
 	}
+	return hours + ":" + minutes + " " + midDayInfo
 }
 
 func getEmptyTaskView() string {
@@ -271,17 +269,15 @@ func incompleteTaskTag(count int) string {
 		return " " + string(rune('➊'+count-1))
 	} else if count > 10 {
 		return "+➓"
-	} else {
-		return ""
 	}
+	return ""
 }
 
 func min(x, y int) int {
 	if x < y {
 		return x
-	} else {
-		return y
 	}
+	return y
 }
 
 func findStackIndex(arr []entities.Stack, id uint) int {
