@@ -132,9 +132,7 @@ func initializeInput(selectedTable string, data entities.Entity, fieldIndex int)
 			targetField.model = initializeListSelector(opts, strconv.Itoa(task.Priority), goToFormWithVal)
 		case taskDeadlineIndex:
 			if task.Deadline.IsZero() {
-				currDate := time.Now().String()[0:10]
-				startOfToday, _ := time.Parse(time.DateOnly, currDate)
-				targetField.model = initializeTimePicker(startOfToday)
+				targetField.model = initializeTimePicker(time.Now())
 			} else {
 				targetField.model = initializeTimePicker(task.Deadline)
 			}
