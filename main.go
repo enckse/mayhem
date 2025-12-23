@@ -4,8 +4,8 @@ import (
 	"log"
 
 	tea "github.com/charmbracelet/bubbletea"
-	entities "github.com/enckse/mayhem/entities"
-	tui "github.com/enckse/mayhem/tui"
+	entities "github.com/enckse/mayhem/internal/entities"
+	tui "github.com/enckse/mayhem/internal/tui"
 )
 
 func main() {

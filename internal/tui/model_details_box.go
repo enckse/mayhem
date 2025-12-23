@@ -5,12 +5,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/enckse/mayhem/entities"
-
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/enckse/mayhem/internal/entities"
 )
 
 type detailsBox struct {

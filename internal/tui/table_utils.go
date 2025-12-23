@@ -7,10 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/enckse/mayhem/entities"
-
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
+	"github.com/enckse/mayhem/internal/entities"
 )
 
 var stackKeys = keyMap{

@@ -1,11 +1,10 @@
 package tui
 
 import (
-	"github.com/enckse/mayhem/entities"
-
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/enckse/mayhem/internal/entities"
 )
 
 // textinput.Model doesn't implement tea.Model interface
