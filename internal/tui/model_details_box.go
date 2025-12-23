@@ -105,9 +105,6 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				scrollDistance = m.scrollData.priority
 				m.Previous()
 			case 3:
-				if m.taskData.IsRecurring {
-					scrollDistance = m.scrollData.deadline
-				}
 				m.Previous()
 			case 4:
 				scrollDistance = m.scrollData.startTime
@@ -131,13 +128,9 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.Next()
 			case 3:
 				scrollDistance = m.scrollData.deadline
-				if m.taskData.IsRecurring {
-					m.Next()
-				} else {
-					m.viewport.GotoTop()
-					m.Start()
-					return m, nil
-				}
+				m.viewport.GotoTop()
+				m.Start()
+				return m, nil
 			case 4:
 				scrollDistance = m.scrollData.startTime
 				m.Next()
@@ -179,31 +172,19 @@ func (m detailsBox) Focused() bool {
 
 func (m *detailsBox) Next() {
 	var length int
-	if m.taskData.IsRecurring {
-		length = 7
-	} else {
-		length = 5
-	}
+	length = 5
 	m.focusIndex = (m.focusIndex + 1) % length
 	m.renderContent()
 }
 
 func (m *detailsBox) End() {
-	if m.taskData.IsRecurring {
-		m.focusIndex = 6
-	} else {
-		m.focusIndex = 4
-	}
+	m.focusIndex = 4
 	m.renderContent()
 }
 
 func (m *detailsBox) Previous() {
 	var length int
-	if m.taskData.IsRecurring {
-		length = 7
-	} else {
-		length = 5
-	}
+	length = 5
 	val := (m.focusIndex - 1) % length
 	if val < 0 {
 		val = val + length
@@ -220,22 +201,11 @@ func (m *detailsBox) Start() {
 func (m *detailsBox) renderContent() {
 	var content []string
 
-	if m.taskData.IsRecurring {
-		content = []string{
-			m.titleBlock(),
-			m.descriptionBlock(),
-			m.priorityBlock(),
-			m.deadlineBlock(),
-			m.startTimeBlock(),
-			m.recurrenceIntervalBlock(),
-		}
-	} else {
-		content = []string{
-			m.titleBlock(),
-			m.descriptionBlock(),
-			m.priorityBlock(),
-			m.deadlineBlock(),
-		}
+	content = []string{
+		m.titleBlock(),
+		m.descriptionBlock(),
+		m.priorityBlock(),
+		m.deadlineBlock(),
 	}
 
 	view := lipgloss.JoinVertical(lipgloss.Left, content...)
@@ -306,26 +276,6 @@ func (m *detailsBox) deadlineBlock() string {
 
 	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).Render(b.String()))
 	m.scrollData.deadline = lipgloss.Height(data)
-	return data
-}
-
-func (m *detailsBox) startTimeBlock() string {
-	var b strings.Builder
-	isFocused := (m.focusIndex == 4)
-	newBlock(&b, "Due Time", isFocused)
-	b.WriteString(formatTime(m.taskData.StartTime, false))
-	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).Render(b.String()))
-	m.scrollData.startTime = lipgloss.Height(data)
-	return data
-}
-
-func (m *detailsBox) recurrenceIntervalBlock() string {
-	var b strings.Builder
-	isFocused := (m.focusIndex == 6)
-	newBlock(&b, "Recurrence Interval", isFocused)
-	b.WriteString(strconv.Itoa(m.taskData.RecurrenceInterval) + " day(s)")
-	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).Render(b.String()))
-	m.scrollData.recurrenceInterval = lipgloss.Height(data)
 	return data
 }
 

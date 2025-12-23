@@ -59,7 +59,7 @@ func InitializeDB() error {
 	if err != nil {
 		return err
 	}
-	db.AutoMigrate(&Stack{}, &Task{}, &RecurTask{})
+	db.AutoMigrate(&Stack{}, &Task{})
 
 	DB = db
 	return nil

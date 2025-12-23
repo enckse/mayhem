@@ -147,10 +147,6 @@ func initializeInput(selectedTable string, data entities.Entity, fieldIndex int)
 			} else {
 				targetField.model = initializeTimePicker(task.Deadline)
 			}
-		case 4:
-			targetField.model = initializeMomentPicker(task.StartTime)
-		case 5:
-			targetField.model = initializeDurationPicker(task.RecurrenceInterval)
 		}
 		m.helpKeys = targetField.helpKeys
 		m.fieldMap[fieldIndex] = targetField
@@ -216,36 +212,14 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case 3:
 				task.Priority, _ = strconv.Atoi(selectedValue.(keyVal).val)
 			case 4:
-				oldDeadline := task.Deadline
 				task.Deadline = selectedValue.(time.Time)
-				if task.IsRecurring {
-					spawnRecurTasks(task, oldDeadline)
-				}
 
-			case 5:
-				prevTime := task.StartTime
-				newTime := selectedValue.(time.Time)
-				task.StartTime = time.Date(prevTime.Year(), prevTime.Month(), prevTime.Day(), newTime.Hour(), newTime.Minute(), 0, 0, prevTime.Location())
-				spawnRecurTasks(task, task.Deadline)
-
-			case 6:
-				task.RecurrenceInterval = selectedValue.(int)
-				spawnRecurTasks(task, task.Deadline)
 			}
 
 			task = task.Save().(entities.Task)
 
 			if m.isNewTask {
-				if task.IsRecurring {
-					recurTask := entities.RecurTask{
-						StackID:  task.StackID,
-						TaskID:   task.ID,
-						Deadline: task.StartTime,
-					}
-					recurTask.Save()
-				} else {
-					entities.IncPendingCount(task.StackID)
-				}
+				entities.IncPendingCount(task.StackID)
 			}
 		}
 
@@ -278,36 +252,4 @@ func (m inputForm) View() string {
 	b.WriteString(m.fieldMap[m.focusIndex].model.View())
 	b.WriteRune('\n')
 	return b.String()
-}
-
-func spawnRecurTasks(task entities.Task, oldDeadline time.Time) {
-	if task.Deadline.Before(time.Now()) {
-		return
-	}
-
-	r, _ := task.LatestRecurTask()
-
-	// Delete all recur tasks from now
-	task.RemoveFutureRecurTasks()
-
-	var startTime time.Time
-	t := time.Now()
-
-	if t.Before(oldDeadline) {
-		startTime = time.Date(r.Deadline.Year(), r.Deadline.Month(), r.Deadline.Day(), task.StartTime.Hour(), task.StartTime.Minute(), 0, 0, task.StartTime.Location())
-	} else {
-		startTime = time.Date(t.Year(), t.Month(), t.Day(), task.StartTime.Hour(), task.StartTime.Minute(), 0, 0, task.StartTime.Location())
-	}
-
-	for startTime.Compare(task.Deadline) <= 0 {
-		recurTask := entities.RecurTask{
-			TaskID:     task.ID,
-			StackID:    task.StackID,
-			IsFinished: false,
-			Deadline:   startTime,
-		}
-		recurTask.Save()
-
-		startTime = startTime.AddDate(0, 0, task.RecurrenceInterval)
-	}
 }

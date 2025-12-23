@@ -46,14 +46,6 @@ func IncPendingCount(id uint) {
 	stack.Save()
 }
 
-// PendingRecurringCount will get the count of pending, recurring items
-func (s Stack) PendingRecurringCount() int {
-	recurTasks := []RecurTask{}
-	// localtime modifier has to be added to DATE other wise UTC time would be used
-	result := DB.Find(&recurTasks, "deadline >= DATE('now', 'localtime', 'start of day') AND deadline < DATE('now', 'localtime', 'start of day', '+1 day') AND stack_id = ? AND is_finished = false", s.ID)
-	return int(result.RowsAffected)
-}
-
 // Save will save the entity
 func (s Stack) Save() Entity {
 	DB.Save(&s)

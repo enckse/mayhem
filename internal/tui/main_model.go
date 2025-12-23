@@ -166,7 +166,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						if len(m.data[stackIndex].Tasks) > 0 {
 							currTask = m.data[stackIndex].Tasks[taskIndex]
 
-							if !currTask.IsRecurring && !currTask.IsFinished {
+							if !currTask.IsFinished {
 								stack := m.data[stackIndex]
 								stack.PendingTaskCount--
 								stack.Save()
@@ -215,24 +215,16 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, nil
 				}
 
-				if currTask.IsRecurring {
-					for _, child := range currTask.FetchAllRecurTasks() {
-						child.StackID = newStackID
-						child.Save()
-					}
-				} else {
-					// Moving recurring tasks wouldn't have any effect on the stack pending task count
+				// Moving recurring tasks wouldn't have any effect on the stack pending task count
 
-					// Decrease pending task count for old stack
-					if !currTask.IsFinished {
-						currStack.PendingTaskCount--
-						currStack.Save()
-					}
-
-					// Increase pending task count for new stack
-					entities.IncPendingCount(newStackID)
+				// Decrease pending task count for old stack
+				if !currTask.IsFinished {
+					currStack.PendingTaskCount--
+					currStack.Save()
 				}
 
+				// Increase pending task count for new stack
+				entities.IncPendingCount(newStackID)
 				currTask.StackID = newStackID
 				currTask.Save()
 
@@ -451,10 +443,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.preInputFocus = "task"
 				newTask := entities.Task{
 					StackID:            m.data[m.stackTable.Cursor()].ID,
-					IsRecurring:        true,
-					StartTime:          time.Now(),
 					Deadline:           time.Now(),
-					RecurrenceInterval: 1,
 				}
 				m.input = initializeInput("task", newTask, 0)
 
@@ -541,13 +530,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					currTask = stack.Tasks[taskIndex]
 
 					// For recurring tasks we toggle the status of latest recur task entry
-					if currTask.IsRecurring {
-						r, count := currTask.LatestRecurTask()
-						if count > 0 {
-							r.IsFinished = !r.IsFinished
-							r.Save()
-						}
-					} else {
 						currTask.IsFinished = !currTask.IsFinished
 						currTask.Save()
 
@@ -561,7 +543,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 						stack.Tasks[taskIndex] = currTask
 						m.data[stackIndex] = stack
-					}
 
 					// Changing finish status will lead to reordering, so state has to be preserved
 					m.preserveState()

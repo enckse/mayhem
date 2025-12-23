@@ -118,7 +118,7 @@ func stackRows(stacks []entities.Stack) []table.Row {
 	for i, val := range stacks {
 		row := []string{
 			val.Title,
-			incompleteTaskTag(val.PendingTaskCount + val.PendingRecurringCount()),
+			incompleteTaskTag(val.PendingTaskCount),
 		}
 		rows[i] = row
 	}
@@ -130,15 +130,7 @@ func taskRows(tasks []entities.Task) []table.Row {
 
 	// We perform this step earlier since we need the deadline & finish status data before sorting
 	for _, val := range tasks {
-		if val.IsRecurring {
-			r, count := val.LatestRecurTask()
-			if count > 0 {
-				recurDeadlines[val.ID] = r.Deadline
-				taskFinishStatus[val.ID] = r.IsFinished
-			}
-		} else {
-			taskFinishStatus[val.ID] = val.IsFinished
-		}
+		taskFinishStatus[val.ID] = val.IsFinished
 	}
 
 	sortTasks(tasks)
@@ -147,11 +139,7 @@ func taskRows(tasks []entities.Task) []table.Row {
 	var deadline string
 
 	for i, val := range tasks {
-		if val.IsRecurring {
-			deadline = formatTime(recurDeadlines[val.ID], true)
-		} else {
-			deadline = formatTime(val.Deadline, true)
-		}
+		deadline = formatTime(val.Deadline, true)
 
 		if taskFinishStatus[val.ID] {
 			prefix = "✘"
@@ -164,10 +152,6 @@ func taskRows(tasks []entities.Task) []table.Row {
 			val.Title,
 			deadline,
 			"   " + strconv.Itoa(val.Priority),
-		}
-
-		if val.IsRecurring {
-			row[3] = row[3] + "  📌"
 		}
 
 		rows[i] = row
@@ -187,19 +171,8 @@ func sortTasks(t []entities.Task) {
 	// Sort by finish status, then deadline, then priority, then title
 	sort.Slice(t, func(i, j int) bool {
 		if taskFinishStatus[t[i].ID] == taskFinishStatus[t[j].ID] {
-			var iDeadline time.Time
-			if t[i].IsRecurring {
-				iDeadline = recurDeadlines[t[i].ID]
-			} else {
-				iDeadline = t[i].Deadline
-			}
-
-			var jDeadline time.Time
-			if t[j].IsRecurring {
-				jDeadline = recurDeadlines[t[j].ID]
-			} else {
-				jDeadline = t[j].Deadline
-			}
+			iDeadline := t[i].Deadline
+			jDeadline := t[j].Deadline
 
 			if iDeadline.Equal(jDeadline) {
 				if t[i].Priority == t[j].Priority {
