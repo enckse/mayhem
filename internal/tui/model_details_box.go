@@ -120,7 +120,7 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.Previous()
 			}
 
-			m.viewport.LineUp(scrollDistance)
+			m.viewport.ScrollUp(scrollDistance)
 
 		case key.Matches(msg, Keys.Down):
 			var scrollDistance int
@@ -154,7 +154,7 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 
-			m.viewport.LineDown(scrollDistance)
+			m.viewport.ScrollDown(scrollDistance)
 
 		case key.Matches(msg, Keys.GotoTop):
 			m.viewport.GotoTop()
