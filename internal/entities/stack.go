@@ -1,15 +1,18 @@
 package entities
 
 import (
+	"slices"
+	"strings"
+
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 // Stack is a set of tasks, sorted alphabetically
 type Stack struct {
-	gorm.Model
+	gorm.Model       `json:"-"`
 	Title            string `gorm:"notnull"`
-	PendingTaskCount int
+	PendingTaskCount int    `json:"-"`
 	Tasks            []Task
 }
 
@@ -57,4 +60,11 @@ func (s Stack) Delete() {
 	// Unscoped() is used to ensure hard delete, where stack will be removed from db instead of being just marked as "deleted"
 	// DB.Unscoped().Delete(&s)
 	DB.Unscoped().Select(clause.Associations).Delete(&s)
+}
+
+// SortStacks will sort by title
+func SortStacks(s []Stack) {
+	slices.SortFunc(s, func(x, y Stack) int {
+		return strings.Compare(x.Title, y.Title)
+	})
 }

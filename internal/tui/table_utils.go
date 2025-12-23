@@ -2,9 +2,7 @@ package tui
 
 import (
 	"fmt"
-	"sort"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -108,7 +106,7 @@ func taskColumns() []table.Column {
 func stackRows(stacks []entities.Stack) []table.Row {
 	rows := make([]table.Row, len(stacks))
 
-	sortStacks(stacks)
+	entities.SortStacks(stacks)
 
 	for i, val := range stacks {
 		row := []string{
@@ -128,7 +126,7 @@ func taskRows(tasks []entities.Task) []table.Row {
 		taskFinishStatus[val.ID] = val.IsFinished
 	}
 
-	sortTasks(tasks)
+	entities.SortTasks(tasks)
 
 	var prefix string
 	var deadline string
@@ -153,41 +151,6 @@ func taskRows(tasks []entities.Task) []table.Row {
 	}
 
 	return rows
-}
-
-func sortStacks(s []entities.Stack) {
-	// Alphabetically sort by stack title
-	sort.Slice(s, func(i, j int) bool {
-		return strings.ToLower(s[i].Title) < strings.ToLower(s[j].Title)
-	})
-}
-
-func sortTasks(t []entities.Task) {
-	// Sort by finish status, then deadline, then priority, then title
-	sort.Slice(t, func(i, j int) bool {
-		if taskFinishStatus[t[i].ID] == taskFinishStatus[t[j].ID] {
-			iDeadline := t[i].Deadline
-			jDeadline := t[j].Deadline
-
-			if iDeadline.Equal(jDeadline) {
-				if t[i].Priority == t[j].Priority {
-					return strings.ToLower(t[i].Title) < strings.ToLower(t[j].Title)
-				}
-				return t[i].Priority > t[j].Priority
-			}
-
-			if iDeadline.IsZero() {
-				return false
-			}
-
-			if jDeadline.IsZero() {
-				return true
-			}
-
-			return iDeadline.Before(jDeadline)
-		}
-		return !taskFinishStatus[t[i].ID]
-	})
 }
 
 func buildTable(columns []table.Column, tableType string) table.Model {

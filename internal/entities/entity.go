@@ -3,8 +3,6 @@ package entities
 
 import (
 	// Using pure-go implementation of GORM driver to avoid CGO issues during cross-compilation
-
-	"os"
 	"path/filepath"
 
 	"github.com/enckse/mayhem/internal/app"
@@ -22,33 +20,10 @@ type Entity interface {
 // DB is the backing database
 var DB *gorm.DB
 
-func getStorageDir() (string, error) {
-	path := os.Getenv(app.EnvPrefix + "DB_PATH")
-	if path != "" {
-		return path, nil
-	}
-
-	const appDir = "mayhem"
-	xdg := os.Getenv("XDG_CACHE_HOME")
-	if xdg != "" {
-		return filepath.Join(xdg, appDir), nil
-	}
-
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(home, ".cache", appDir), nil
-}
-
 // InitializeDB will setup and ready the backing store
 func InitializeDB() error {
-	path, err := getStorageDir()
+	path, err := app.DataDir()
 	if err != nil {
-		return err
-	}
-
-	if err := os.MkdirAll(path, os.ModePerm); err != nil {
 		return err
 	}
 

@@ -1,6 +1,8 @@
 package entities
 
 import (
+	"slices"
+	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -9,13 +11,13 @@ import (
 
 // Task defines task-based entities for work
 type Task struct {
-	gorm.Model
+	gorm.Model  `json:"-"`
 	Title       string `gorm:"notnull"`
 	Description string
 	Deadline    time.Time
 	Priority    int // 3: High, 2: Mid, 1: Low, 0: No Priority
 	IsFinished  bool
-	StackID     uint
+	StackID     uint `json:"-"`
 }
 
 // Save will store the task
@@ -33,4 +35,20 @@ func (t Task) Delete() {
 // EntityID gets the backing entity id
 func (t Task) EntityID() uint {
 	return t.ID
+}
+
+// SortTasks will sort by finished, deadline, title
+func SortTasks(t []Task) {
+	slices.SortFunc(t, func(x, y Task) int {
+		if x.IsFinished && !y.IsFinished {
+			return -1
+		}
+		if !x.IsFinished && y.IsFinished {
+			return 1
+		}
+		if val := x.Deadline.Compare(y.Deadline); val != 0 {
+			return val
+		}
+		return strings.Compare(x.Title, y.Title)
+	})
 }

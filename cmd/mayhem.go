@@ -4,10 +4,11 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/enckse/mayhem/internal/app"
+	"github.com/enckse/mayhem/internal/convert"
 	entities "github.com/enckse/mayhem/internal/entities"
 	tui "github.com/enckse/mayhem/internal/tui"
 )
@@ -42,9 +43,8 @@ func run() error {
 	if _, err := p.Run(); err != nil {
 		return err
 	}
-	cmd := os.Getenv(app.EnvPrefix + "ON_EXIT")
-	if cmd != "" {
-		return exec.Command("/bin/sh", "-c", cmd).Run()
+	if strings.TrimSpace(os.Getenv(app.EnvPrefix+"EXPORT_JSON")) == "1" {
+		return convert.ToJSON()
 	}
 	return nil
 }
