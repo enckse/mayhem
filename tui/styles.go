@@ -14,8 +14,8 @@ var (
 	screenWidth     int
 	screenHeight    int
 	tableViewHeight = 25
-	stackTableWidth = 26 //22: column width + 2*2: column padding
-	taskTableWidth  = 67 //59: column widths + 2*4: column paddings
+	stackTableWidth = 26 // 22: column width + 2*2: column padding
+	taskTableWidth  = 67 // 59: column widths + 2*4: column paddings
 	dash            = "–"
 )
 
@@ -36,6 +36,7 @@ var (
 	unfocusedColor             = lipgloss.Color("#898989")
 	whiteColor                 = lipgloss.Color("#ffffff")
 )
+
 var (
 	selectedBoxStyle = lipgloss.NewStyle().
 				BorderStyle(lipgloss.ThickBorder())
@@ -95,7 +96,7 @@ var (
 // Since width is dynamic, we have to append it to the style before usage
 
 func getInputFormStyle() lipgloss.Style {
-	//Subtract 2 for padding on each side
+	// Subtract 2 for padding on each side
 	return inputFormStyle.Width(screenWidth - 2)
 }
 
@@ -118,7 +119,7 @@ func getEmptyTaskStyle() lipgloss.Style {
 		AlignHorizontal(lipgloss.Center).
 		AlignVertical(lipgloss.Center).
 		Width(60).
-		Height(tableViewHeight + 3) //3 is added to account for header & footer height
+		Height(tableViewHeight + 3) // 3 is added to account for header & footer height
 }
 
 func getEmptyDetailsStyle() lipgloss.Style {
@@ -129,8 +130,9 @@ func getEmptyDetailsStyle() lipgloss.Style {
 }
 
 func getDetailsBoxWidth() int {
-	return screenWidth - (stackTableWidth + taskTableWidth + 3*2) //each of the 3 boxes have left & right borders
+	return screenWidth - (stackTableWidth + taskTableWidth + 3*2) // each of the 3 boxes have left & right borders
 }
+
 func getDetailsBoxHeight() int {
 	return tableViewHeight
 }

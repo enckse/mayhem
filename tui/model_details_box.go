@@ -79,8 +79,8 @@ var detailsNavigationKeys = keyMap{
 func (m *detailsBox) buildDetailsBox(data entities.Task, preserveOffset bool) {
 	m.taskData = data
 
-	//We want to preserve offset when we return to same details view after editing any field
-	//But when going from one task to another, we want to reset the view
+	// We want to preserve offset when we return to same details view after editing any field
+	// But when going from one task to another, we want to reset the view
 	m.preserveOffset = preserveOffset
 	m.oldViewportOffset = m.viewport.YOffset
 	m.viewport = viewport.New(getDetailsBoxWidth(), tableViewHeight)
@@ -99,7 +99,6 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.viewport.Width = getDetailsBoxWidth()
 
 	switch msg := msg.(type) {
-
 	case tea.KeyMsg:
 		switch {
 
@@ -273,6 +272,7 @@ func (m *detailsBox) renderContent() {
 		m.preserveOffset = false
 	}
 }
+
 func (m *detailsBox) titleBlock() string {
 	var b strings.Builder
 

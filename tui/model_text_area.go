@@ -34,7 +34,7 @@ func initializeTextArea(value string) tea.Model {
 	t.CharLimit = 500
 	t.Placeholder = "Enter task description"
 	t.ShowLineNumbers = false
-	//We only deal with textarea in focused state, so blurred style is redundant
+	// We only deal with textarea in focused state, so blurred style is redundant
 	t.FocusedStyle = textarea.Style{Placeholder: placeHolderStyle, Text: textInputStyle}
 	t.Focus()
 
@@ -51,7 +51,6 @@ func (m textArea) Init() tea.Cmd {
 
 func (m textArea) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+s":

@@ -40,7 +40,7 @@ func IncPendingCount(id uint) {
 
 func (s Stack) PendingRecurringCount() int {
 	recurTasks := []RecurTask{}
-	//localtime modifier has to be added to DATE other wise UTC time would be used
+	// localtime modifier has to be added to DATE other wise UTC time would be used
 	result := DB.Find(&recurTasks, "deadline >= DATE('now', 'localtime', 'start of day') AND deadline < DATE('now', 'localtime', 'start of day', '+1 day') AND stack_id = ? AND is_finished = false", s.ID)
 	return int(result.RowsAffected)
 }
@@ -51,7 +51,7 @@ func (s Stack) Save() Entity {
 }
 
 func (s Stack) Delete() {
-	//Unscoped() is used to ensure hard delete, where stack will be removed from db instead of being just marked as "deleted"
+	// Unscoped() is used to ensure hard delete, where stack will be removed from db instead of being just marked as "deleted"
 	// DB.Unscoped().Delete(&s)
 	DB.Unscoped().Select(clause.Associations).Delete(&s)
 }

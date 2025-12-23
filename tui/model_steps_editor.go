@@ -58,9 +58,7 @@ var (
 	unselectedStepColor = lipgloss.Color("#999999")
 )
 
-var (
-	newStepPlaceholder = "Enter Step Description"
-)
+var newStepPlaceholder = "Enter Step Description"
 
 func initializeStepsEditor(steps []entities.Step, taskID uint) tea.Model {
 	t := stepsEditor{
@@ -94,7 +92,6 @@ func (m stepsEditor) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	switch msg := msg.(type) {
-
 	case tea.KeyMsg:
 		switch {
 

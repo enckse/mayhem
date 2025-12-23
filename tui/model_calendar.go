@@ -10,17 +10,15 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var (
-	weekDays = map[int]string{
-		0: "Mo",
-		1: "Tu",
-		2: "We",
-		3: "Th",
-		4: "Fr",
-		5: "Sa",
-		6: "Su",
-	}
-)
+var weekDays = map[int]string{
+	0: "Mo",
+	1: "Tu",
+	2: "We",
+	3: "Th",
+	4: "Fr",
+	5: "Sa",
+	6: "Su",
+}
 
 type calendar struct {
 	selectedDate time.Time
@@ -32,7 +30,7 @@ func initializeCalender(selectedDate time.Time) calendar {
 	c := calendar{}
 	c.selectedDate = selectedDate
 
-	//As per time package Sunday has 0 index, but in our arrangement Sunday appears at the end of the row with 7 index
+	// As per time package Sunday has 0 index, but in our arrangement Sunday appears at the end of the row with 7 index
 	offset := int(c.selectedDate.AddDate(0, 0, -c.selectedDate.Day()+1).Weekday()) - int(time.Monday)
 
 	if offset == -1 {
@@ -52,7 +50,6 @@ func (c calendar) Init() tea.Cmd {
 
 func (c calendar) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, Keys.Right):
@@ -77,10 +74,10 @@ func (c calendar) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (c calendar) View() string {
-	//Add month + year row
+	// Add month + year row
 	monthRow := lipgloss.NewStyle().Padding(1, 0).Bold(true).Render(c.renderCalendarMonth())
 
-	//Add weekday row
+	// Add weekday row
 	weekdayRow := lipgloss.NewStyle().Padding(0, 1).Render(c.renderWeekDays())
 
 	return lipgloss.JoinVertical(lipgloss.Center, monthRow, weekdayRow, c.renderCalender())
@@ -89,7 +86,7 @@ func (c calendar) View() string {
 func (c calendar) renderCalender() string {
 	var output []string
 
-	//Calculate ceiling
+	// Calculate ceiling
 	rowCount := (c.totalDays + c.startOffset + (7 - 1)) / 7
 
 	for rowIndex := 0; rowIndex < rowCount; rowIndex++ {

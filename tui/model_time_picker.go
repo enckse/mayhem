@@ -13,9 +13,9 @@ import (
 type timePicker struct {
 	currTime         time.Time
 	focusIndex       int
-	isDurationPicker bool //Show all fields, else only show days
-	isMomentPicker   bool //Show only min+hr fields
-	dayCount         int  //Used in duration picker mode
+	isDurationPicker bool // Show all fields, else only show days
+	isMomentPicker   bool // Show only min+hr fields
+	dayCount         int  // Used in duration picker mode
 }
 
 type timeUnit struct {
@@ -112,7 +112,6 @@ func (m timePicker) Init() tea.Cmd {
 
 func (m timePicker) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-
 	case tea.KeyMsg:
 		switch {
 
@@ -215,7 +214,7 @@ func (m timePicker) View() string {
 		)
 
 	} else {
-		//Empty spaces are added to align the label and value rows
+		// Empty spaces are added to align the label and value rows
 		timeUnitLabel = lipgloss.JoinHorizontal(lipgloss.Center,
 			m.renderUnitTag(0),
 			" ",
@@ -248,7 +247,6 @@ func (m timePicker) View() string {
 			timeUnitLabel,
 		)
 	}
-
 }
 
 func (m timePicker) renderUnitCol(index int, val int) string {

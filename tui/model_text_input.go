@@ -9,8 +9,8 @@ import (
 // textinput.Model doesn't implement tea.Model interface
 type textInput struct {
 	input textinput.Model
-	//Since textinput field can be used in multiple places,
-	//responder is required to determine the receiver of the message emitted by textinput field
+	// Since textinput field can be used in multiple places,
+	// responder is required to determine the receiver of the message emitted by textinput field
 	responder func(interface{}) tea.Cmd
 }
 
@@ -50,7 +50,6 @@ func (m textInput) Init() tea.Cmd {
 
 func (m textInput) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, Keys.Enter):

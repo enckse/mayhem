@@ -13,10 +13,10 @@ type Task struct {
 	Description        string
 	Steps              []Step
 	Deadline           time.Time
-	Priority           int //3: High, 2: Mid, 1: Low, 0: No Priority
+	Priority           int // 3: High, 2: Mid, 1: Low, 0: No Priority
 	IsFinished         bool
 	IsRecurring        bool
-	StartTime          time.Time //Applicable only for recurring tasks
+	StartTime          time.Time // Applicable only for recurring tasks
 	RecurrenceInterval int       // in days
 	RecurChildren      []RecurTask
 	StackID            uint
@@ -28,13 +28,13 @@ func (t Task) Save() Entity {
 }
 
 func (t Task) Delete() {
-	//Unscoped() is used to ensure hard delete, where task will be removed from db instead of being just marked as "deleted"
+	// Unscoped() is used to ensure hard delete, where task will be removed from db instead of being just marked as "deleted"
 	DB.Unscoped().Select(clause.Associations).Delete(&t)
 }
 
 func (t Task) LatestRecurTask() (RecurTask, int64) {
 	recurTask := RecurTask{}
-	//localtime modifier has to be added to DATE other wise UTC time would be used
+	// localtime modifier has to be added to DATE other wise UTC time would be used
 	result := DB.Last(&recurTask, "task_id = ? AND deadline <  DATE('now', 'localtime', 'start of day', '+1 day')", t.ID)
 
 	// if t.IsFinished != recurTask.IsFinished {

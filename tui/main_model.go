@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/enckse/mayhem/entities"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/enckse/mayhem/entities"
 )
 
 type model struct {
@@ -26,7 +26,7 @@ type model struct {
 	customInputType string
 	showCustomInput bool
 	navigationKeys  keyMap
-	preInputFocus   string //useful for reverting back when input box is closed
+	preInputFocus   string // useful for reverting back when input box is closed
 	firstRender     bool
 	prevState       preserveState
 }
@@ -62,9 +62,8 @@ func (m *model) Init() tea.Cmd {
 }
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	//Transfer control to inputForm's Update method
+	// Transfer control to inputForm's Update method
 	if m.showInput {
-
 		switch msg := msg.(type) {
 
 		case goToMainMsg:
@@ -118,7 +117,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		switch m.customInputType {
-		//Transfer control to delete confirmation model
+		// Transfer control to delete confirmation model
 		case "delete":
 			switch msg := msg.(type) {
 
@@ -158,7 +157,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 							currTask = m.data[stackIndex].Tasks[taskIndex]
 
 							if currTask.IsRecurring {
-
 							} else {
 								if !currTask.IsFinished {
 									stack := m.data[stackIndex]
@@ -216,15 +214,15 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						child.Save()
 					}
 				} else {
-					//Moving recurring tasks wouldn't have any effect on the stack pending task count
+					// Moving recurring tasks wouldn't have any effect on the stack pending task count
 
-					//Decrease pending task count for old stack
+					// Decrease pending task count for old stack
 					if !currTask.IsFinished {
 						currStack.PendingTaskCount--
 						currStack.Save()
 					}
 
-					//Increase pending task count for new stack
+					// Increase pending task count for new stack
 					entities.IncPendingCount(newStackID)
 				}
 
@@ -496,8 +494,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			return m, nil
 
-		//Actual delete operation happens in showDelete conditional at the start of Update() method
-		//Here we just trigger the delete confirmation step
+		// Actual delete operation happens in showDelete conditional at the start of Update() method
+		// Here we just trigger the delete confirmation step
 		case key.Matches(msg, Keys.Delete):
 			if m.stackTable.Focused() {
 				m.preInputFocus = "stack"
@@ -525,7 +523,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case key.Matches(msg, Keys.Toggle):
-			//Toggle task finish status
+			// Toggle task finish status
 			if m.taskTable.Focused() {
 				stackIndex := m.stackTable.Cursor()
 				taskIndex := m.taskTable.Cursor()
@@ -535,7 +533,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					stack := m.data[stackIndex]
 					currTask = stack.Tasks[taskIndex]
 
-					//For recurring tasks we toggle the status of latest recur task entry
+					// For recurring tasks we toggle the status of latest recur task entry
 					if currTask.IsRecurring {
 						r, count := currTask.LatestRecurTask()
 						if count > 0 {
@@ -558,7 +556,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						m.data[stackIndex] = stack
 					}
 
-					//Changing finish status will lead to reordering, so state has to be preserved
+					// Changing finish status will lead to reordering, so state has to be preserved
 					m.preserveState()
 					m.updateSelectionData("stacks")
 					return m, nil
@@ -603,8 +601,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.updateViewDimensions(10)
 
 		if m.firstRender {
-			//updateSelectionData() is called here instead of being called from Init()
-			//since details box rendering requires screen dimensions, which aren't set at the time of Init()
+			// updateSelectionData() is called here instead of being called from Init()
+			// since details box rendering requires screen dimensions, which aren't set at the time of Init()
 			m.updateSelectionData("stacks")
 			m.firstRender = false
 		}
@@ -743,8 +741,8 @@ func (m *model) updateSelectionData(category string) {
 }
 
 func (m *model) updateStackTableData(retainIndex bool) {
-	//Set stack view data
-	//We pass a slice to stackRows, so the changes (like sorting) that happen there will be reflected in original slice
+	// Set stack view data
+	// We pass a slice to stackRows, so the changes (like sorting) that happen there will be reflected in original slice
 	m.stackTable.SetRows(stackRows(m.data))
 
 	if retainIndex {
@@ -757,11 +755,11 @@ func (m *model) updateStackTableData(retainIndex bool) {
 }
 
 func (m *model) updateTaskTableData(retainIndex bool) {
-	//Set task view data for selected stack
+	// Set task view data for selected stack
 	stackIndex := m.stackTable.Cursor()
 	currStack := m.data[stackIndex]
 
-	//We pass a slice to taskRows, so the changes (like sorting) that happen there will be reflected in original slice
+	// We pass a slice to taskRows, so the changes (like sorting) that happen there will be reflected in original slice
 	m.taskTable.SetRows(taskRows(currStack.Tasks))
 
 	if retainIndex {
@@ -806,8 +804,8 @@ func (m *model) preserveState() {
 func (m *model) updateViewDimensions(offset int) {
 	tableViewHeight = screenHeight - offset
 
-	//Details box viewport dimensions & section width are set at the time of box creation,
-	//after that they have to be manually adjusted
+	// Details box viewport dimensions & section width are set at the time of box creation,
+	// after that they have to be manually adjusted
 	m.taskDetails.viewport.Width = getDetailsBoxWidth()
 	m.taskDetails.viewport.Height = getDetailsBoxHeight()
 	m.updateDetailsBoxData(true)

@@ -90,8 +90,10 @@ var tableNavigationKeys = keyMap{
 	),
 }
 
-var taskFinishStatus = map[uint]bool{}
-var recurDeadlines = map[uint]time.Time{}
+var (
+	taskFinishStatus = map[uint]bool{}
+	recurDeadlines   = map[uint]time.Time{}
+)
 
 func stackColumns() []table.Column {
 	return []table.Column{
@@ -178,14 +180,14 @@ func taskRows(tasks []entities.Task) []table.Row {
 }
 
 func sortStacks(s []entities.Stack) {
-	//Alphabetically sort by stack title
+	// Alphabetically sort by stack title
 	sort.Slice(s, func(i, j int) bool {
 		return strings.ToLower(s[i].Title) < strings.ToLower(s[j].Title)
 	})
 }
 
 func sortTasks(t []entities.Task) {
-	//Sort by finish status, then deadline, then priority, then title
+	// Sort by finish status, then deadline, then priority, then title
 	sort.Slice(t, func(i, j int) bool {
 		if taskFinishStatus[t[i].ID] == taskFinishStatus[t[j].ID] {
 			var deadline_i time.Time
@@ -255,7 +257,6 @@ func formatTime(time time.Time, fullDate bool) string {
 	} else {
 		return hours + ":" + minutes + " " + midDayInfo
 	}
-
 }
 
 func getEmptyTaskView() string {

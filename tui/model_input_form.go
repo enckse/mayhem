@@ -174,16 +174,15 @@ func (m inputForm) Init() tea.Cmd {
 }
 
 func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-
-	//Transfer control to selectModel's Update method
+	// Transfer control to selectModel's Update method
 	switch msg := msg.(type) {
 
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, Keys.Return):
 			if m.focusIndex == TaskFieldIndex["Steps"] {
-				//In case of steps editor the steps are saved at the time of editing itself,
-				//so returning from steps editor should update the data
+				// In case of steps editor the steps are saved at the time of editing itself,
+				// so returning from steps editor should update the data
 				return m, goToMainWithVal("refresh")
 			} else {
 				return m, goToMainCmd
@@ -281,7 +280,7 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m inputForm) View() string {
 	var b strings.Builder
 
-	//ADD changes for invalid input case
+	// ADD changes for invalid input case
 
 	b.WriteString(highlightedTextStyle.Render(m.fieldMap[m.focusIndex].prompt))
 
@@ -317,7 +316,7 @@ func spawnRecurTasks(task entities.Task, oldDeadline time.Time) {
 
 	r, _ := task.LatestRecurTask()
 
-	//Delete all recur tasks from now
+	// Delete all recur tasks from now
 	task.RemoveFutureRecurTasks()
 
 	var startTime time.Time
