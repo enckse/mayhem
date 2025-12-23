@@ -246,14 +246,20 @@ func (m *detailsBox) renderContent() {
 	}
 }
 
+func newBlock(b *strings.Builder, title string, isFocus bool) {
+	prefix := ""
+	if isFocus {
+		prefix = "» "
+	}
+	b.WriteString(highlightedTextStyle.Render(fmt.Sprintf("%s%s:", prefix, title)))
+	b.WriteString("\n\n")
+}
+
 func (m *detailsBox) titleBlock() string {
 	var b strings.Builder
-
-	b.WriteString(highlightedTextStyle.Render("Title:"))
-	b.WriteString("\n\n")
-	b.WriteString(m.taskData.Title)
-
 	isFocused := (m.focusIndex == 0)
+	newBlock(&b, "Title", isFocused)
+	b.WriteString(m.taskData.Title)
 
 	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).PaddingTop(0).Render(b.String()))
 	m.scrollData.title = lipgloss.Height(data)
@@ -262,16 +268,14 @@ func (m *detailsBox) titleBlock() string {
 
 func (m *detailsBox) descriptionBlock() string {
 	var b strings.Builder
+	isFocused := (m.focusIndex == 1)
+	newBlock(&b, "Description", isFocused)
 
-	b.WriteString(highlightedTextStyle.Render("Description:"))
-	b.WriteString("\n\n")
 	if m.taskData.Description == "" {
 		b.WriteString(dash)
 	} else {
 		b.WriteString(m.taskData.Description)
 	}
-
-	isFocused := (m.focusIndex == 1)
 
 	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).Render(b.String()))
 	m.scrollData.description = lipgloss.Height(data)
@@ -280,12 +284,9 @@ func (m *detailsBox) descriptionBlock() string {
 
 func (m *detailsBox) priorityBlock() string {
 	var b strings.Builder
-
-	b.WriteString(highlightedTextStyle.Render("Priority:"))
-	b.WriteString("\n\n")
+	isFocused := (m.focusIndex == 2)
+	newBlock(&b, "Priority", isFocused)
 	b.WriteString(strconv.Itoa(m.taskData.Priority))
-
-	isFocused := (m.focusIndex == 3)
 
 	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).Render(b.String()))
 	m.scrollData.priority = lipgloss.Height(data)
@@ -294,16 +295,14 @@ func (m *detailsBox) priorityBlock() string {
 
 func (m *detailsBox) deadlineBlock() string {
 	var b strings.Builder
+	isFocused := (m.focusIndex == 3)
+	newBlock(&b, "Deadline", isFocused)
 
-	b.WriteString(highlightedTextStyle.Render("Deadline:"))
-	b.WriteString("\n\n")
 	if m.taskData.Deadline.IsZero() {
 		b.WriteString("Not Scheduled")
 	} else {
 		b.WriteString(formatTime(m.taskData.Deadline, true))
 	}
-
-	isFocused := (m.focusIndex == 4)
 
 	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).Render(b.String()))
 	m.scrollData.deadline = lipgloss.Height(data)
@@ -312,13 +311,9 @@ func (m *detailsBox) deadlineBlock() string {
 
 func (m *detailsBox) startTimeBlock() string {
 	var b strings.Builder
-
-	b.WriteString(highlightedTextStyle.Render("Due Time:"))
-	b.WriteString("\n\n")
+	isFocused := (m.focusIndex == 4)
+	newBlock(&b, "Due Time", isFocused)
 	b.WriteString(formatTime(m.taskData.StartTime, false))
-
-	isFocused := (m.focusIndex == 5)
-
 	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).Render(b.String()))
 	m.scrollData.startTime = lipgloss.Height(data)
 	return data
@@ -326,13 +321,9 @@ func (m *detailsBox) startTimeBlock() string {
 
 func (m *detailsBox) recurrenceIntervalBlock() string {
 	var b strings.Builder
-
-	b.WriteString(highlightedTextStyle.Render("Recurrence Interval:"))
-	b.WriteString("\n\n")
-	b.WriteString(strconv.Itoa(m.taskData.RecurrenceInterval) + " day(s)")
-
 	isFocused := (m.focusIndex == 6)
-
+	newBlock(&b, "Recurrence Interval", isFocused)
+	b.WriteString(strconv.Itoa(m.taskData.RecurrenceInterval) + " day(s)")
 	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).Render(b.String()))
 	m.scrollData.recurrenceInterval = lipgloss.Height(data)
 	return data
