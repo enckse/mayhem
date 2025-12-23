@@ -362,10 +362,7 @@ func (m *detailsBox) recurrenceIntervalBlock() string {
 }
 
 func (m *detailsBox) footerView() string {
-	scrollInfoStyle := footerContainerStyle.Copy().
-		Width(m.viewport.Width).
-		Align(lipgloss.Right)
-
+	scrollInfoStyle := footerContainerStyle.Width(m.viewport.Width).Align(lipgloss.Right)
 	info := footerInfoStyle.Render(fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
 	return scrollInfoStyle.Render(info)
 }

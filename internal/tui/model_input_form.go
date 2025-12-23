@@ -199,7 +199,8 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.isInvalid = false
 
-		if m.dataType == "stack" {
+		switch m.dataType {
+		case "stack":
 			stack := m.data.(entities.Stack)
 
 			switch m.focusIndex {
@@ -209,7 +210,7 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			stack.Save()
 
-		} else if m.dataType == "task" {
+		case "task":
 			task := m.data.(entities.Task)
 
 			switch m.focusIndex {

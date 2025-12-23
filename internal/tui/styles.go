@@ -32,44 +32,27 @@ var (
 )
 
 var (
-	selectedBoxStyle = lipgloss.NewStyle().
-				BorderStyle(lipgloss.ThickBorder())
-
-	selectedStackBoxStyle = selectedBoxStyle.Copy().
-				BorderForeground(stackBorderColor)
-
-	selectedTaskBoxStyle = selectedBoxStyle.Copy().
-				BorderForeground(taskBorderColor)
-
-	selectedDetailsBoxStyle = selectedBoxStyle.Copy().
-				BorderForeground(detailsBorderColor)
-
-	unselectedBoxStyle = lipgloss.NewStyle().
-				BorderStyle(lipgloss.RoundedBorder()).
-				BorderForeground(unfocusedColor)
-
-	columnHeaderStyle = table.DefaultStyles().Header.
+	selectedBoxStyle        = lipgloss.NewStyle().BorderStyle(lipgloss.ThickBorder())
+	selectedStackBoxStyle   = selectedBoxStyle.BorderForeground(stackBorderColor)
+	selectedTaskBoxStyle    = selectedBoxStyle.BorderForeground(taskBorderColor)
+	selectedDetailsBoxStyle = selectedBoxStyle.BorderForeground(detailsBorderColor)
+	unselectedBoxStyle      = lipgloss.NewStyle().BorderStyle(lipgloss.RoundedBorder()).BorderForeground(unfocusedColor)
+	columnHeaderStyle       = table.DefaultStyles().Header.
 				BorderStyle(lipgloss.NormalBorder()).
 				BorderForeground(unfocusedColor).
 				BorderBottom(true).
 				Bold(true)
-
 	stackSelectedRowStyle = table.DefaultStyles().Selected.
 				Foreground(highlightedTextColor).
 				Background(stackSelectionColor).
 				Bold(false)
-
-	taskSelectedRowStyle = stackSelectedRowStyle.Copy().
-				Background(taskSelectionColor)
-
-	footerInfoStyle = lipgloss.NewStyle().
-			Padding(0, 1).
-			Background(lipgloss.Color("#1c2c4c"))
-
+	taskSelectedRowStyle = stackSelectedRowStyle.Background(taskSelectionColor)
+	footerInfoStyle      = lipgloss.NewStyle().
+				Padding(0, 1).
+				Background(lipgloss.Color("#1c2c4c"))
 	footerContainerStyle = lipgloss.NewStyle().
 				Align(lipgloss.Center).
 				Background(lipgloss.Color("#3e424b"))
-
 	highlightedTextStyle = lipgloss.NewStyle().
 				Bold(true).
 				Italic(true).
@@ -77,7 +60,6 @@ var (
 				Background(highlightedBackgroundColor).
 				Padding(0, 1).
 				MarginTop(1)
-
 	inputFormStyle = lipgloss.NewStyle().
 			BorderStyle(lipgloss.ThickBorder()).
 			BorderForeground(inputFormBorderColor).
@@ -88,7 +70,6 @@ var (
 )
 
 // Since width is dynamic, we have to append it to the style before usage
-
 func getInputFormStyle() lipgloss.Style {
 	// Subtract 2 for padding on each side
 	return inputFormStyle.Width(screenWidth - 2)
