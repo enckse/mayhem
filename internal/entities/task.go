@@ -54,6 +54,7 @@ func (t Task) FetchAllRecurTasks() []RecurTask {
 	return t.RecurChildren
 }
 
+// EntityID gets the backing entity id
 func (t Task) EntityID() uint {
 	return t.ID
 }

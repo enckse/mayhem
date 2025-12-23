@@ -84,10 +84,12 @@ var (
 			helpKeys: timePickerKeys,
 		},
 	}
+	// StackFieldIndex are stack field index mappings
 	StackFieldIndex = map[string]int{
 		"Title": 0,
 	}
 
+	// TaskFieldIndex are task field index mappings
 	TaskFieldIndex = map[string]int{
 		"Title":              0,
 		"Description":        1,

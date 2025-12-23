@@ -1,3 +1,4 @@
+// Package entities defines backing store objects
 package entities
 
 import (

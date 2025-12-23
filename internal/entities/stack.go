@@ -13,6 +13,7 @@ type Stack struct {
 	Tasks            []Task
 }
 
+// EntityID gets the backing entity id
 func (s Stack) EntityID() uint {
 	return s.ID
 }

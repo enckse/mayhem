@@ -177,9 +177,8 @@ func (m timePicker) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, Keys.Enter):
 			if m.isDurationPicker {
 				return m, goToFormWithVal(m.dayCount)
-			} else {
-				return m, goToFormWithVal(m.currTime)
 			}
+			return m, goToFormWithVal(m.currTime)
 		}
 	}
 	return m, nil
@@ -285,10 +284,10 @@ func (m timePicker) renderUnitTag(index int) string {
 }
 
 func renderMidDayInfo(hours int) string {
-	if isBeforeMidDay(hours) {
-		return "am"
+	if hours >= 12 {
+		return "pm"
 	}
-	return "pm"
+	return "am"
 }
 
 // Adjust Hour value to 12 hour clock format
@@ -297,11 +296,4 @@ func formatHour(value int) int {
 		return value - 12
 	}
 	return value
-}
-
-func isBeforeMidDay(value int) bool {
-	if value >= 12 {
-		return false
-	}
-	return true
 }

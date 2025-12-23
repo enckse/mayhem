@@ -13,14 +13,13 @@ import (
 )
 
 type detailsBox struct {
-	taskData             entities.Task
-	viewport             viewport.Model
-	preserveOffset       bool
-	oldViewportOffset    int
-	focusIndex           int
-	isBoxFocused         bool
-	isRecurrenceDuration bool
-	scrollData           scrollData
+	taskData          entities.Task
+	viewport          viewport.Model
+	preserveOffset    bool
+	oldViewportOffset int
+	focusIndex        int
+	isBoxFocused      bool
+	scrollData        scrollData
 }
 
 type scrollData struct {

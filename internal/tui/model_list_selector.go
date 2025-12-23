@@ -10,7 +10,7 @@ type listSelector struct {
 	options    []keyVal
 	focusIndex int
 	maxIndex   int
-	responder  func(interface{}) tea.Cmd
+	responder  func(any) tea.Cmd
 }
 
 type keyVal struct {
@@ -41,7 +41,7 @@ func (m listSelector) Init() tea.Cmd {
 	return nil
 }
 
-func initializeListSelector(options []keyVal, selectedVal string, responder func(interface{}) tea.Cmd) tea.Model {
+func initializeListSelector(options []keyVal, selectedVal string, responder func(any) tea.Cmd) tea.Model {
 	// Takes care of default case where index should be 0
 	var selectedIndex int
 

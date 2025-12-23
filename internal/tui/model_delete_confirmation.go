@@ -38,9 +38,8 @@ func (m deleteConfirmation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		default:
 			if msg.String() == "y" || msg.String() == "Y" {
 				return m, goToMainWithVal("y")
-			} else {
-				return m, goToMainWithVal("")
 			}
+			return m, goToMainWithVal("")
 		}
 	}
 	return m, nil

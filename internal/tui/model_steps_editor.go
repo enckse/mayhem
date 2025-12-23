@@ -51,12 +51,6 @@ var stepsEditorKeys = keyMap{
 	),
 }
 
-var (
-	selectedStepColor = lipgloss.Color("#FFFF00")
-
-	unselectedStepColor = lipgloss.Color("#999999")
-)
-
 var newStepPlaceholder = "Enter Step Description"
 
 func initializeStepsEditor(steps []entities.Step, taskID uint) tea.Model {

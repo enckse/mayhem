@@ -35,7 +35,7 @@ func run() error {
 	}
 
 	model := tui.InitializeMainModel()
-	p := tea.NewProgram(model, tea.WithAltScreen())
+	p := tea.NewProgram(model.Backing, tea.WithAltScreen())
 
 	_, err := p.Run()
 	return err

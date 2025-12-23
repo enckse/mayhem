@@ -11,6 +11,11 @@ import (
 	"github.com/enckse/mayhem/internal/entities"
 )
 
+// ModelWrapper provides a wrapper around a backing TUI model
+type ModelWrapper struct {
+	Backing *model
+}
+
 type model struct {
 	data            []entities.Stack
 	stackTable      table.Model
@@ -38,7 +43,7 @@ type preserveState struct {
 }
 
 // InitializeMainModel will startup the core application model
-func InitializeMainModel() *model {
+func InitializeMainModel() ModelWrapper {
 	stacks, _ := entities.FetchAllStacks()
 
 	m := &model{
@@ -54,7 +59,7 @@ func InitializeMainModel() *model {
 	m.stackTable.Focus()
 	m.taskTable.Blur()
 	m.taskDetails.Blur()
-	return m
+	return ModelWrapper{m}
 }
 
 // Init initializes the model
@@ -78,15 +83,16 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.refreshData()
 			}
 
-			if m.preInputFocus == "stack" {
+			switch m.preInputFocus {
+			case "stack":
 				m.stackTable.Focus()
 				m.help = initializeHelp(stackKeys)
 				m.navigationKeys = tableNavigationKeys
-			} else if m.preInputFocus == "task" {
+			case "task":
 				m.taskTable.Focus()
 				m.help = initializeHelp(taskKeys)
 				m.navigationKeys = tableNavigationKeys
-			} else if m.preInputFocus == "detail" {
+			case "detail":
 				m.taskDetails.Focus()
 				m.navigationKeys = detailsNavigationKeys
 			}
