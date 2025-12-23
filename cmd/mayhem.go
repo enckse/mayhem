@@ -4,8 +4,10 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/enckse/mayhem/internal/app"
 	entities "github.com/enckse/mayhem/internal/entities"
 	tui "github.com/enckse/mayhem/internal/tui"
 )
@@ -37,6 +39,12 @@ func run() error {
 	model := tui.InitializeMainModel()
 	p := tea.NewProgram(model.Backing, tea.WithAltScreen())
 
-	_, err := p.Run()
-	return err
+	if _, err := p.Run(); err != nil {
+		return err
+	}
+	cmd := os.Getenv(app.ENV_PREFIX + "ON_EXIT")
+	if cmd != "" {
+		return exec.Command("/bin/sh", "-c", cmd).Run()
+	}
+	return nil
 }

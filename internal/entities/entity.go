@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/enckse/mayhem/internal/app"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -22,7 +23,7 @@ type Entity interface {
 var DB *gorm.DB
 
 func getStorageDir() (string, error) {
-	path := os.Getenv("MAYHEM_DB_PATH")
+	path := os.Getenv(app.ENV_PREFIX + "DB_PATH")
 	if path != "" {
 		return path, nil
 	}
