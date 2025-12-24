@@ -1,7 +1,6 @@
 package state
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,14 +9,25 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+const databaseName = "tasks.db"
+
 // Config is the overall configuration file
 type Config struct {
 	Data struct {
 		Directory string
 	}
+	Backups struct {
+		Directory string
+		Days      uint
+	}
 	Convert struct {
 		JSON bool
 	}
+}
+
+// Database will get the path to the database file
+func (c Config) Database() string {
+	return filepath.Join(c.Data.Directory, databaseName)
 }
 
 // LoadConfig will load the config from disk
@@ -28,7 +38,7 @@ func LoadConfig() (Config, error) {
 	}
 	cfg = filepath.Join(cfg, "settings.toml")
 	config := Config{}
-	if _, err := os.Stat(cfg); !errors.Is(err, os.ErrNotExist) {
+	if PathExists(cfg) {
 		meta, err := toml.DecodeFile(cfg, &config)
 		if err != nil {
 			return config, err
@@ -53,6 +63,9 @@ func LoadConfig() (Config, error) {
 			return config, err
 		}
 		config.Data.Directory = strings.Replace(config.Data.Directory, isHome, home, 1)
+	}
+	if config.Backups.Directory != "" {
+		config.Backups.Directory = filepath.Join(config.Data.Directory, config.Backups.Directory)
 	}
 	return config, nil
 }

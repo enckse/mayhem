@@ -38,6 +38,9 @@ func run() error {
 		return err
 	}
 	ctx.Config = cfg
+	if err := ctx.Config.Backup(); err != nil {
+		return err
+	}
 	if err := entities.InitializeDB(ctx); err != nil {
 		return err
 	}

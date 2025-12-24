@@ -1,10 +1,23 @@
 // Package state handles overall app state
 package state
 
-import "gorm.io/gorm"
+import (
+	"errors"
+	"os"
+
+	"gorm.io/gorm"
+)
 
 // Context is the overall state context
 type Context struct {
 	DB     *gorm.DB
 	Config Config
+}
+
+// PathExists will indicate if a path exists (or not)
+func PathExists(path string) bool {
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		return false
+	}
+	return true
 }
