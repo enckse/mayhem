@@ -3,8 +3,10 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/enckse/mayhem/internal/display"
@@ -26,32 +28,34 @@ func run() error {
 	isExport := false
 	isImport := false
 	isMerge := false
-	for idx, arg := range os.Args {
-		switch idx {
-		case 0:
-			continue
-		case 1:
-		default:
-			return fmt.Errorf("unexpected argument: %s", arg)
+	args := os.Args
+	var configFile string
+	if len(args) > 1 {
+		args = args[1:]
+		cmd := args[0]
+		if !strings.HasPrefix(cmd, "-") {
+			switch cmd {
+			case "version":
+				fmt.Fprintf(os.Stderr, "%s\n", version)
+				return nil
+			case "export":
+				isExport = true
+			case "import":
+				isImport = true
+			case "merge":
+				isImport = true
+				isMerge = true
+			}
+			if len(args) > 1 {
+				args = args[1:]
+			}
 		}
-		if idx == 0 {
-			continue
+		set := flag.NewFlagSet("cli", flag.ExitOnError)
+		cfgFile := set.String("config", "", "configuration file")
+		if err := set.Parse(args); err != nil {
+			return err
 		}
-		switch arg {
-		case "--version":
-			fmt.Fprintf(os.Stderr, "%s\n", version)
-			return nil
-		case "export":
-			isExport = true
-			continue
-		case "import":
-			isImport = true
-			continue
-		case "merge":
-			isImport = true
-			isMerge = true
-			continue
-		}
+		configFile = *cfgFile
 	}
 	if isExport && isImport {
 		return errors.New("only one of export/import can be provided")
@@ -59,7 +63,7 @@ func run() error {
 	ctx := &state.Context{}
 	ctx.Screen = display.NewScreen()
 	ctx.State.FinishedTasks = make(map[uint]bool)
-	cfg, err := state.LoadConfig()
+	cfg, err := state.LoadConfig(configFile)
 	if err != nil {
 		return err
 	}

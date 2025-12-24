@@ -32,12 +32,16 @@ func (c Config) Database() string {
 }
 
 // LoadConfig will load the config from disk
-func LoadConfig() (Config, error) {
-	cfg, err := detectDir("XDG_CONFIG_HOME", "CONFIG", ".config")
-	if err != nil {
-		return Config{}, err
+func LoadConfig(file string) (Config, error) {
+	cfg := file
+	if cfg == "" {
+		var err error
+		cfg, err = detectDir("XDG_CONFIG_HOME", "CONFIG", ".config")
+		if err != nil {
+			return Config{}, err
+		}
+		cfg = filepath.Join(cfg, "settings.toml")
 	}
-	cfg = filepath.Join(cfg, "settings.toml")
 	config := Config{}
 	if PathExists(cfg) {
 		meta, err := toml.DecodeFile(cfg, &config)
