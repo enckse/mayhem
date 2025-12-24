@@ -1,4 +1,5 @@
-package tui
+// Package timepicker displays a date+time picker
+package timepicker
 
 import (
 	"fmt"
@@ -13,8 +14,9 @@ import (
 )
 
 type (
+	// Input defines a time picker
 	// textinput.Model doesn't implement tea.Model interface
-	timePicker struct {
+	Input struct {
 		currTime   time.Time
 		focusIndex int
 	}
@@ -34,76 +36,50 @@ const (
 	minuteItem
 )
 
-var (
-	timePickerKeys = keys.Map{
-		Up: key.NewBinding(
-			key.WithKeys("up", "k"),
-			key.WithHelp("'↑/k'", "increase"),
-		),
-		Down: key.NewBinding(
-			key.WithKeys("down", "j"),
-			key.WithHelp("'↓/j'", "decrease"),
-		),
-		Left: key.NewBinding(
-			key.WithKeys("left", "h"),
-			key.WithHelp("'←/h'", "move left"),
-		),
-		Right: key.NewBinding(
-			key.WithKeys("right", "l"),
-			key.WithHelp("'→/l'", "move right"),
-		),
-		Enter: key.NewBinding(
-			key.WithKeys("enter"),
-			key.WithHelp("'enter'", "save"),
-		),
-		Return: key.NewBinding(
-			key.WithKeys("esc"),
-			key.WithHelp("'esc'", "return"),
-		),
-	}
+var timeUnitMap = map[int]timeUnit{
+	hourItem: {
+		title:     "Hour",
+		tag:       "hh",
+		charWidth: 2,
+	},
+	minuteItem: {
+		title:     "Minute",
+		tag:       "mm",
+		charWidth: 2,
+	},
+	dayItem: {
+		title:     "Day",
+		tag:       "DD",
+		charWidth: 2,
+	},
+	monthItem: {
+		title:     "Month",
+		tag:       "MM",
+		charWidth: 2,
+	},
+	yearItem: {
+		title:     "Year",
+		tag:       "YYYY",
+		charWidth: 4,
+	},
+}
 
-	timeUnitMap = map[int]timeUnit{
-		hourItem: {
-			title:     "Hour",
-			tag:       "hh",
-			charWidth: 2,
-		},
-		minuteItem: {
-			title:     "Minute",
-			tag:       "mm",
-			charWidth: 2,
-		},
-		dayItem: {
-			title:     "Day",
-			tag:       "DD",
-			charWidth: 2,
-		},
-		monthItem: {
-			title:     "Month",
-			tag:       "MM",
-			charWidth: 2,
-		},
-		yearItem: {
-			title:     "Year",
-			tag:       "YYYY",
-			charWidth: 4,
-		},
-	}
-)
-
-func initializeTimePicker(currTime time.Time) tea.Model {
-	t := timePicker{
+// New will create a new time picker
+func New(currTime time.Time) tea.Model {
+	t := Input{
 		currTime: currTime,
 	}
 
 	return t
 }
 
-func (m timePicker) Init() tea.Cmd {
+// Init will init the model
+func (m Input) Init() tea.Cmd {
 	return nil
 }
 
-func (m timePicker) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+// Update will update the model
+func (m Input) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -160,7 +136,8 @@ func (m timePicker) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m timePicker) View() string {
+// View will show the model
+func (m Input) View() string {
 	var timeUnitLabel string
 	var timeValue string
 
@@ -184,11 +161,11 @@ func (m timePicker) View() string {
 		"-",
 		m.renderUnitCol(yearItem, m.currTime.Year()),
 		" ",
-		m.renderUnitCol(hourItem, formatHour(m.currTime.Hour())),
+		m.renderUnitCol(hourItem, FormatHour(m.currTime.Hour())),
 		":",
 		m.renderUnitCol(minuteItem, m.currTime.Minute()),
 		" ",
-		renderMidDayInfo(m.currTime.Hour()))
+		RenderMidDayInfo(m.currTime.Hour()))
 
 	return lipgloss.JoinVertical(lipgloss.Center,
 		timeValue,
@@ -196,7 +173,7 @@ func (m timePicker) View() string {
 	)
 }
 
-func (m timePicker) renderUnitCol(index, val int) string {
+func (m Input) renderUnitCol(index, val int) string {
 	value := fmt.Sprintf("%0*d", timeUnitMap[index].charWidth, val)
 
 	var color lipgloss.Color
@@ -215,7 +192,7 @@ func (m timePicker) renderUnitCol(index, val int) string {
 	return style.Render(value)
 }
 
-func (m timePicker) renderUnitTag(index int) string {
+func (m Input) renderUnitTag(index int) string {
 	value := timeUnitMap[index].tag
 
 	var color lipgloss.Color
@@ -232,15 +209,16 @@ func (m timePicker) renderUnitTag(index int) string {
 	return style.Render(value)
 }
 
-func renderMidDayInfo(hours int) string {
+// RenderMidDayInfo will show the display string for an hour
+func RenderMidDayInfo(hours int) string {
 	if hours >= 12 {
 		return "pm"
 	}
 	return "am"
 }
 
-// Adjust Hour value to 12 hour clock format
-func formatHour(value int) int {
+// FormatHour will adjust the hour by 12 hours (as needed)
+func FormatHour(value int) int {
 	if value > 12 {
 		return value - 12
 	}

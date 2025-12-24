@@ -1,4 +1,5 @@
-package tui
+// Package text defines simple text inputs
+package text
 
 import (
 	"github.com/charmbracelet/bubbles/key"
@@ -8,26 +9,17 @@ import (
 	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
+// Input defines the text input type
 // textinput.Model doesn't implement tea.Model interface
-type textInput struct {
+type Input struct {
 	input textinput.Model
 	// Since textinput field can be used in multiple places,
 	// responder is required to determine the receiver of the message emitted by textinput field
 	responder func(any) tea.Cmd
 }
 
-var textInputKeys = keys.Map{
-	Enter: key.NewBinding(
-		key.WithKeys("enter"),
-		key.WithHelp("'enter'", "save"),
-	),
-	Return: key.NewBinding(
-		key.WithKeys("esc"),
-		key.WithHelp("'esc'", "return"),
-	),
-}
-
-func initializeTextInput(value, placeholder string, charLimit int, responder func(any) tea.Cmd) tea.Model {
+// New creates a new text entry input
+func New(value, placeholder string, charLimit int, responder func(any) tea.Cmd) tea.Model {
 	t := textinput.New()
 	t.SetValue(value)
 
@@ -38,7 +30,7 @@ func initializeTextInput(value, placeholder string, charLimit int, responder fun
 	t.TextStyle = display.TextInputStyle
 	t.Placeholder = placeholder
 
-	m := textInput{
+	m := Input{
 		input:     t,
 		responder: responder,
 	}
@@ -46,11 +38,13 @@ func initializeTextInput(value, placeholder string, charLimit int, responder fun
 	return m
 }
 
-func (m textInput) Init() tea.Cmd {
+// Init will init the model
+func (m Input) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (m textInput) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+// Update will update the model
+func (m Input) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -65,7 +59,8 @@ func (m textInput) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m textInput) View() string {
+// View will view the model
+func (m Input) View() string {
 	// Can't just render textinput.Value(), otherwise cursor blinking wouldn't work
 	return m.input.View()
 }

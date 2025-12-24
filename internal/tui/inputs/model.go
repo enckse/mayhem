@@ -1,4 +1,5 @@
-package tui
+// Package inputs defines forms
+package inputs
 
 import (
 	"fmt"
@@ -12,12 +13,18 @@ import (
 	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
+	"github.com/enckse/mayhem/internal/tui/definitions"
+	"github.com/enckse/mayhem/internal/tui/inputs/lists"
+	"github.com/enckse/mayhem/internal/tui/inputs/text"
+	"github.com/enckse/mayhem/internal/tui/inputs/textarea"
+	"github.com/enckse/mayhem/internal/tui/inputs/timepicker"
 	"github.com/enckse/mayhem/internal/tui/keys"
 	"github.com/enckse/mayhem/internal/tui/messages"
 )
 
 type (
-	inputForm struct {
+	// Form is an input form
+	Form struct {
 		focusIndex    int
 		data          entities.Entity
 		dataType      string
@@ -40,62 +47,50 @@ type (
 	}
 )
 
-const (
-	stackTitleIndex int = iota
-)
-
-const (
-	taskTitleIndex int = iota
-	taskNotesIndex
-	taskPriorityIndex
-	taskDeadlineIndex
-)
-
-const taskLastIndex = taskDeadlineIndex
-
 var (
 	stackFields = map[int]field{
-		stackTitleIndex: {
+		definitions.StackTitleIndex: {
 			name:             "Title",
 			prompt:           "Stack Title",
 			isRequired:       true,
 			nilValue:         "",
-			helpKeys:         textInputKeys,
+			helpKeys:         keys.TextInputMappings,
 			validationPrompt: "Stack title field can not be empty❗",
 		},
 	}
 
 	taskFields = map[int]field{
-		taskTitleIndex: {
+		definitions.TaskTitleIndex: {
 			name:             "Title",
 			prompt:           "Task Title",
 			isRequired:       true,
 			nilValue:         "",
-			helpKeys:         textInputKeys,
+			helpKeys:         keys.TextInputMappings,
 			validationPrompt: "Task title field can not be empty❗",
 		},
-		taskNotesIndex: {
+		definitions.TaskNotesIndex: {
 			name:     "Notes",
 			prompt:   "Task Notes",
-			helpKeys: textAreaKeys,
+			helpKeys: keys.TextAreaInputMappings,
 		},
-		taskPriorityIndex: {
+		definitions.TaskPriorityIndex: {
 			name:     "Priority",
 			prompt:   "Task Priority",
-			helpKeys: listSelectorKeys,
+			helpKeys: keys.ListSelectorMappings,
 		},
-		taskDeadlineIndex: {
+		definitions.TaskDeadlineIndex: {
 			name:     "Deadline",
 			prompt:   "Task Deadline",
-			helpKeys: timePickerKeys,
+			helpKeys: keys.TimePickerMappings,
 		},
 	}
 )
 
-func initializeInput(selectedTable string, data entities.Entity, fieldIndex int, ctx *state.Context) inputForm {
-	var m inputForm
+// New will create a new input form
+func New(selectedTable string, data entities.Entity, fieldIndex int, ctx *state.Context) Form {
+	var m Form
 	if selectedTable == "stack" {
-		m = inputForm{
+		m = Form{
 			data:       data,
 			focusIndex: fieldIndex,
 			dataType:   "stack",
@@ -107,14 +102,14 @@ func initializeInput(selectedTable string, data entities.Entity, fieldIndex int,
 
 		switch fieldIndex {
 		case 0:
-			targetField.model = initializeTextInput(stack.Title, "", 20, messages.FormGoToWith)
+			targetField.model = text.New(stack.Title, "", 20, messages.FormGoToWith)
 		}
 
 		m.helpKeys = targetField.helpKeys
 		m.fieldMap[fieldIndex] = targetField
 
 	} else {
-		m = inputForm{
+		m = Form{
 			data:       data,
 			focusIndex: fieldIndex,
 			fieldMap:   taskFields,
@@ -125,24 +120,24 @@ func initializeInput(selectedTable string, data entities.Entity, fieldIndex int,
 		task := data.(entities.Task)
 
 		switch fieldIndex {
-		case taskTitleIndex:
-			targetField.model = initializeTextInput(task.Title, "", 60, messages.FormGoToWith)
-		case taskNotesIndex:
-			targetField.model = initializeTextArea(task.Notes, ctx.Screen)
-		case taskPriorityIndex:
-			opts := []keyVal{
-				{val: "0"},
-				{val: "1"},
-				{val: "2"},
-				{val: "3"},
-				{val: "4"},
+		case definitions.TaskTitleIndex:
+			targetField.model = text.New(task.Title, "", 60, messages.FormGoToWith)
+		case definitions.TaskNotesIndex:
+			targetField.model = textarea.New(task.Notes, ctx.Screen)
+		case definitions.TaskPriorityIndex:
+			opts := []definitions.KeyValue{
+				{Value: "0"},
+				{Value: "1"},
+				{Value: "2"},
+				{Value: "3"},
+				{Value: "4"},
 			}
-			targetField.model = initializeListSelector(opts, fmt.Sprintf("%d", task.Priority), messages.FormGoToWith)
-		case taskDeadlineIndex:
+			targetField.model = lists.NewSelector(opts, fmt.Sprintf("%d", task.Priority), messages.FormGoToWith)
+		case definitions.TaskDeadlineIndex:
 			if task.Deadline.IsZero() {
-				targetField.model = initializeTimePicker(time.Now())
+				targetField.model = timepicker.New(time.Now())
 			} else {
-				targetField.model = initializeTimePicker(task.Deadline)
+				targetField.model = timepicker.New(task.Deadline)
 			}
 		}
 		m.helpKeys = targetField.helpKeys
@@ -153,11 +148,18 @@ func initializeInput(selectedTable string, data entities.Entity, fieldIndex int,
 	return m
 }
 
-func (m inputForm) Init() tea.Cmd {
+// HelpKeys will get the help keys for the input form
+func (m Form) HelpKeys() keys.Map {
+	return m.helpKeys
+}
+
+// Init will init the model
+func (m Form) Init() tea.Cmd {
 	return nil
 }
 
-func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+// Update will update the model
+func (m Form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// Transfer control to selectModel's Update method
 	switch msg := msg.(type) {
 
@@ -185,7 +187,7 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			stack := m.data.(entities.Stack)
 
 			switch m.focusIndex {
-			case stackTitleIndex:
+			case definitions.StackTitleIndex:
 				stack.Title = selectedValue.(string)
 			}
 
@@ -195,18 +197,18 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			task := m.data.(entities.Task)
 
 			switch m.focusIndex {
-			case taskTitleIndex:
+			case definitions.TaskTitleIndex:
 				task.Title = selectedValue.(string)
 
 				if task.CreatedAt.IsZero() {
 					m.isNewTask = true
 				}
 
-			case taskNotesIndex:
+			case definitions.TaskNotesIndex:
 				task.Notes = selectedValue.(string)
-			case taskPriorityIndex:
-				task.Priority, _ = strconv.ParseUint(selectedValue.(keyVal).val, 10, 64)
-			case taskDeadlineIndex:
+			case definitions.TaskPriorityIndex:
+				task.Priority, _ = strconv.ParseUint(selectedValue.(definitions.KeyValue).Value, 10, 64)
+			case definitions.TaskDeadlineIndex:
 				task.Deadline = selectedValue.(time.Time)
 
 			}
@@ -230,7 +232,8 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m inputForm) View() string {
+// View will display the model
+func (m Form) View() string {
 	var b strings.Builder
 
 	// ADD changes for invalid input case

@@ -1,35 +1,21 @@
-package tui
+// Package textarea is a large text area input
+package textarea
 
 import (
-	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textarea"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/enckse/mayhem/internal/display"
-	"github.com/enckse/mayhem/internal/tui/keys"
 	"github.com/enckse/mayhem/internal/tui/messages"
 )
 
+// Input is a textarea input field
 // textarea.Model doesn't implement tea.Model interface
-type textArea struct {
+type Input struct {
 	input textarea.Model
 }
 
-var textAreaKeys = keys.Map{
-	Enter: key.NewBinding(
-		key.WithKeys("enter"),
-		key.WithHelp("'enter'", "new line"),
-	),
-	Save: key.NewBinding(
-		key.WithKeys("ctrl+s"),
-		key.WithHelp("'ctrl+s'", "save"),
-	),
-	Return: key.NewBinding(
-		key.WithKeys("esc"),
-		key.WithHelp("'esc'", "return"),
-	),
-}
-
-func initializeTextArea(value string, screen *display.Screen) tea.Model {
+// New will create a new textarea
+func New(value string, screen *display.Screen) tea.Model {
 	t := textarea.New()
 	t.SetValue(value)
 	t.SetWidth(screen.InputFormStyle().GetWidth() - 2)
@@ -41,18 +27,20 @@ func initializeTextArea(value string, screen *display.Screen) tea.Model {
 	t.FocusedStyle = textarea.Style{Placeholder: display.PlaceHolderStyle, Text: display.TextInputStyle}
 	t.Focus()
 
-	m := textArea{
+	m := Input{
 		input: t,
 	}
 
 	return m
 }
 
-func (m textArea) Init() tea.Cmd {
+// Init will init the model
+func (m Input) Init() tea.Cmd {
 	return textarea.Blink
 }
 
-func (m textArea) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+// Update will update the model
+func (m Input) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -67,7 +55,8 @@ func (m textArea) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m textArea) View() string {
+// View will display the view
+func (m Input) View() string {
 	// Can't just render textarea.Value(), otherwise cursor blinking wouldn't work
 	return m.input.View()
 }

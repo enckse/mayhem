@@ -1,63 +1,42 @@
-package tui
+// Package lists has list selectors
+package lists
 
 import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/enckse/mayhem/internal/display"
+	"github.com/enckse/mayhem/internal/tui/definitions"
 	"github.com/enckse/mayhem/internal/tui/keys"
 	"github.com/enckse/mayhem/internal/tui/messages"
 )
 
-type (
-	listSelector struct {
-		options    []keyVal
-		focusIndex int
-		maxIndex   int
-		responder  func(any) tea.Cmd
-	}
-
-	keyVal struct {
-		key uint
-		val string
-	}
-)
-
-var listSelectorKeys = keys.Map{
-	Up: key.NewBinding(
-		key.WithKeys("up", "k"),
-		key.WithHelp("'↑/k'", "up"),
-	),
-	Down: key.NewBinding(
-		key.WithKeys("down", "j"),
-		key.WithHelp("'↓/j'", "down"),
-	),
-	Enter: key.NewBinding(
-		key.WithKeys("enter"),
-		key.WithHelp("'enter'", "save"),
-	),
-	Return: key.NewBinding(
-		key.WithKeys("esc"),
-		key.WithHelp("'esc'", "return"),
-	),
+// Selector is a list picker/selector
+type Selector struct {
+	options    []definitions.KeyValue
+	focusIndex int
+	maxIndex   int
+	responder  func(any) tea.Cmd
 }
 
-func (m listSelector) Init() tea.Cmd {
+// Init will init the model
+func (m Selector) Init() tea.Cmd {
 	return nil
 }
 
-func initializeListSelector(options []keyVal, selectedVal string, responder func(any) tea.Cmd) tea.Model {
+// NewSelector will create a new list selector
+func NewSelector(options []definitions.KeyValue, selectedVal string, responder func(any) tea.Cmd) tea.Model {
 	// Takes care of default case where index should be 0
 	var selectedIndex int
 
 	for i, item := range options {
-		if item.val == selectedVal {
+		if item.Value == selectedVal {
 			selectedIndex = i
 			break
 		}
 	}
 
-	m := listSelector{
+	m := Selector{
 		focusIndex: selectedIndex,
 		maxIndex:   len(options) - 1,
 		options:    options,
@@ -67,12 +46,13 @@ func initializeListSelector(options []keyVal, selectedVal string, responder func
 	return m
 }
 
-func (m listSelector) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+// Update will update the model
+func (m Selector) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, keys.Mappings.Return):
-			return m, messages.MainGoToWith(keyVal{})
+			return m, messages.MainGoToWith(definitions.KeyValue{})
 
 		case key.Matches(msg, keys.Mappings.Quit, keys.Mappings.Exit):
 			return m, tea.Quit
@@ -100,16 +80,17 @@ func (m listSelector) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m listSelector) View() string {
+// View will show the model
+func (m Selector) View() string {
 	var res []string
 
 	for i, item := range m.options {
 		var value string
 
 		if i == m.focusIndex {
-			value = lipgloss.NewStyle().Foreground(display.InputFormColor).Bold(true).Render("» " + item.val)
+			value = lipgloss.NewStyle().Foreground(display.InputFormColor).Bold(true).Render("» " + item.Value)
 		} else {
-			value = lipgloss.NewStyle().Foreground(display.InputFormColor).Bold(true).Render("  " + item.val)
+			value = lipgloss.NewStyle().Foreground(display.InputFormColor).Bold(true).Render("  " + item.Value)
 		}
 
 		res = append(res, value)

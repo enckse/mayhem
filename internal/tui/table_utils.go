@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/bubbles/table"
 	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/entities"
+	"github.com/enckse/mayhem/internal/tui/inputs/timepicker"
 	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
@@ -175,9 +176,9 @@ func formatTime(time time.Time, fullDate bool) string {
 	year := fmt.Sprintf("%04d", time.Year())
 	month := fmt.Sprintf("%02d", int(time.Month()))
 	days := fmt.Sprintf("%02d", time.Day())
-	hours := fmt.Sprintf("%02d", formatHour(time.Hour()))
+	hours := fmt.Sprintf("%02d", timepicker.FormatHour(time.Hour()))
 	minutes := fmt.Sprintf("%02d", time.Minute())
-	midDayInfo := renderMidDayInfo(time.Hour())
+	midDayInfo := timepicker.RenderMidDayInfo(time.Hour())
 
 	if fullDate {
 		return days + "-" + month + "-" + year + "  " + hours + ":" + minutes + " " + midDayInfo

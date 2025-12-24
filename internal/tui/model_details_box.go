@@ -10,6 +10,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/entities"
+	"github.com/enckse/mayhem/internal/tui/definitions"
 	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
@@ -99,17 +100,17 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, keys.Mappings.Up):
 			var scrollDistance int
 			switch m.focusIndex {
-			case taskTitleIndex:
+			case definitions.TaskTitleIndex:
 				m.viewport.GotoBottom()
 				m.End()
 				return m, nil
-			case taskNotesIndex:
+			case definitions.TaskNotesIndex:
 				scrollDistance = m.scrollData.notes
 				m.Previous()
-			case taskPriorityIndex:
+			case definitions.TaskPriorityIndex:
 				scrollDistance = m.scrollData.priority
 				m.Previous()
-			case taskDeadlineIndex:
+			case definitions.TaskDeadlineIndex:
 				m.Previous()
 			}
 
@@ -118,15 +119,15 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, keys.Mappings.Down):
 			var scrollDistance int
 			switch m.focusIndex {
-			case taskTitleIndex:
+			case definitions.TaskTitleIndex:
 				m.Next()
-			case taskNotesIndex:
+			case definitions.TaskNotesIndex:
 				scrollDistance = m.scrollData.notes
 				m.Next()
-			case taskPriorityIndex:
+			case definitions.TaskPriorityIndex:
 				scrollDistance = m.scrollData.priority
 				m.Next()
-			case taskDeadlineIndex:
+			case definitions.TaskDeadlineIndex:
 				m.viewport.GotoTop()
 				m.Start()
 				return m, nil
@@ -163,18 +164,18 @@ func (m detailsBox) Focused() bool {
 }
 
 func (m *detailsBox) Next() {
-	length := taskLastIndex + 1
+	length := definitions.TaskLastIndex + 1
 	m.focusIndex = (m.focusIndex + 1) % length
 	m.renderContent()
 }
 
 func (m *detailsBox) End() {
-	m.focusIndex = taskLastIndex
+	m.focusIndex = definitions.TaskLastIndex
 	m.renderContent()
 }
 
 func (m *detailsBox) Previous() {
-	length := taskLastIndex + 1
+	length := definitions.TaskLastIndex + 1
 	val := (m.focusIndex - 1) % length
 	if val < 0 {
 		val = val + length
@@ -215,7 +216,7 @@ func newBlock(b *strings.Builder, title string, isFocus bool) {
 
 func (m *detailsBox) titleBlock() string {
 	var b strings.Builder
-	isFocused := (m.focusIndex == taskTitleIndex)
+	isFocused := (m.focusIndex == definitions.TaskTitleIndex)
 	newBlock(&b, "Title", isFocused)
 	b.WriteString(m.taskData.Title)
 
@@ -226,7 +227,7 @@ func (m *detailsBox) titleBlock() string {
 
 func (m *detailsBox) notesBlock() string {
 	var b strings.Builder
-	isFocused := (m.focusIndex == taskNotesIndex)
+	isFocused := (m.focusIndex == definitions.TaskNotesIndex)
 	newBlock(&b, "Notes", isFocused)
 
 	if m.taskData.Notes == "" {
@@ -242,7 +243,7 @@ func (m *detailsBox) notesBlock() string {
 
 func (m *detailsBox) priorityBlock() string {
 	var b strings.Builder
-	isFocused := (m.focusIndex == taskPriorityIndex)
+	isFocused := (m.focusIndex == definitions.TaskPriorityIndex)
 	newBlock(&b, "Priority", isFocused)
 	fmt.Fprintf(&b, "%d", m.taskData.Priority)
 
@@ -253,7 +254,7 @@ func (m *detailsBox) priorityBlock() string {
 
 func (m *detailsBox) deadlineBlock() string {
 	var b strings.Builder
-	isFocused := (m.focusIndex == taskDeadlineIndex)
+	isFocused := (m.focusIndex == definitions.TaskDeadlineIndex)
 	newBlock(&b, "Deadline", isFocused)
 
 	if m.taskData.Deadline.IsZero() {

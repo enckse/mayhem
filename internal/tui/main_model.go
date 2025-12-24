@@ -11,8 +11,11 @@ import (
 	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
+	"github.com/enckse/mayhem/internal/tui/definitions"
 	"github.com/enckse/mayhem/internal/tui/deletion"
 	"github.com/enckse/mayhem/internal/tui/help"
+	"github.com/enckse/mayhem/internal/tui/inputs"
+	"github.com/enckse/mayhem/internal/tui/inputs/lists"
 	"github.com/enckse/mayhem/internal/tui/keys"
 	"github.com/enckse/mayhem/internal/tui/messages"
 )
@@ -29,7 +32,7 @@ type (
 		taskTable       table.Model
 		taskDetails     detailsBox
 		help            help.Model
-		input           inputForm
+		input           inputs.Form
 		showTasks       bool
 		showDetails     bool
 		showInput       bool
@@ -86,7 +89,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg := msg.(type) {
 
 		case messages.Main:
-			m.input = inputForm{}
+			m.input = inputs.Form{}
 			m.showInput = false
 
 			if msg.Value.(string) == "refresh" {
@@ -120,7 +123,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		default:
 			inp, cmd := m.input.Update(msg)
-			t, _ := inp.(inputForm)
+			t, _ := inp.(inputs.Form)
 			m.input = t
 
 			return m, cmd
@@ -208,13 +211,13 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.taskTable.Focus()
 				m.help = help.NewModel(taskKeys)
 
-				response := msg.Value.(keyVal)
+				response := msg.Value.(definitions.KeyValue)
 
-				if response.val == "" {
+				if response.Value == "" {
 					return m, nil
 				}
 
-				newStackID := response.key
+				newStackID := response.Key
 
 				stackIndex := m.stackTable.Cursor()
 				taskIndex := m.taskTable.Cursor()
@@ -247,7 +250,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			default:
 				inp, cmd := m.customInput.Update(msg)
-				t, _ := inp.(listSelector)
+				t, _ := inp.(lists.Selector)
 				m.customInput = t
 
 				return m, cmd
@@ -426,14 +429,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, keys.Mappings.New):
 			if m.stackTable.Focused() {
 				m.preInputFocus = "stack"
-				m.input = initializeInput("stack", entities.Stack{}, 0, m.context)
+				m.input = inputs.New("stack", entities.Stack{}, 0, m.context)
 
 			} else if m.taskTable.Focused() {
 				m.preInputFocus = "task"
 				newTask := entities.Task{
 					StackID: m.data[m.stackTable.Cursor()].ID,
 				}
-				m.input = initializeInput("task", newTask, 0, m.context)
+				m.input = inputs.New("task", newTask, 0, m.context)
 
 			} else if m.taskDetails.Focused() {
 				return m, nil
@@ -455,7 +458,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, nil
 				}
 				m.preInputFocus = "stack"
-				m.input = initializeInput("stack", m.data[m.stackTable.Cursor()], 0, m.context)
+				m.input = inputs.New("stack", m.data[m.stackTable.Cursor()], 0, m.context)
 			} else if m.taskTable.Focused() {
 				if len(m.taskTable.Rows()) > 0 {
 					m.showDetails = true
@@ -468,7 +471,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			} else if m.taskDetails.Focused() {
 				m.preInputFocus = "detail"
-				m.input = initializeInput("task", m.data[m.stackTable.Cursor()].Tasks[m.taskTable.Cursor()], m.taskDetails.focusIndex, m.context)
+				m.input = inputs.New("task", m.data[m.stackTable.Cursor()].Tasks[m.taskTable.Cursor()], m.taskDetails.focusIndex, m.context)
 			}
 
 			m.stackTable.Blur()
@@ -551,17 +554,17 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.customInputType = "move"
 					m.taskTable.Blur()
 
-					opts := []keyVal{}
+					opts := []definitions.KeyValue{}
 					for _, stack := range m.data {
-						entry := keyVal{
-							key: stack.ID,
-							val: stack.Title,
+						entry := definitions.KeyValue{
+							Key:   stack.ID,
+							Value: stack.Title,
 						}
 						opts = append(opts, entry)
 					}
-					m.customInput = initializeListSelector(opts, "", messages.MainGoToWith)
+					m.customInput = lists.NewSelector(opts, "", messages.MainGoToWith)
 
-					m.help = help.NewModel(listSelectorKeys)
+					m.help = help.NewModel(keys.ListSelectorMappings)
 					return m, nil
 				}
 			}
@@ -639,7 +642,7 @@ func (m *model) View() string {
 			tablesView,
 			inputFormView,
 		)
-		m.help = help.NewModel(m.input.helpKeys)
+		m.help = help.NewModel(m.input.HelpKeys())
 	}
 
 	if m.showHelp {
