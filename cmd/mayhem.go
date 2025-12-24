@@ -69,6 +69,9 @@ func run() error {
 	if isExport {
 		return entities.DumpJSON(ctx)
 	}
+	if isImport {
+		return entities.LoadJSON(ctx)
+	}
 
 	model := tui.InitializeMainModel(ctx)
 	p := tea.NewProgram(model.Backing, tea.WithAltScreen())

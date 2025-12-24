@@ -1,13 +1,40 @@
 package entities
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 
 	"github.com/enckse/mayhem/internal/state"
 )
+
+// LoadJSON will import JSON
+func LoadJSON(ctx *state.Context) error {
+	scanner := bufio.NewScanner(os.Stdin)
+	var buf bytes.Buffer
+	for scanner.Scan() {
+		if _, err := buf.WriteString(scanner.Text()); err != nil {
+			return err
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+	var items []Stack
+	if err := json.Unmarshal(buf.Bytes(), &items); err != nil {
+		return err
+	}
+	for _, s := range items {
+		fmt.Println(s.Title)
+		s.Save(ctx)
+	}
+	return nil
+}
 
 // ToJSON will dump entities to JSON
 func ToJSON(ctx *state.Context) error {

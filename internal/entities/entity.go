@@ -30,6 +30,7 @@ func InitializeDB(ctx *state.Context) error {
 	return nil
 }
 
+// Sync will save to the DB and perform any other sync operations of interest
 func Sync(ctx *state.Context, obj any) {
 	ctx.DB.Save(obj)
 	if ctx.Config.JSON.Sync {
