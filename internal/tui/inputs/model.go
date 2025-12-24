@@ -98,7 +98,6 @@ var (
 // New will create a new input form
 func New(formTable FormTable, data entities.Entity, fieldIndex int, ctx *state.Context) Form {
 	var m Form
-	m.formType = formTable
 	switch formTable {
 	case StackFormTable:
 		m = Form{
@@ -153,6 +152,7 @@ func New(formTable FormTable, data entities.Entity, fieldIndex int, ctx *state.C
 		m.fieldMap[fieldIndex] = targetField
 	}
 
+	m.formType = formTable
 	m.context = ctx
 	return m
 }
