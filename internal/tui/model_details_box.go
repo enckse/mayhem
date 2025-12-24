@@ -2,7 +2,6 @@ package tui
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -241,7 +240,7 @@ func (m *detailsBox) priorityBlock() string {
 	var b strings.Builder
 	isFocused := (m.focusIndex == taskPriorityIndex)
 	newBlock(&b, "Priority", isFocused)
-	b.WriteString(strconv.Itoa(m.taskData.Priority))
+	fmt.Fprintf(&b, "%d", m.taskData.Priority)
 
 	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).Render(b.String()))
 	m.scrollData.priority = lipgloss.Height(data)

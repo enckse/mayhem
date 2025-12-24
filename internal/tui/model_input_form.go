@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -127,13 +128,13 @@ func initializeInput(selectedTable string, data entities.Entity, fieldIndex int,
 			targetField.model = initializeTextArea(task.Description)
 		case taskPriorityIndex:
 			opts := []keyVal{
+				{val: "0"},
 				{val: "1"},
 				{val: "2"},
 				{val: "3"},
 				{val: "4"},
-				{val: "5"},
 			}
-			targetField.model = initializeListSelector(opts, strconv.Itoa(task.Priority), goToFormWithVal)
+			targetField.model = initializeListSelector(opts, fmt.Sprintf("%d", task.Priority), goToFormWithVal)
 		case taskDeadlineIndex:
 			if task.Deadline.IsZero() {
 				targetField.model = initializeTimePicker(time.Now())
@@ -201,7 +202,7 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case taskDescriptionIndex:
 				task.Description = selectedValue.(string)
 			case taskPriorityIndex:
-				task.Priority, _ = strconv.Atoi(selectedValue.(keyVal).val)
+				task.Priority, _ = strconv.ParseUint(selectedValue.(keyVal).val, 10, 64)
 			case taskDeadlineIndex:
 				task.Deadline = selectedValue.(time.Time)
 

@@ -2,7 +2,6 @@ package tui
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -144,7 +143,7 @@ func taskRows(tasks []entities.Task) []table.Row {
 			prefix,
 			val.Title,
 			deadline,
-			"   " + strconv.Itoa(val.Priority),
+			fmt.Sprintf("   %d", val.Priority),
 		}
 
 		rows[i] = row

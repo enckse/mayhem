@@ -16,7 +16,7 @@ type Task struct {
 	Title       string `gorm:"notnull"`
 	Description string
 	Deadline    time.Time
-	Priority    int // 3: High, 2: Mid, 1: Low, 0: No Priority
+	Priority    uint64
 	IsFinished  bool
 	StackID     uint `json:"-"`
 }
