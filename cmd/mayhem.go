@@ -2,6 +2,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -22,15 +23,28 @@ func main() {
 }
 
 func run() error {
+	isExport := false
+	isImport := false
 	for idx, arg := range os.Args {
 		if idx == 0 {
 			continue
 		}
-		if arg == "--version" {
+		switch arg {
+		case "--version":
 			fmt.Fprintf(os.Stderr, "%s\n", version)
 			return nil
+		case "export":
+			isExport = true
+			continue
+		case "import":
+			isImport = true
+			continue
 		}
+
 		return fmt.Errorf("invalid arguments: %s", arg)
+	}
+	if isExport && isImport {
+		return errors.New("only one of export/import can be provided")
 	}
 	ctx := &state.Context{}
 	cfg, err := state.LoadConfig()
@@ -38,11 +52,19 @@ func run() error {
 		return err
 	}
 	ctx.Config = cfg
-	if err := ctx.Config.Backup(); err != nil {
-		return err
+	if isExport && !state.PathExists(ctx.Config.Database()) {
+		return errors.New("no database to dump")
+	}
+	if !isExport && !isImport {
+		if err := ctx.Config.Backup(); err != nil {
+			return err
+		}
 	}
 	if err := entities.InitializeDB(ctx); err != nil {
 		return err
+	}
+	if isExport {
+		return convert.DumpJSON(ctx)
 	}
 
 	model := tui.InitializeMainModel(ctx)

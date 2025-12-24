@@ -3,6 +3,7 @@ package convert
 
 import (
 	"encoding/json"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -12,6 +13,20 @@ import (
 
 // ToJSON will dump entities to JSON
 func ToJSON(ctx *state.Context) error {
+	file, err := os.OpenFile(filepath.Join(ctx.Config.Data.Directory, "tasks.json"), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o755)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	return handleJSON(file, ctx)
+}
+
+// DumpJSON will write the current JSOn state to stdout
+func DumpJSON(ctx *state.Context) error {
+	return handleJSON(os.Stdout, ctx)
+}
+
+func handleJSON(dst io.Writer, ctx *state.Context) error {
 	s, err := entities.FetchAllStacks(ctx)
 	if err != nil {
 		return err
@@ -22,10 +37,10 @@ func ToJSON(ctx *state.Context) error {
 		entities.SortTasks(tasks)
 		item.Tasks = tasks
 	}
-	payload := filepath.Join(ctx.Config.Data.Directory, "tasks.json")
 	b, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(payload, b, 0o644)
+	_, err = dst.Write(b)
+	return err
 }
