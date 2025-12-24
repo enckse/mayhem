@@ -15,7 +15,7 @@ var (
 	// StackColumns are the table columns for stacks
 	StackColumns = []table.Column{
 		{Title: "       Stacks", Width: 20},
-		{Title: "", Width: 2},
+		{Title: "", Width: 5},
 	}
 	// TaskColumns are the table columns for tasks
 	TaskColumns = []table.Column{
@@ -35,7 +35,7 @@ func StackRows(stacks []entities.Stack) []table.Row {
 	for i, val := range stacks {
 		row := []string{
 			val.Title,
-			incompleteTaskTag(val.PendingTaskCount),
+			formatCount(val.PendingTaskCount),
 		}
 		rows[i] = row
 	}
@@ -92,11 +92,13 @@ func New(columns []table.Column, tableType display.TableType, screen *display.Sc
 	return t
 }
 
-func incompleteTaskTag(count uint64) string {
-	if count > 0 && count <= 10 {
-		return " " + string(rune('➊'+count-1))
-	} else if count > 10 {
-		return "+➓"
+func formatCount(count uint64) string {
+	switch {
+	case count == 0:
+		return "     "
+	case count < 100:
+		return fmt.Sprintf("[%3d]", count)
+	default:
+		return "[99+]"
 	}
-	return ""
 }
