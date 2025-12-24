@@ -429,14 +429,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, keys.Mappings.New):
 			if m.stackTable.Focused() {
 				m.preInputFocus = "stack"
-				m.input = inputs.New("stack", entities.Stack{}, 0, m.context)
+				m.input = inputs.New(inputs.StackFormTable, entities.Stack{}, 0, m.context)
 
 			} else if m.taskTable.Focused() {
 				m.preInputFocus = "task"
 				newTask := entities.Task{
 					StackID: m.data[m.stackTable.Cursor()].ID,
 				}
-				m.input = inputs.New("task", newTask, 0, m.context)
+				m.input = inputs.New(inputs.TaskFormTable, newTask, 0, m.context)
 
 			} else if m.taskDetails.Focused() {
 				return m, nil
@@ -458,7 +458,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, nil
 				}
 				m.preInputFocus = "stack"
-				m.input = inputs.New("stack", m.data[m.stackTable.Cursor()], 0, m.context)
+				m.input = inputs.New(inputs.StackFormTable, m.data[m.stackTable.Cursor()], 0, m.context)
 			} else if m.taskTable.Focused() {
 				if len(m.taskTable.Rows()) > 0 {
 					m.showDetails = true
@@ -471,7 +471,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			} else if m.taskDetails.Focused() {
 				m.preInputFocus = "detail"
-				m.input = inputs.New("task", m.data[m.stackTable.Cursor()].Tasks[m.taskTable.Cursor()], m.taskDetails.focusIndex, m.context)
+				m.input = inputs.New(inputs.TaskFormTable, m.data[m.stackTable.Cursor()].Tasks[m.taskTable.Cursor()], m.taskDetails.focusIndex, m.context)
 			}
 
 			m.stackTable.Blur()

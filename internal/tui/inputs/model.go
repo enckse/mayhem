@@ -23,6 +23,8 @@ import (
 )
 
 type (
+	// FormTable are the known form table types
+	FormTable int
 	// Form is an input form
 	Form struct {
 		focusIndex    int
@@ -45,6 +47,13 @@ type (
 		validationPrompt string
 		helpKeys         keys.Map
 	}
+)
+
+const (
+	// StackFormTable is a stack (collection of tasks) form
+	StackFormTable FormTable = iota
+	// TaskFormTable is a set of tasks
+	TaskFormTable
 )
 
 var (
@@ -87,9 +96,10 @@ var (
 )
 
 // New will create a new input form
-func New(selectedTable string, data entities.Entity, fieldIndex int, ctx *state.Context) Form {
+func New(formTable FormTable, data entities.Entity, fieldIndex int, ctx *state.Context) Form {
 	var m Form
-	if selectedTable == "stack" {
+	switch formTable {
+	case StackFormTable:
 		m = Form{
 			data:       data,
 			focusIndex: fieldIndex,
@@ -108,7 +118,7 @@ func New(selectedTable string, data entities.Entity, fieldIndex int, ctx *state.
 		m.helpKeys = targetField.helpKeys
 		m.fieldMap[fieldIndex] = targetField
 
-	} else {
+	case TaskFormTable:
 		m = Form{
 			data:       data,
 			focusIndex: fieldIndex,
