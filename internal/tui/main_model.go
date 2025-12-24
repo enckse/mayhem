@@ -11,6 +11,7 @@ import (
 	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
+	"github.com/enckse/mayhem/internal/tui/deletion"
 	"github.com/enckse/mayhem/internal/tui/help"
 	"github.com/enckse/mayhem/internal/tui/keys"
 	"github.com/enckse/mayhem/internal/tui/messages"
@@ -193,7 +194,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			default:
 				inp, cmd := m.customInput.Update(msg)
-				t, _ := inp.(deleteConfirmation)
+				t, _ := inp.(deletion.Confirmation)
 				m.customInput = t
 
 				return m, cmd
@@ -487,7 +488,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.preInputFocus = "stack"
 				m.showCustomInput = true
 				m.customInputType = "delete"
-				m.customInput = initializeDeleteConfirmation()
+				m.customInput = deletion.NewConfirmation()
 				m.stackTable.Blur()
 				m.help = help.Model{}
 
@@ -500,7 +501,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.preInputFocus = "task"
 					m.showCustomInput = true
 					m.customInputType = "delete"
-					m.customInput = initializeDeleteConfirmation()
+					m.customInput = deletion.NewConfirmation()
 					m.taskTable.Blur()
 					m.help = help.Model{}
 

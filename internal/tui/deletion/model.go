@@ -1,4 +1,5 @@
-package tui
+// Package deletion handles confirmation of removal
+package deletion
 
 import (
 	"strings"
@@ -14,24 +15,28 @@ import (
 
 const isConfirm = "y"
 
+// Confirmation is a delete confirmation handler
 // textinput.Model doesn't implement tea.Model interface
-type deleteConfirmation struct {
+type Confirmation struct {
 	customInputType string
 }
 
-func initializeDeleteConfirmation() tea.Model {
-	m := deleteConfirmation{
+// NewConfirmation creates a new confirmation model item
+func NewConfirmation() tea.Model {
+	m := Confirmation{
 		customInputType: "delete",
 	}
 
 	return m
 }
 
-func (m deleteConfirmation) Init() tea.Cmd {
+// Init will initialize the object
+func (m Confirmation) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (m deleteConfirmation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+// Update will update the object
+func (m Confirmation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -52,7 +57,8 @@ func (m deleteConfirmation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m deleteConfirmation) View() string {
+// View will handle rendering the view
+func (m Confirmation) View() string {
 	// Can't just render textinput.Value(), otherwise cursor blinking wouldn't work
 	return lipgloss.NewStyle().Foreground(display.HighlightedBackgroundColor).Padding(1, 0).Render("Do you wish to proceed with deletion? (" + isConfirm + "/n): ")
 }
