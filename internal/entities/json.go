@@ -60,15 +60,11 @@ func ToJSON(ctx *state.Context) error {
 		return err
 	}
 	defer file.Close()
-	return handleJSON(file, ctx)
+	return DumpJSON(file, ctx)
 }
 
 // DumpJSON will write the current JSOn state to stdout
-func DumpJSON(ctx *state.Context) error {
-	return handleJSON(os.Stdout, ctx)
-}
-
-func handleJSON(dst io.Writer, ctx *state.Context) error {
+func DumpJSON(dst io.Writer, ctx *state.Context) error {
 	s, err := FetchStacks(ctx)
 	if err != nil {
 		return err

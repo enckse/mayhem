@@ -84,7 +84,7 @@ func run() error {
 		return err
 	}
 	if isExport {
-		return entities.DumpJSON(ctx)
+		return entities.DumpJSON(os.Stdout, ctx)
 	}
 	if isImport {
 		return entities.LoadJSON(ctx, isMerge)
