@@ -6,6 +6,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/tui/keys"
+	"github.com/enckse/mayhem/internal/tui/messages"
 )
 
 // textarea.Model doesn't implement tea.Model interface
@@ -56,7 +57,7 @@ func (m textArea) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+s":
-			return m, goToFormWithVal(m.input.Value())
+			return m, messages.FormGoToWith(m.input.Value())
 		}
 	}
 

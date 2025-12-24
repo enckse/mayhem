@@ -1,3 +1,4 @@
+// Package tui has the main control window
 package tui
 
 import (
@@ -12,6 +13,7 @@ import (
 	"github.com/enckse/mayhem/internal/state"
 	"github.com/enckse/mayhem/internal/tui/help"
 	"github.com/enckse/mayhem/internal/tui/keys"
+	"github.com/enckse/mayhem/internal/tui/messages"
 )
 
 type (
@@ -82,11 +84,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.showInput {
 		switch msg := msg.(type) {
 
-		case goToMainMsg:
+		case messages.Main:
 			m.input = inputForm{}
 			m.showInput = false
 
-			if msg.value.(string) == "refresh" {
+			if msg.Value.(string) == "refresh" {
 				m.preserveState()
 				m.refreshData()
 			}
@@ -138,7 +140,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "delete":
 			switch msg := msg.(type) {
 
-			case goToMainMsg:
+			case messages.Main:
 				m.showCustomInput = false
 
 				switch m.preInputFocus {
@@ -150,7 +152,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.help = help.NewModel(taskKeys)
 				}
 
-				if msg.value.(string) == "y" {
+				if msg.Value.(string) == "y" {
 					switch m.preInputFocus {
 					case "stack":
 						stackIndex := m.stackTable.Cursor()
@@ -200,12 +202,12 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "move":
 			switch msg := msg.(type) {
 
-			case goToMainMsg:
+			case messages.Main:
 				m.showCustomInput = false
 				m.taskTable.Focus()
 				m.help = help.NewModel(taskKeys)
 
-				response := msg.value.(keyVal)
+				response := msg.Value.(keyVal)
 
 				if response.val == "" {
 					return m, nil
@@ -556,7 +558,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						}
 						opts = append(opts, entry)
 					}
-					m.customInput = initializeListSelector(opts, "", goToMainWithVal)
+					m.customInput = initializeListSelector(opts, "", messages.MainGoToWith)
 
 					m.help = help.NewModel(listSelectorKeys)
 					return m, nil

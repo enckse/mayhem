@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/tui/keys"
+	"github.com/enckse/mayhem/internal/tui/messages"
 )
 
 type (
@@ -71,7 +72,7 @@ func (m listSelector) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, keys.Mappings.Return):
-			return m, goToMainWithVal(keyVal{})
+			return m, messages.MainGoToWith(keyVal{})
 
 		case key.Matches(msg, keys.Mappings.Quit, keys.Mappings.Exit):
 			return m, tea.Quit

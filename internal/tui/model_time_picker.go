@@ -9,6 +9,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/tui/keys"
+	"github.com/enckse/mayhem/internal/tui/messages"
 )
 
 type (
@@ -153,7 +154,7 @@ func (m timePicker) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return m, nil
 		case key.Matches(msg, keys.Mappings.Enter):
-			return m, goToFormWithVal(m.currTime)
+			return m, messages.FormGoToWith(m.currTime)
 		}
 	}
 	return m, nil

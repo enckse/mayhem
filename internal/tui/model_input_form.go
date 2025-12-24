@@ -13,6 +13,7 @@ import (
 	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
 	"github.com/enckse/mayhem/internal/tui/keys"
+	"github.com/enckse/mayhem/internal/tui/messages"
 )
 
 type (
@@ -106,7 +107,7 @@ func initializeInput(selectedTable string, data entities.Entity, fieldIndex int,
 
 		switch fieldIndex {
 		case 0:
-			targetField.model = initializeTextInput(stack.Title, "", 20, goToFormWithVal)
+			targetField.model = initializeTextInput(stack.Title, "", 20, messages.FormGoToWith)
 		}
 
 		m.helpKeys = targetField.helpKeys
@@ -125,7 +126,7 @@ func initializeInput(selectedTable string, data entities.Entity, fieldIndex int,
 
 		switch fieldIndex {
 		case taskTitleIndex:
-			targetField.model = initializeTextInput(task.Title, "", 60, goToFormWithVal)
+			targetField.model = initializeTextInput(task.Title, "", 60, messages.FormGoToWith)
 		case taskNotesIndex:
 			targetField.model = initializeTextArea(task.Notes, ctx.Screen)
 		case taskPriorityIndex:
@@ -136,7 +137,7 @@ func initializeInput(selectedTable string, data entities.Entity, fieldIndex int,
 				{val: "3"},
 				{val: "4"},
 			}
-			targetField.model = initializeListSelector(opts, fmt.Sprintf("%d", task.Priority), goToFormWithVal)
+			targetField.model = initializeListSelector(opts, fmt.Sprintf("%d", task.Priority), messages.FormGoToWith)
 		case taskDeadlineIndex:
 			if task.Deadline.IsZero() {
 				targetField.model = initializeTimePicker(time.Now())
@@ -163,14 +164,14 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, keys.Mappings.Return):
-			return m, goToMainCmd
+			return m, messages.MainGoTo
 
 		case key.Matches(msg, keys.Mappings.Exit):
 			return m, tea.Quit
 		}
 
-	case goToFormMsg:
-		selectedValue := msg.value
+	case messages.Form:
+		selectedValue := msg.Value
 
 		if (m.fieldMap[m.focusIndex].isRequired) && (selectedValue == m.fieldMap[m.focusIndex].nilValue) {
 			m.isInvalid = true
@@ -217,7 +218,7 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 
-		return m, goToMainWithVal("refresh")
+		return m, messages.MainGoToWith("refresh")
 	}
 
 	// Placing it outside KeyMsg case is required, otherwise messages like textinput's Blink will be lost

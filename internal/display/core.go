@@ -84,6 +84,7 @@ var (
 	PlaceHolderStyle = lipgloss.NewStyle().Foreground(UnfocusedColor)
 )
 
+// NewScreen will initialize a new, default screen setup
 func NewScreen() *Screen {
 	s := &Screen{}
 	s.Table.ViewHeight = 25

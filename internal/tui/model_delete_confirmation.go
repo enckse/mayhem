@@ -9,6 +9,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/tui/keys"
+	"github.com/enckse/mayhem/internal/tui/messages"
 )
 
 const isConfirm = "y"
@@ -36,16 +37,16 @@ func (m deleteConfirmation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 
 		case key.Matches(msg, keys.Mappings.Return):
-			return m, goToMainCmd
+			return m, messages.MainGoTo
 
 		case key.Matches(msg, keys.Mappings.Quit):
 			return m, tea.Quit
 
 		default:
 			if strings.ToLower(msg.String()) == isConfirm {
-				return m, goToMainWithVal(isConfirm)
+				return m, messages.MainGoToWith(isConfirm)
 			}
-			return m, goToMainWithVal("")
+			return m, messages.MainGoToWith("")
 		}
 	}
 	return m, nil
