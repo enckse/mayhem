@@ -5,5 +5,6 @@ import "gorm.io/gorm"
 
 // Context is the overall state context
 type Context struct {
-	DB *gorm.DB
+	DB     *gorm.DB
+	Config Config
 }

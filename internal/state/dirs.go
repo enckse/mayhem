@@ -1,5 +1,4 @@
-// Package app provides common application definitions
-package app
+package state
 
 import (
 	"os"
@@ -9,16 +8,15 @@ import (
 // EnvPrefix is the environment prefix for os.Getenv calls
 const EnvPrefix = "MAYHEM_"
 
-// DataDir will get the data directory for db storage
-func DataDir() (string, error) {
-	p, err := detectDir("XDG_CACHE_HOME", "DB_PATH", ".cache")
+func detectDir(xdgName, envVar, altName string) (string, error) {
+	p, err := getDir(xdgName, envVar, altName)
 	if err != nil {
 		return "", err
 	}
 	return p, os.MkdirAll(p, os.ModePerm)
 }
 
-func detectDir(xdgName, envVar, altName string) (string, error) {
+func getDir(xdgName, envVar, altName string) (string, error) {
 	path := os.Getenv(EnvPrefix + envVar)
 	if path != "" {
 		return path, nil

@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/enckse/mayhem/internal/app"
 	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
 )
@@ -23,11 +22,7 @@ func ToJSON(ctx *state.Context) error {
 		entities.SortTasks(tasks)
 		item.Tasks = tasks
 	}
-	dir, err := app.DataDir()
-	if err != nil {
-		return err
-	}
-	payload := filepath.Join(dir, "tasks.json")
+	payload := filepath.Join(ctx.Config.Data.Directory, "tasks.json")
 	b, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
 		return err

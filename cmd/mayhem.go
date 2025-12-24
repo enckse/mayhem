@@ -4,10 +4,8 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/enckse/mayhem/internal/app"
 	"github.com/enckse/mayhem/internal/convert"
 	entities "github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
@@ -35,6 +33,11 @@ func run() error {
 		return fmt.Errorf("invalid arguments: %s", arg)
 	}
 	ctx := &state.Context{}
+	cfg, err := state.LoadConfig()
+	if err != nil {
+		return err
+	}
+	ctx.Config = cfg
 	if err := entities.InitializeDB(ctx); err != nil {
 		return err
 	}
@@ -45,7 +48,7 @@ func run() error {
 	if _, err := p.Run(); err != nil {
 		return err
 	}
-	if strings.TrimSpace(os.Getenv(app.EnvPrefix+"EXPORT_JSON")) == "1" {
+	if ctx.Config.Convert.JSON {
 		return convert.ToJSON(ctx)
 	}
 	return nil
