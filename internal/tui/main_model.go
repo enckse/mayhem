@@ -8,6 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/enckse/mayhem/internal/entities"
+	"github.com/enckse/mayhem/internal/state"
 )
 
 type (
@@ -34,6 +35,7 @@ type (
 		preInputFocus   string // useful for reverting back when input box is closed
 		firstRender     bool
 		prevState       preserveState
+		context         *state.Context
 	}
 
 	preserveState struct {
@@ -44,8 +46,8 @@ type (
 )
 
 // InitializeMainModel will startup the core application model
-func InitializeMainModel() ModelWrapper {
-	stacks, _ := entities.FetchAllStacks()
+func InitializeMainModel(ctx *state.Context) ModelWrapper {
+	stacks, _ := entities.FetchAllStacks(ctx)
 
 	m := &model{
 		stackTable:     buildTable(stackColumns(), "stack"),
@@ -55,6 +57,7 @@ func InitializeMainModel() ModelWrapper {
 		help:           initializeHelp(stackKeys),
 		navigationKeys: tableNavigationKeys,
 		showHelp:       true,
+		context:        ctx,
 	}
 
 	m.stackTable.Focus()
@@ -153,7 +156,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 							m.stackTable.SetCursor(stackIndex - 1)
 						}
 
-						currStack.Delete()
+						currStack.Delete(m.context)
 						m.showTasks = false
 						m.showDetails = false
 						m.refreshData()
@@ -170,12 +173,12 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 							if !currTask.IsFinished {
 								stack := m.data[stackIndex]
 								stack.PendingTaskCount--
-								stack.Save()
+								stack.Save(m.context)
 							}
 							if taskIndex == len(m.taskTable.Rows())-1 {
 								m.taskTable.SetCursor(taskIndex - 1)
 							}
-							currTask.Delete()
+							currTask.Delete(m.context)
 							m.refreshData()
 							return m, nil
 						}
@@ -221,13 +224,13 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				// Decrease pending task count for old stack
 				if !currTask.IsFinished {
 					currStack.PendingTaskCount--
-					currStack.Save()
+					currStack.Save(m.context)
 				}
 
 				// Increase pending task count for new stack
-				entities.IncPendingCount(newStackID)
+				entities.IncPendingCount(newStackID, m.context)
 				currTask.StackID = newStackID
-				currTask.Save()
+				currTask.Save(m.context)
 
 				if taskIndex == len(m.taskTable.Rows())-1 {
 					m.taskTable.SetCursor(taskIndex - 1)
@@ -416,14 +419,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, Keys.New):
 			if m.stackTable.Focused() {
 				m.preInputFocus = "stack"
-				m.input = initializeInput("stack", entities.Stack{}, 0)
+				m.input = initializeInput("stack", entities.Stack{}, 0, m.context)
 
 			} else if m.taskTable.Focused() {
 				m.preInputFocus = "task"
 				newTask := entities.Task{
 					StackID: m.data[m.stackTable.Cursor()].ID,
 				}
-				m.input = initializeInput("task", newTask, 0)
+				m.input = initializeInput("task", newTask, 0, m.context)
 
 			} else if m.taskDetails.Focused() {
 				return m, nil
@@ -445,7 +448,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, nil
 				}
 				m.preInputFocus = "stack"
-				m.input = initializeInput("stack", m.data[m.stackTable.Cursor()], 0)
+				m.input = initializeInput("stack", m.data[m.stackTable.Cursor()], 0, m.context)
 			} else if m.taskTable.Focused() {
 				if len(m.taskTable.Rows()) > 0 {
 					m.showDetails = true
@@ -458,7 +461,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			} else if m.taskDetails.Focused() {
 				m.preInputFocus = "detail"
-				m.input = initializeInput("task", m.data[m.stackTable.Cursor()].Tasks[m.taskTable.Cursor()], m.taskDetails.focusIndex)
+				m.input = initializeInput("task", m.data[m.stackTable.Cursor()].Tasks[m.taskTable.Cursor()], m.taskDetails.focusIndex, m.context)
 			}
 
 			m.stackTable.Blur()
@@ -512,15 +515,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 					// For recurring tasks we toggle the status of latest recur task entry
 					currTask.IsFinished = !currTask.IsFinished
-					currTask.Save()
+					currTask.Save(m.context)
 
 					if currTask.IsFinished {
 						stack.PendingTaskCount--
-						stack.Save()
 					} else {
 						stack.PendingTaskCount++
-						stack.Save()
 					}
+					stack.Save(m.context)
 
 					stack.Tasks[taskIndex] = currTask
 					m.data[stackIndex] = stack
@@ -673,7 +675,7 @@ func (m *model) taskFooter() string {
 
 // Pull new data from database
 func (m *model) refreshData() {
-	stacks, _ := entities.FetchAllStacks()
+	stacks, _ := entities.FetchAllStacks(m.context)
 	m.data = stacks
 	m.updateSelectionData("stacks")
 }

@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/enckse/mayhem/internal/entities"
+	"github.com/enckse/mayhem/internal/state"
 )
 
 type (
@@ -21,6 +22,7 @@ type (
 		invalidPrompt string
 		isNewTask     bool
 		helpKeys      keyMap
+		context       *state.Context
 	}
 
 	field struct {
@@ -86,7 +88,7 @@ var (
 	}
 )
 
-func initializeInput(selectedTable string, data entities.Entity, fieldIndex int) inputForm {
+func initializeInput(selectedTable string, data entities.Entity, fieldIndex int, ctx *state.Context) inputForm {
 	var m inputForm
 	if selectedTable == "stack" {
 		m = inputForm{
@@ -143,6 +145,7 @@ func initializeInput(selectedTable string, data entities.Entity, fieldIndex int)
 		m.fieldMap[fieldIndex] = targetField
 	}
 
+	m.context = ctx
 	return m
 }
 
@@ -182,7 +185,7 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				stack.Title = selectedValue.(string)
 			}
 
-			stack.Save()
+			stack.Save(m.context)
 
 		case "task":
 			task := m.data.(entities.Task)
@@ -204,10 +207,10 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			}
 
-			task = task.Save().(entities.Task)
+			task = task.Save(m.context).(entities.Task)
 
 			if m.isNewTask {
-				entities.IncPendingCount(task.StackID)
+				entities.IncPendingCount(task.StackID, m.context)
 			}
 		}
 

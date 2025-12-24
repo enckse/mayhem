@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/enckse/mayhem/internal/state"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -21,15 +22,15 @@ type Task struct {
 }
 
 // Save will store the task
-func (t Task) Save() Entity {
-	DB.Save(&t)
+func (t Task) Save(ctx *state.Context) Entity {
+	ctx.DB.Save(&t)
 	return t
 }
 
 // Delete will remove the task
-func (t Task) Delete() {
+func (t Task) Delete(ctx *state.Context) {
 	// Unscoped() is used to ensure hard delete, where task will be removed from db instead of being just marked as "deleted"
-	DB.Unscoped().Select(clause.Associations).Delete(&t)
+	ctx.DB.Unscoped().Select(clause.Associations).Delete(&t)
 }
 
 // EntityID gets the backing entity id

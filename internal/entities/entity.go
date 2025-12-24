@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/enckse/mayhem/internal/app"
+	"github.com/enckse/mayhem/internal/state"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -13,15 +14,12 @@ import (
 
 // Entity is the core DB entity
 type Entity interface {
-	Save() Entity
-	Delete()
+	Save(*state.Context) Entity
+	Delete(*state.Context)
 }
 
-// DB is the backing database
-var DB *gorm.DB
-
 // InitializeDB will setup and ready the backing store
-func InitializeDB() error {
+func InitializeDB(ctx *state.Context) error {
 	path, err := app.DataDir()
 	if err != nil {
 		return err
@@ -36,6 +34,6 @@ func InitializeDB() error {
 	}
 	db.AutoMigrate(&Stack{}, &Task{})
 
-	DB = db
+	ctx.DB = db
 	return nil
 }

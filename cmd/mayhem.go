@@ -10,6 +10,7 @@ import (
 	"github.com/enckse/mayhem/internal/app"
 	"github.com/enckse/mayhem/internal/convert"
 	entities "github.com/enckse/mayhem/internal/entities"
+	"github.com/enckse/mayhem/internal/state"
 	tui "github.com/enckse/mayhem/internal/tui"
 )
 
@@ -33,18 +34,19 @@ func run() error {
 		}
 		return fmt.Errorf("invalid arguments: %s", arg)
 	}
-	if err := entities.InitializeDB(); err != nil {
+	ctx := &state.Context{}
+	if err := entities.InitializeDB(ctx); err != nil {
 		return err
 	}
 
-	model := tui.InitializeMainModel()
+	model := tui.InitializeMainModel(ctx)
 	p := tea.NewProgram(model.Backing, tea.WithAltScreen())
 
 	if _, err := p.Run(); err != nil {
 		return err
 	}
 	if strings.TrimSpace(os.Getenv(app.EnvPrefix+"EXPORT_JSON")) == "1" {
-		return convert.ToJSON()
+		return convert.ToJSON(ctx)
 	}
 	return nil
 }

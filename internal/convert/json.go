@@ -8,11 +8,12 @@ import (
 
 	"github.com/enckse/mayhem/internal/app"
 	"github.com/enckse/mayhem/internal/entities"
+	"github.com/enckse/mayhem/internal/state"
 )
 
 // ToJSON will dump entities to JSON
-func ToJSON() error {
-	s, err := entities.FetchAllStacks()
+func ToJSON(ctx *state.Context) error {
+	s, err := entities.FetchAllStacks(ctx)
 	if err != nil {
 		return err
 	}

@@ -4,6 +4,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/enckse/mayhem/internal/state"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -22,19 +23,19 @@ func (s Stack) EntityID() uint {
 }
 
 // InitializeStacks will initialize the initial stack set
-func InitializeStacks() (Stack, error) {
+func InitializeStacks(ctx *state.Context) (Stack, error) {
 	stack := Stack{Title: "New Stack"}
-	result := DB.Create(&stack)
+	result := ctx.DB.Create(&stack)
 	return stack, result.Error
 }
 
 // FetchAllStacks will retrieve all stacks
-func FetchAllStacks() ([]Stack, error) {
+func FetchAllStacks(ctx *state.Context) ([]Stack, error) {
 	var stacks []Stack
-	result := DB.Model(&Stack{}).Preload("Tasks").Find(&stacks)
+	result := ctx.DB.Model(&Stack{}).Preload("Tasks").Find(&stacks)
 
 	if len(stacks) == 0 {
-		stack, err := InitializeStacks()
+		stack, err := InitializeStacks(ctx)
 		return []Stack{stack}, err
 	}
 
@@ -42,24 +43,24 @@ func FetchAllStacks() ([]Stack, error) {
 }
 
 // IncPendingCount will add to the pending task count
-func IncPendingCount(id uint) {
+func IncPendingCount(id uint, ctx *state.Context) {
 	stack := Stack{}
-	DB.Find(&stack, id)
+	ctx.DB.Find(&stack, id)
 	stack.PendingTaskCount++
-	stack.Save()
+	stack.Save(ctx)
 }
 
 // Save will save the entity
-func (s Stack) Save() Entity {
-	DB.Save(&s)
+func (s Stack) Save(ctx *state.Context) Entity {
+	ctx.DB.Save(&s)
 	return s
 }
 
 // Delete will remove the entity
-func (s Stack) Delete() {
+func (s Stack) Delete(ctx *state.Context) {
 	// Unscoped() is used to ensure hard delete, where stack will be removed from db instead of being just marked as "deleted"
 	// DB.Unscoped().Delete(&s)
-	DB.Unscoped().Select(clause.Associations).Delete(&s)
+	ctx.DB.Unscoped().Select(clause.Associations).Delete(&s)
 }
 
 // SortStacks will sort by title
