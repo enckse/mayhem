@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"github.com/enckse/mayhem/internal/state"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -28,4 +29,8 @@ func (d *DBWrapper) Delete(obj any) {
 	// Unscoped() is used to ensure hard delete, where stack will be removed from db instead of being just marked as "deleted"
 	// DB.Unscoped().Delete(&s)
 	d.db.Unscoped().Select(clause.Associations).Delete(obj)
+}
+
+func (d *DBWrapper) SyncJSON(ctx *state.Context) {
+	ToJSON(ctx)
 }

@@ -18,6 +18,7 @@ type (
 		Stacks(any) error
 		Find(any, uint)
 		Delete(any)
+		SyncJSON(*Context)
 	}
 	// Context is the overall state context
 	Context struct {

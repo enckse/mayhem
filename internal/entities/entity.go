@@ -34,7 +34,7 @@ func InitializeDB(ctx *state.Context) error {
 func Sync(ctx *state.Context, obj any) {
 	ctx.DB.Save(obj)
 	if ctx.Config.JSON.Sync {
-		ToJSON(ctx)
+		ctx.DB.SyncJSON(ctx)
 	}
 }
 
