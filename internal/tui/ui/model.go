@@ -54,15 +54,19 @@ type (
 		stackID     uint
 		taskID      uint
 	}
+	dataCategory int
 )
 
 const (
-	stackViewName     = "stack"
-	detailViewName    = "detail"
-	taskViewName      = "task"
-	tasksDataUpdate   = "tasks"
-	stacksDataUpdate  = "stacks"
-	detailsDataUpdate = "details"
+	stackViewName  = "stack"
+	detailViewName = "detail"
+	taskViewName   = "task"
+)
+
+const (
+	stackDataCategory dataCategory = iota
+	taskDataCategory
+	detailDataCategory
 )
 
 // Initialize will startup the core application model
@@ -350,14 +354,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.taskDetails.FocusIndex = 0
 				m.showTasks = false
 				m.showDetails = false
-				m.updateSelectionData(tasksDataUpdate)
+				m.updateSelectionData(taskDataCategory)
 				return m, nil
 
 			} else if m.taskTable.Focused() {
 				m.taskTable.MoveUp(1)
 				m.taskDetails.FocusIndex = 0
 				m.showDetails = false
-				m.updateSelectionData(detailsDataUpdate)
+				m.updateSelectionData(detailDataCategory)
 				return m, nil
 
 			} else if m.taskDetails.Focused() {
@@ -374,14 +378,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.taskDetails.FocusIndex = 0
 				m.showTasks = false
 				m.showDetails = false
-				m.updateSelectionData(tasksDataUpdate)
+				m.updateSelectionData(taskDataCategory)
 				return m, nil
 
 			} else if m.taskTable.Focused() {
 				m.taskTable.MoveDown(1)
 				m.taskDetails.FocusIndex = 0
 				m.showDetails = false
-				m.updateSelectionData(detailsDataUpdate)
+				m.updateSelectionData(detailDataCategory)
 				return m, nil
 
 			} else if m.taskDetails.Focused() {
@@ -398,14 +402,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.taskDetails.FocusIndex = 0
 				m.showTasks = false
 				m.showDetails = false
-				m.updateSelectionData(tasksDataUpdate)
+				m.updateSelectionData(taskDataCategory)
 				return m, nil
 
 			} else if m.taskTable.Focused() {
 				m.taskTable.GotoTop()
 				m.taskDetails.FocusIndex = 0
 				m.showDetails = false
-				m.updateSelectionData(detailsDataUpdate)
+				m.updateSelectionData(detailDataCategory)
 				return m, nil
 
 			} else if m.taskDetails.Focused() {
@@ -422,14 +426,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.taskDetails.FocusIndex = 0
 				m.showTasks = false
 				m.showDetails = false
-				m.updateSelectionData(tasksDataUpdate)
+				m.updateSelectionData(taskDataCategory)
 				return m, nil
 
 			} else if m.taskTable.Focused() {
 				m.taskTable.GotoBottom()
 				m.taskDetails.FocusIndex = 0
 				m.showDetails = false
-				m.updateSelectionData(detailsDataUpdate)
+				m.updateSelectionData(detailDataCategory)
 				return m, nil
 
 			} else if m.taskDetails.Focused() {
@@ -552,7 +556,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 					// Changing finish status will lead to reordering, so state has to be preserved
 					m.preserveState()
-					m.updateSelectionData(stacksDataUpdate)
+					m.updateSelectionData(stackDataCategory)
 					return m, nil
 				}
 			}
@@ -597,7 +601,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.firstRender {
 			// updateSelectionData() is called here instead of being called from Init()
 			// since details box rendering requires screen dimensions, which aren't set at the time of Init()
-			m.updateSelectionData(stacksDataUpdate)
+			m.updateSelectionData(stackDataCategory)
 			m.firstRender = false
 		}
 	}
@@ -700,11 +704,11 @@ func (m *model) taskFooter() string {
 func (m *model) refreshData() {
 	stacks, _ := entities.FetchStacks(m.context)
 	m.data = stacks
-	m.updateSelectionData(stacksDataUpdate)
+	m.updateSelectionData(stackDataCategory)
 }
 
 // Efficiently update only the required pane
-func (m *model) updateSelectionData(category string) {
+func (m *model) updateSelectionData(category dataCategory) {
 	var retainIndex bool
 	if m.prevState.retainState {
 		retainIndex = true
@@ -712,14 +716,14 @@ func (m *model) updateSelectionData(category string) {
 	}
 
 	switch category {
-	case stacksDataUpdate:
+	case stackDataCategory:
 		m.updateStackTableData(retainIndex)
 		m.updateTaskTableData(retainIndex)
 		m.updateDetailsBoxData(true)
-	case tasksDataUpdate:
+	case taskDataCategory:
 		m.updateTaskTableData(retainIndex)
 		m.updateDetailsBoxData(false)
-	case detailsDataUpdate:
+	case detailDataCategory:
 		m.updateDetailsBoxData(false)
 	default:
 		m.updateStackTableData(retainIndex)
