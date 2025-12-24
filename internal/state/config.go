@@ -44,7 +44,6 @@ func LoadConfig() (Config, error) {
 		if err != nil {
 			return config, err
 		}
-		fmt.Println(d)
 		config.Data.Directory = d
 	}
 	const isHome = "~"
