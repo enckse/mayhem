@@ -29,7 +29,7 @@ func LoadJSON(ctx *state.Context, merge bool) error {
 	var existing []Stack
 	if merge {
 		var err error
-		existing, err = FetchAllStacks(ctx)
+		existing, err = FetchStacks(ctx)
 		if err != nil {
 			return err
 		}
@@ -69,7 +69,7 @@ func DumpJSON(ctx *state.Context) error {
 }
 
 func handleJSON(dst io.Writer, ctx *state.Context) error {
-	s, err := FetchAllStacks(ctx)
+	s, err := FetchStacks(ctx)
 	if err != nil {
 		return err
 	}

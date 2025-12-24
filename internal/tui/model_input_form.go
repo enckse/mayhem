@@ -212,7 +212,7 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			task = task.Save(m.context).(entities.Task)
 
 			if m.isNewTask {
-				entities.IncPendingCount(task.StackID, m.context)
+				entities.IncrementPendingCount(task.StackID, m.context)
 			}
 		}
 

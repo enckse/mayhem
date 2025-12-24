@@ -49,7 +49,7 @@ type (
 
 // InitializeMainModel will startup the core application model
 func InitializeMainModel(ctx *state.Context) ModelWrapper {
-	stacks, _ := entities.FetchAllStacks(ctx)
+	stacks, _ := entities.FetchStacks(ctx)
 
 	m := &model{
 		stackTable:     buildTable(stackColumns(), "stack"),
@@ -230,7 +230,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 
 				// Increase pending task count for new stack
-				entities.IncPendingCount(newStackID, m.context)
+				entities.IncrementPendingCount(newStackID, m.context)
 				currTask.StackID = newStackID
 				currTask.Save(m.context)
 
@@ -677,7 +677,7 @@ func (m *model) taskFooter() string {
 
 // Pull new data from database
 func (m *model) refreshData() {
-	stacks, _ := entities.FetchAllStacks(m.context)
+	stacks, _ := entities.FetchStacks(m.context)
 	m.data = stacks
 	m.updateSelectionData("stacks")
 }

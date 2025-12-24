@@ -22,28 +22,28 @@ func (s Stack) EntityID() uint {
 	return s.ID
 }
 
-// InitializeStacks will initialize the initial stack set
-func InitializeStacks(ctx *state.Context) (Stack, error) {
+// NewStack will create a new stack
+func NewStack(ctx *state.Context) (Stack, error) {
 	stack := Stack{Title: "New Stack"}
 	result := ctx.DB.Create(&stack)
 	return stack, result.Error
 }
 
-// FetchAllStacks will retrieve all stacks
-func FetchAllStacks(ctx *state.Context) ([]Stack, error) {
+// FetchStacks will retrieve all stacks
+func FetchStacks(ctx *state.Context) ([]Stack, error) {
 	var stacks []Stack
 	result := ctx.DB.Model(&Stack{}).Preload("Tasks").Find(&stacks)
 
 	if len(stacks) == 0 {
-		stack, err := InitializeStacks(ctx)
+		stack, err := NewStack(ctx)
 		return []Stack{stack}, err
 	}
 
 	return stacks, result.Error
 }
 
-// IncPendingCount will add to the pending task count
-func IncPendingCount(id uint, ctx *state.Context) {
+// IncrementPendingCount will add to the pending task count
+func IncrementPendingCount(id uint, ctx *state.Context) {
 	stack := Stack{}
 	ctx.DB.Find(&stack, id)
 	stack.PendingTaskCount++
