@@ -126,13 +126,13 @@ func (s *Screen) EmptyTaskStyle() lipgloss.Style {
 		AlignHorizontal(lipgloss.Center).
 		AlignVertical(lipgloss.Center).
 		Width(60).
-		Height(s.Table.ViewHeight + 3) // 3 is added to account for header & footer height
+		Height(s.Table.ViewHeight + 1) // 3 is added to account for header & footer height
 }
 
 // EmptyDetailsStyle will get the style for empty details
 func (s *Screen) EmptyDetailsStyle() lipgloss.Style {
 	return s.DetailsBoxStyle().
-		Height(s.Table.ViewHeight + 3).
+		Height(s.Table.ViewHeight + 1).
 		AlignHorizontal(lipgloss.Center).
 		AlignVertical(lipgloss.Center)
 }
@@ -151,7 +151,7 @@ func (s *Screen) DetailsBoxHeight() int {
 func (s *Screen) DetailsBoxStyle() lipgloss.Style {
 	return lipgloss.NewStyle().
 		Width(s.DetailsBoxWidth()).
-		Height(s.Table.ViewHeight + 2)
+		Height(s.Table.ViewHeight)
 }
 
 // DetailsItemStyle will get the style for details box item(s)
