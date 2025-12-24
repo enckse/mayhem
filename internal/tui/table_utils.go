@@ -191,7 +191,7 @@ func getEmptyDetailsView() string {
 	return getEmptyDetailsStyle().Render("Press either '→' or 'l' key to see task details")
 }
 
-func incompleteTaskTag(count int) string {
+func incompleteTaskTag(count uint64) string {
 	if count > 0 && count <= 10 {
 		return " " + string(rune('➊'+count-1))
 	} else if count > 10 {

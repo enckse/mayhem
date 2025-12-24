@@ -13,7 +13,7 @@ import (
 type Stack struct {
 	gorm.Model       `json:"-"`
 	Title            string `gorm:"notnull"`
-	PendingTaskCount int    `json:"-"`
+	PendingTaskCount uint64 `json:"-"`
 	Tasks            []Task
 }
 
