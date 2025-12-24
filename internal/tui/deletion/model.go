@@ -41,13 +41,10 @@ func (m Confirmation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
-
 		case key.Matches(msg, keys.Mappings.Return):
 			return m, messages.MainGoTo
-
 		case key.Matches(msg, keys.Mappings.Quit):
 			return m, tea.Quit
-
 		default:
 			if strings.ToLower(msg.String()) == isConfirm {
 				return m, messages.MainGoToWith(isConfirm)

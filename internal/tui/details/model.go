@@ -43,15 +43,14 @@ func NewBox(screen *display.Screen) Box {
 }
 
 // Build will construct a new details box
-func (m *Box) Build(data entities.Task, preserveOffset bool, screen *display.Screen) {
+func (m *Box) Build(data entities.Task, preserveOffset bool) {
 	m.taskData = data
-	m.screen = screen
 
 	// We want to preserve offset when we return to same details view after editing any field
 	// But when going from one task to another, we want to reset the view
 	m.preserveOffset = preserveOffset
 	m.oldViewportOffset = m.ViewPort.YOffset
-	m.ViewPort = viewport.New(screen.DetailsBoxWidth(), screen.Table.ViewHeight)
+	m.ViewPort = viewport.New(m.screen.DetailsBoxWidth(), m.screen.Table.ViewHeight)
 	m.renderContent()
 }
 

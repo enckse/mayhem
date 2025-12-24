@@ -777,7 +777,7 @@ func (m *model) updateDetailsBoxData(preserveOffset bool) {
 		currTask = entities.Task{}
 	}
 
-	m.taskDetails.Build(currTask, preserveOffset, m.context.Screen)
+	m.taskDetails.Build(currTask, preserveOffset)
 }
 
 // Changing title, deadline, priority or finish status will lead to table reordering
