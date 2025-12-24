@@ -6,8 +6,18 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// TableType are the various UI display tables that exist
-type TableType uint
+type (
+	// TableType are the various UI display tables that exist
+	TableType uint
+	// Screen is the backing display screen
+	Screen struct {
+		Height int
+		Width  int
+		Table  struct {
+			ViewHeight int
+		}
+	}
+)
 
 const (
 	// StackTableWidth is the width of the stack(s) table
@@ -23,13 +33,6 @@ const (
 )
 
 var (
-	// TableViewHeight is the height of displayable tables
-	TableViewHeight = 25
-	// ScreenWidth is the width of the screen
-	ScreenWidth int
-	// ScreenHeight is the height of the screen
-	ScreenHeight int
-
 	inputFormBorderColor = lipgloss.Color("#325b84")
 
 	taskSelectionColor    = lipgloss.Color("#f1b44c")
@@ -81,14 +84,20 @@ var (
 	PlaceHolderStyle = lipgloss.NewStyle().Foreground(UnfocusedColor)
 )
 
+func NewScreen() *Screen {
+	s := &Screen{}
+	s.Table.ViewHeight = 25
+	return s
+}
+
 // InputFormStyle will get the default input form style to use
 // Since width is dynamic, we have to append it to the style before usage
-func InputFormStyle() lipgloss.Style {
+func (s *Screen) InputFormStyle() lipgloss.Style {
 	// Subtract 2 for padding on each side
 	return lipgloss.NewStyle().
 		BorderStyle(lipgloss.ThickBorder()).
 		BorderForeground(inputFormBorderColor).
-		Padding(0, 1).Width(ScreenWidth - 2)
+		Padding(0, 1).Width(s.Width - 2)
 }
 
 // TableStyle will get the table style definition
@@ -111,44 +120,44 @@ func TableStyle(tableType TableType) table.Styles {
 }
 
 // EmptyTaskStyle will get the style for an empty task
-func EmptyTaskStyle() lipgloss.Style {
+func (s *Screen) EmptyTaskStyle() lipgloss.Style {
 	return lipgloss.NewStyle().
 		AlignHorizontal(lipgloss.Center).
 		AlignVertical(lipgloss.Center).
 		Width(60).
-		Height(TableViewHeight + 3) // 3 is added to account for header & footer height
+		Height(s.Table.ViewHeight + 3) // 3 is added to account for header & footer height
 }
 
 // EmptyDetailsStyle will get the style for empty details
-func EmptyDetailsStyle() lipgloss.Style {
-	return DetailsBoxStyle().
-		Height(TableViewHeight + 3).
+func (s *Screen) EmptyDetailsStyle() lipgloss.Style {
+	return s.DetailsBoxStyle().
+		Height(s.Table.ViewHeight + 3).
 		AlignHorizontal(lipgloss.Center).
 		AlignVertical(lipgloss.Center)
 }
 
 // DetailsBoxWidth will get the width for the details box
-func DetailsBoxWidth() int {
-	return ScreenWidth - (StackTableWidth + TaskTableWidth + 3*2) // each of the 3 boxes have left & right borders
+func (s *Screen) DetailsBoxWidth() int {
+	return s.Width - (StackTableWidth + TaskTableWidth + 3*2) // each of the 3 boxes have left & right borders
 }
 
 // DetailsBoxHeight will get the height for the details box
-func DetailsBoxHeight() int {
-	return TableViewHeight
+func (s *Screen) DetailsBoxHeight() int {
+	return s.Table.ViewHeight
 }
 
 // DetailsBoxStyle will get the style for details box
-func DetailsBoxStyle() lipgloss.Style {
+func (s *Screen) DetailsBoxStyle() lipgloss.Style {
 	return lipgloss.NewStyle().
-		Width(DetailsBoxWidth()).
-		Height(TableViewHeight + 2)
+		Width(s.DetailsBoxWidth()).
+		Height(s.Table.ViewHeight + 2)
 }
 
 // DetailsItemStyle will get the style for details box item(s)
-func DetailsItemStyle(isSelected bool) lipgloss.Style {
+func (s *Screen) DetailsItemStyle(isSelected bool) lipgloss.Style {
 	style := lipgloss.NewStyle().
 		Padding(0, 0, 1, 0).
-		Width(DetailsBoxWidth() - 2)
+		Width(s.DetailsBoxWidth() - 2)
 
 	if isSelected {
 		style.Background(detailsSelectionColor)
@@ -160,14 +169,24 @@ func DetailsItemStyle(isSelected bool) lipgloss.Style {
 // ItemContainerStyle will get the style for an item based on default style and selection
 // Applying padding (0,1) to detail items causes issue with description text alignment
 // To avoid that an additional container is used for detail items
-func ItemContainerStyle(isSelected bool) lipgloss.Style {
+func (s *Screen) ItemContainerStyle(isSelected bool) lipgloss.Style {
 	style := lipgloss.NewStyle().
 		Padding(0, 1).
-		Width(DetailsBoxWidth())
+		Width(s.DetailsBoxWidth())
 
 	if isSelected {
 		style.Background(detailsSelectionColor)
 	}
 
 	return style
+}
+
+// EmptyTaskView will get the empty task view setup
+func (s *Screen) EmptyTaskView() string {
+	return s.EmptyTaskStyle().Render("Press either '→' or 'l' key to explore this stack")
+}
+
+// EmptyDetailsView will get the empty details view setup
+func (s *Screen) EmptyDetailsView() string {
+	return s.EmptyDetailsStyle().Render("Press either '→' or 'l' key to see task details")
 }

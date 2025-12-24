@@ -7,9 +7,10 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	entities "github.com/enckse/mayhem/internal/entities"
+	"github.com/enckse/mayhem/internal/display"
+	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
-	tui "github.com/enckse/mayhem/internal/tui"
+	"github.com/enckse/mayhem/internal/tui"
 )
 
 var version string
@@ -56,6 +57,7 @@ func run() error {
 		return errors.New("only one of export/import can be provided")
 	}
 	ctx := &state.Context{}
+	ctx.Screen = display.NewScreen()
 	cfg, err := state.LoadConfig()
 	if err != nil {
 		return err

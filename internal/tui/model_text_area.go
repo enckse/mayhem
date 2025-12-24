@@ -4,7 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textarea"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/enckse/mayhem/internal/tui/display"
+	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
@@ -28,10 +28,10 @@ var textAreaKeys = keys.Map{
 	),
 }
 
-func initializeTextArea(value string) tea.Model {
+func initializeTextArea(value string, screen *display.Screen) tea.Model {
 	t := textarea.New()
 	t.SetValue(value)
-	t.SetWidth(display.InputFormStyle().GetWidth() - 2)
+	t.SetWidth(screen.InputFormStyle().GetWidth() - 2)
 	t.SetHeight(4)
 	t.CharLimit = 500
 	t.Placeholder = "Enter task notes"

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 
+	"github.com/enckse/mayhem/internal/display"
 	"gorm.io/gorm"
 )
 
@@ -15,6 +16,7 @@ const FileName = "todo."
 type Context struct {
 	DB     *gorm.DB
 	Config Config
+	Screen *display.Screen
 }
 
 // PathExists will indicate if a path exists (or not)

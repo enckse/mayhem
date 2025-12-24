@@ -6,8 +6,8 @@ import (
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
+	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/entities"
-	"github.com/enckse/mayhem/internal/tui/display"
 	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
@@ -154,9 +154,9 @@ func taskRows(tasks []entities.Task) []table.Row {
 	return rows
 }
 
-func buildTable(columns []table.Column, tableType display.TableType) table.Model {
+func buildTable(columns []table.Column, tableType display.TableType, screen *display.Screen) table.Model {
 	t := table.New(
-		table.WithHeight(display.TableViewHeight),
+		table.WithHeight(screen.Table.ViewHeight),
 		table.WithColumns(columns),
 		table.WithKeyMap(table.DefaultKeyMap()),
 	)
@@ -183,14 +183,6 @@ func formatTime(time time.Time, fullDate bool) string {
 		return days + "-" + month + "-" + year + "  " + hours + ":" + minutes + " " + midDayInfo
 	}
 	return hours + ":" + minutes + " " + midDayInfo
-}
-
-func getEmptyTaskView() string {
-	return display.EmptyTaskStyle().Render("Press either '→' or 'l' key to explore this stack")
-}
-
-func getEmptyDetailsView() string {
-	return display.EmptyDetailsStyle().Render("Press either '→' or 'l' key to see task details")
 }
 
 func incompleteTaskTag(count uint64) string {

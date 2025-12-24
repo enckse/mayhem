@@ -9,9 +9,9 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
-	"github.com/enckse/mayhem/internal/tui/display"
 	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
@@ -127,7 +127,7 @@ func initializeInput(selectedTable string, data entities.Entity, fieldIndex int,
 		case taskTitleIndex:
 			targetField.model = initializeTextInput(task.Title, "", 60, goToFormWithVal)
 		case taskNotesIndex:
-			targetField.model = initializeTextArea(task.Notes)
+			targetField.model = initializeTextArea(task.Notes, ctx.Screen)
 		case taskPriorityIndex:
 			opts := []keyVal{
 				{val: "0"},
