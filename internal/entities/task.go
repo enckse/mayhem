@@ -7,7 +7,6 @@ import (
 
 	"github.com/enckse/mayhem/internal/state"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 // Task defines task-based entities for work
@@ -29,8 +28,7 @@ func (t Task) Save(ctx *state.Context) Entity {
 
 // Delete will remove the task
 func (t Task) Delete(ctx *state.Context) {
-	// Unscoped() is used to ensure hard delete, where task will be removed from db instead of being just marked as "deleted"
-	ctx.DB.Unscoped().Select(clause.Associations).Delete(&t)
+	ctx.DB.Delete(&t)
 }
 
 // EntityID gets the backing entity id

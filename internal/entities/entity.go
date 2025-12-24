@@ -26,7 +26,7 @@ func InitializeDB(ctx *state.Context) error {
 	}
 	db.AutoMigrate(&Stack{}, &Task{})
 
-	ctx.DB = db
+	ctx.DB = &DBWrapper{db}
 	return nil
 }
 

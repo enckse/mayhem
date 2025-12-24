@@ -6,21 +6,29 @@ import (
 	"os"
 
 	"github.com/enckse/mayhem/internal/display"
-	"gorm.io/gorm"
 )
 
 // FileName is the application name prefix
 const FileName = "todo."
 
-// Context is the overall state context
-type Context struct {
-	DB     *gorm.DB
-	Config Config
-	Screen *display.Screen
-	State  struct {
-		FinishedTasks map[uint]bool
+type (
+	Store interface {
+		Save(any)
+		Create(any) error
+		Stacks(any) error
+		Find(any, uint)
+		Delete(any)
 	}
-}
+	// Context is the overall state context
+	Context struct {
+		DB     Store
+		Config Config
+		Screen *display.Screen
+		State  struct {
+			FinishedTasks map[uint]bool
+		}
+	}
+)
 
 // PathExists will indicate if a path exists (or not)
 func PathExists(path string) bool {
