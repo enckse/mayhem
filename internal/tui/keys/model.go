@@ -1,7 +1,9 @@
+// Package keys handles key mappings
 package keys
 
 import "github.com/charmbracelet/bubbles/key"
 
+// Map is the key binding map definition
 type Map struct {
 	CalendarToggle key.Binding
 	Up             key.Binding
@@ -24,6 +26,7 @@ type Map struct {
 	Exit           key.Binding
 }
 
+// Mappings are actual key bindings
 var Mappings = Map{
 	CalendarToggle: key.NewBinding(
 		key.WithKeys("c"),

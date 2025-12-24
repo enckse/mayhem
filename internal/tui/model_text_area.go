@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textarea"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/enckse/mayhem/internal/tui/display"
 	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
@@ -30,13 +31,13 @@ var textAreaKeys = keys.Map{
 func initializeTextArea(value string) tea.Model {
 	t := textarea.New()
 	t.SetValue(value)
-	t.SetWidth(getInputFormStyle().GetWidth() - 2)
+	t.SetWidth(display.InputFormStyle().GetWidth() - 2)
 	t.SetHeight(4)
 	t.CharLimit = 500
 	t.Placeholder = "Enter task notes"
 	t.ShowLineNumbers = false
 	// We only deal with textarea in focused state, so blurred style is redundant
-	t.FocusedStyle = textarea.Style{Placeholder: placeHolderStyle, Text: textInputStyle}
+	t.FocusedStyle = textarea.Style{Placeholder: display.PlaceHolderStyle, Text: display.TextInputStyle}
 	t.Focus()
 
 	m := textArea{

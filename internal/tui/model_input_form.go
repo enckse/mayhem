@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
+	"github.com/enckse/mayhem/internal/tui/display"
 	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
@@ -233,10 +234,10 @@ func (m inputForm) View() string {
 
 	// ADD changes for invalid input case
 
-	b.WriteString(highlightedTextStyle.Render(m.fieldMap[m.focusIndex].prompt))
+	b.WriteString(display.HighlightedTextStyle.Render(m.fieldMap[m.focusIndex].prompt))
 
 	if m.isInvalid {
-		b.WriteString(lipgloss.NewStyle().Foreground(highlightedBackgroundColor).Render("    **" + m.invalidPrompt))
+		b.WriteString(lipgloss.NewStyle().Foreground(display.HighlightedBackgroundColor).Render("    **" + m.invalidPrompt))
 	}
 
 	b.WriteRune('\n')

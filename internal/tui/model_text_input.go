@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/enckse/mayhem/internal/tui/display"
 	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
@@ -30,11 +31,11 @@ func initializeTextInput(value, placeholder string, charLimit int, responder fun
 	t := textinput.New()
 	t.SetValue(value)
 
-	t.Cursor.Style = textInputStyle
+	t.Cursor.Style = display.TextInputStyle
 	t.CharLimit = charLimit
 	t.Focus()
-	t.PromptStyle = textInputStyle
-	t.TextStyle = textInputStyle
+	t.PromptStyle = display.TextInputStyle
+	t.TextStyle = display.TextInputStyle
 	t.Placeholder = placeholder
 
 	m := textInput{

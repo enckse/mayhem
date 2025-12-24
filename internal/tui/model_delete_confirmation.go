@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/enckse/mayhem/internal/tui/display"
 	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
@@ -52,5 +53,5 @@ func (m deleteConfirmation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m deleteConfirmation) View() string {
 	// Can't just render textinput.Value(), otherwise cursor blinking wouldn't work
-	return lipgloss.NewStyle().Foreground(highlightedBackgroundColor).Padding(1, 0).Render("Do you wish to proceed with deletion? (" + isConfirm + "/n): ")
+	return lipgloss.NewStyle().Foreground(display.HighlightedBackgroundColor).Padding(1, 0).Render("Do you wish to proceed with deletion? (" + isConfirm + "/n): ")
 }

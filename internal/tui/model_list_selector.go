@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/enckse/mayhem/internal/tui/display"
 	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
@@ -105,9 +106,9 @@ func (m listSelector) View() string {
 		var value string
 
 		if i == m.focusIndex {
-			value = lipgloss.NewStyle().Foreground(inputFormColor).Bold(true).Render("» " + item.val)
+			value = lipgloss.NewStyle().Foreground(display.InputFormColor).Bold(true).Render("» " + item.val)
 		} else {
-			value = lipgloss.NewStyle().Foreground(inputFormColor).Bold(true).Render("  " + item.val)
+			value = lipgloss.NewStyle().Foreground(display.InputFormColor).Bold(true).Render("  " + item.val)
 		}
 
 		res = append(res, value)

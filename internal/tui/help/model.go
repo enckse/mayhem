@@ -14,6 +14,7 @@ type Model struct {
 	keys keys.Map
 }
 
+// NewModel will create a new help model
 func NewModel(keys keys.Map) Model {
 	return Model{
 		keys: keys,
@@ -21,10 +22,12 @@ func NewModel(keys keys.Map) Model {
 	}
 }
 
+// Init is the model init
 func (m Model) Init() tea.Cmd {
 	return nil
 }
 
+// Update will update the model
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -36,6 +39,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+// View will handle view rendering
 func (m Model) View() string {
 	style := lipgloss.NewStyle().MarginTop(1)
 	return style.Render(m.help.View(m.keys))

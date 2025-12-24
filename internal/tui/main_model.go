@@ -9,6 +9,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
+	"github.com/enckse/mayhem/internal/tui/display"
 	"github.com/enckse/mayhem/internal/tui/help"
 	"github.com/enckse/mayhem/internal/tui/keys"
 )
@@ -52,8 +53,8 @@ func InitializeMainModel(ctx *state.Context) ModelWrapper {
 	stacks, _ := entities.FetchStacks(ctx)
 
 	m := &model{
-		stackTable:     buildTable(stackColumns(), "stack"),
-		taskTable:      buildTable(taskColumns(), "task"),
+		stackTable:     buildTable(stackColumns(), display.StackTableType),
+		taskTable:      buildTable(taskColumns(), display.TaskTableType),
 		taskDetails:    detailsBox{}, // we can't build the details box at this stage since we need both stack & task indices for that
 		data:           stacks,
 		help:           help.NewModel(stackKeys),
@@ -108,8 +109,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 
 		case tea.WindowSizeMsg:
-			screenWidth = msg.Width
-			screenHeight = msg.Height
+			display.ScreenWidth = msg.Width
+			display.ScreenHeight = msg.Height
 			m.updateViewDimensions(14)
 			return m, nil
 
@@ -125,8 +126,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.showCustomInput {
 		switch msg := msg.(type) {
 		case tea.WindowSizeMsg:
-			screenWidth = msg.Width
-			screenHeight = msg.Height
+			display.ScreenWidth = msg.Width
+			display.ScreenHeight = msg.Height
 			m.updateViewDimensions(14)
 			return m, nil
 		}
@@ -569,8 +570,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case tea.WindowSizeMsg:
-		screenWidth = msg.Width
-		screenHeight = msg.Height
+		display.ScreenWidth = msg.Width
+		display.ScreenHeight = msg.Height
 		m.updateViewDimensions(10)
 
 		if m.firstRender {
@@ -589,21 +590,21 @@ func (m *model) View() string {
 	var stackView, taskView, detailView string
 
 	if m.stackTable.Focused() {
-		stackView = selectedStackBoxStyle.Render(m.stackView())
-		taskView = unselectedBoxStyle.Render(m.taskView())
-		detailView = unselectedBoxStyle.Render(m.taskDetails.View())
+		stackView = display.SelectedStackBoxStyle.Render(m.stackView())
+		taskView = display.UnselectedBoxStyle.Render(m.taskView())
+		detailView = display.UnselectedBoxStyle.Render(m.taskDetails.View())
 	} else if m.taskTable.Focused() {
-		stackView = unselectedBoxStyle.Render(m.stackView())
-		taskView = selectedTaskBoxStyle.Render(m.taskView())
-		detailView = unselectedBoxStyle.Render(m.taskDetails.View())
+		stackView = display.UnselectedBoxStyle.Render(m.stackView())
+		taskView = display.SelectedTaskBoxStyle.Render(m.taskView())
+		detailView = display.UnselectedBoxStyle.Render(m.taskDetails.View())
 	} else if m.taskDetails.Focused() {
-		stackView = unselectedBoxStyle.Render(m.stackView())
-		taskView = unselectedBoxStyle.Render(m.taskView())
-		detailView = selectedDetailsBoxStyle.Render(m.taskDetails.View())
+		stackView = display.UnselectedBoxStyle.Render(m.stackView())
+		taskView = display.UnselectedBoxStyle.Render(m.taskView())
+		detailView = display.SelectedDetailsBoxStyle.Render(m.taskDetails.View())
 	} else {
-		stackView = unselectedBoxStyle.Render(m.stackView())
-		taskView = unselectedBoxStyle.Render(m.taskView())
-		detailView = unselectedBoxStyle.Render(m.taskDetails.View())
+		stackView = display.UnselectedBoxStyle.Render(m.stackView())
+		taskView = display.UnselectedBoxStyle.Render(m.taskView())
+		detailView = display.UnselectedBoxStyle.Render(m.taskDetails.View())
 	}
 
 	viewArr := []string{stackView}
@@ -613,10 +614,10 @@ func (m *model) View() string {
 		if m.showDetails {
 			viewArr = append(viewArr, detailView)
 		} else if len(m.taskTable.Rows()) > 0 {
-			viewArr = append(viewArr, unselectedBoxStyle.Render(getEmptyDetailsView()))
+			viewArr = append(viewArr, display.UnselectedBoxStyle.Render(getEmptyDetailsView()))
 		}
 	} else {
-		viewArr = append(viewArr, unselectedBoxStyle.Render(getEmptyTaskView()))
+		viewArr = append(viewArr, display.UnselectedBoxStyle.Render(getEmptyTaskView()))
 	}
 
 	tablesView := lipgloss.JoinHorizontal(lipgloss.Center, viewArr...)
@@ -624,12 +625,12 @@ func (m *model) View() string {
 	if m.showCustomInput {
 		tablesView = lipgloss.JoinVertical(lipgloss.Left,
 			tablesView,
-			getInputFormStyle().Render(m.customInput.View()),
+			display.InputFormStyle().Render(m.customInput.View()),
 		)
 	}
 
 	if m.showInput {
-		inputFormView := getInputFormStyle().Render(m.input.View())
+		inputFormView := display.InputFormStyle().Render(m.input.View())
 		tablesView = lipgloss.JoinVertical(lipgloss.Left,
 			tablesView,
 			inputFormView,
@@ -648,30 +649,30 @@ func (m *model) View() string {
 }
 
 func (m *model) stackView() string {
-	m.stackTable.SetHeight(tableViewHeight)
+	m.stackTable.SetHeight(display.TableViewHeight)
 	return lipgloss.JoinVertical(lipgloss.Center, m.stackTable.View(), m.stackFooter())
 }
 
 func (m *model) stackFooter() string {
-	stackFooterStyle := footerContainerStyle.Width(stackTableWidth)
+	stackFooterStyle := display.FooterContainerStyle.Width(display.StackTableWidth)
 
-	info := footerInfoStyle.Render(fmt.Sprintf("%d/%d", m.stackTable.Cursor()+1, len(m.stackTable.Rows())))
+	info := display.FooterInfoStyle.Render(fmt.Sprintf("%d/%d", m.stackTable.Cursor()+1, len(m.stackTable.Rows())))
 
 	return stackFooterStyle.Render(info)
 }
 
 func (m *model) taskView() string {
-	m.taskTable.SetHeight(tableViewHeight)
+	m.taskTable.SetHeight(display.TableViewHeight)
 	return lipgloss.JoinVertical(lipgloss.Center, m.taskTable.View(), m.taskFooter())
 }
 
 func (m *model) taskFooter() string {
-	taskFooterStyle := footerContainerStyle.Width(taskTableWidth)
+	taskFooterStyle := display.FooterContainerStyle.Width(display.TaskTableWidth)
 
 	if len(m.taskTable.Rows()) == 0 {
 		return taskFooterStyle.Render("Press 'n' to create a new task")
 	}
-	info := footerInfoStyle.Render(fmt.Sprintf("%d/%d", m.taskTable.Cursor()+1, len(m.taskTable.Rows())))
+	info := display.FooterInfoStyle.Render(fmt.Sprintf("%d/%d", m.taskTable.Cursor()+1, len(m.taskTable.Rows())))
 	return taskFooterStyle.Render(info)
 }
 
@@ -769,11 +770,11 @@ func (m *model) preserveState() {
 }
 
 func (m *model) updateViewDimensions(offset int) {
-	tableViewHeight = screenHeight - offset
+	display.TableViewHeight = display.ScreenHeight - offset
 
 	// Details box viewport dimensions & section width are set at the time of box creation,
 	// after that they have to be manually adjusted
-	m.taskDetails.viewport.Width = getDetailsBoxWidth()
-	m.taskDetails.viewport.Height = getDetailsBoxHeight()
+	m.taskDetails.viewport.Width = display.DetailsBoxWidth()
+	m.taskDetails.viewport.Height = display.DetailsBoxHeight()
 	m.updateDetailsBoxData(true)
 }

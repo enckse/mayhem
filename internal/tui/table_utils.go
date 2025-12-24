@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	"github.com/enckse/mayhem/internal/entities"
+	"github.com/enckse/mayhem/internal/tui/display"
 	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
@@ -153,14 +154,14 @@ func taskRows(tasks []entities.Task) []table.Row {
 	return rows
 }
 
-func buildTable(columns []table.Column, tableType string) table.Model {
+func buildTable(columns []table.Column, tableType display.TableType) table.Model {
 	t := table.New(
-		table.WithHeight(tableViewHeight),
+		table.WithHeight(display.TableViewHeight),
 		table.WithColumns(columns),
 		table.WithKeyMap(table.DefaultKeyMap()),
 	)
 
-	s := getTableStyle(tableType)
+	s := display.TableStyle(tableType)
 	t.SetStyles(s)
 
 	return t
@@ -168,7 +169,7 @@ func buildTable(columns []table.Column, tableType string) table.Model {
 
 func formatTime(time time.Time, fullDate bool) string {
 	if time.IsZero() {
-		return fmt.Sprintf("%10s", dash)
+		return fmt.Sprintf("%10s", "-")
 	}
 
 	year := fmt.Sprintf("%04d", time.Year())
@@ -185,11 +186,11 @@ func formatTime(time time.Time, fullDate bool) string {
 }
 
 func getEmptyTaskView() string {
-	return getEmptyTaskStyle().Render("Press either '→' or 'l' key to explore this stack")
+	return display.EmptyTaskStyle().Render("Press either '→' or 'l' key to explore this stack")
 }
 
 func getEmptyDetailsView() string {
-	return getEmptyDetailsStyle().Render("Press either '→' or 'l' key to see task details")
+	return display.EmptyDetailsStyle().Render("Press either '→' or 'l' key to see task details")
 }
 
 func incompleteTaskTag(count uint64) string {

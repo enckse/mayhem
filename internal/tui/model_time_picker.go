@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/enckse/mayhem/internal/tui/display"
 	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
@@ -199,9 +200,9 @@ func (m timePicker) renderUnitCol(index, val int) string {
 
 	var color lipgloss.Color
 	if m.focusIndex == index {
-		color = timeFocusColor
+		color = display.TimeFocusColor
 	} else {
-		color = unfocusedColor
+		color = display.UnfocusedColor
 	}
 
 	style := lipgloss.NewStyle().
@@ -218,9 +219,9 @@ func (m timePicker) renderUnitTag(index int) string {
 
 	var color lipgloss.Color
 	if m.focusIndex == index {
-		color = timeFocusColor
+		color = display.TimeFocusColor
 	} else {
-		color = unfocusedColor
+		color = display.UnfocusedColor
 	}
 
 	style := lipgloss.NewStyle().

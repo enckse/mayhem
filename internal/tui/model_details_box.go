@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/enckse/mayhem/internal/entities"
+	"github.com/enckse/mayhem/internal/tui/display"
 	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
@@ -74,7 +75,7 @@ func (m *detailsBox) buildDetailsBox(data entities.Task, preserveOffset bool) {
 	// But when going from one task to another, we want to reset the view
 	m.preserveOffset = preserveOffset
 	m.oldViewportOffset = m.viewport.YOffset
-	m.viewport = viewport.New(getDetailsBoxWidth(), tableViewHeight)
+	m.viewport = viewport.New(display.DetailsBoxWidth(), display.TableViewHeight)
 	m.renderContent()
 }
 
@@ -87,7 +88,7 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
-	m.viewport.Width = getDetailsBoxWidth()
+	m.viewport.Width = display.DetailsBoxWidth()
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -144,7 +145,7 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m detailsBox) View() string {
-	return lipgloss.JoinVertical(lipgloss.Center, getDetailsBoxStyle().Render(m.viewport.View()), m.footerView())
+	return lipgloss.JoinVertical(lipgloss.Center, display.DetailsBoxStyle().Render(m.viewport.View()), m.footerView())
 }
 
 func (m *detailsBox) Focus() {
@@ -206,7 +207,7 @@ func newBlock(b *strings.Builder, title string, isFocus bool) {
 	if isFocus {
 		prefix = "» "
 	}
-	b.WriteString(highlightedTextStyle.Render(fmt.Sprintf("%s%s:", prefix, title)))
+	b.WriteString(display.HighlightedTextStyle.Render(fmt.Sprintf("%s%s:", prefix, title)))
 	b.WriteString("\n\n")
 }
 
@@ -216,7 +217,7 @@ func (m *detailsBox) titleBlock() string {
 	newBlock(&b, "Title", isFocused)
 	b.WriteString(m.taskData.Title)
 
-	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).PaddingTop(0).Render(b.String()))
+	data := display.ItemContainerStyle(isFocused).Render(display.DetailsItemStyle(isFocused).PaddingTop(0).Render(b.String()))
 	m.scrollData.title = lipgloss.Height(data)
 	return data
 }
@@ -227,12 +228,12 @@ func (m *detailsBox) notesBlock() string {
 	newBlock(&b, "Notes", isFocused)
 
 	if m.taskData.Notes == "" {
-		b.WriteString(dash)
+		b.WriteString("-")
 	} else {
 		b.WriteString(m.taskData.Notes)
 	}
 
-	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).Render(b.String()))
+	data := display.ItemContainerStyle(isFocused).Render(display.DetailsItemStyle(isFocused).Render(b.String()))
 	m.scrollData.notes = lipgloss.Height(data)
 	return data
 }
@@ -243,7 +244,7 @@ func (m *detailsBox) priorityBlock() string {
 	newBlock(&b, "Priority", isFocused)
 	fmt.Fprintf(&b, "%d", m.taskData.Priority)
 
-	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).Render(b.String()))
+	data := display.ItemContainerStyle(isFocused).Render(display.DetailsItemStyle(isFocused).Render(b.String()))
 	m.scrollData.priority = lipgloss.Height(data)
 	return data
 }
@@ -259,13 +260,13 @@ func (m *detailsBox) deadlineBlock() string {
 		b.WriteString(formatTime(m.taskData.Deadline, true))
 	}
 
-	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).Render(b.String()))
+	data := display.ItemContainerStyle(isFocused).Render(display.DetailsItemStyle(isFocused).Render(b.String()))
 	m.scrollData.deadline = lipgloss.Height(data)
 	return data
 }
 
 func (m *detailsBox) footerView() string {
-	scrollInfoStyle := footerContainerStyle.Width(m.viewport.Width).Align(lipgloss.Right)
-	info := footerInfoStyle.Render(fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
+	scrollInfoStyle := display.FooterContainerStyle.Width(m.viewport.Width).Align(lipgloss.Right)
+	info := display.FooterInfoStyle.Render(fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
 	return scrollInfoStyle.Render(info)
 }
