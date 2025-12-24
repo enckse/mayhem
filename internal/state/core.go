@@ -8,6 +8,9 @@ import (
 	"gorm.io/gorm"
 )
 
+// FileName is the application name prefix
+const FileName = "todo."
+
 // Context is the overall state context
 type Context struct {
 	DB     *gorm.DB

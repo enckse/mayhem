@@ -55,7 +55,7 @@ func LoadJSON(ctx *state.Context, merge bool) error {
 
 // ToJSON will dump entities to JSON
 func ToJSON(ctx *state.Context) error {
-	file, err := os.OpenFile(filepath.Join(ctx.Config.Data.Directory, "tasks.json"), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o755)
+	file, err := os.OpenFile(filepath.Join(ctx.Config.Data.Directory, state.FileName+"json"), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o755)
 	if err != nil {
 		return err
 	}

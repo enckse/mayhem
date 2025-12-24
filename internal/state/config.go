@@ -9,7 +9,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-const databaseName = "tasks.db"
+const databaseName = FileName + "db"
 
 // Config is the overall configuration file
 type Config struct {
