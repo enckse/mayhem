@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/enckse/mayhem/internal/display"
+	"github.com/enckse/mayhem/internal/tui/definitions"
 	"github.com/enckse/mayhem/internal/tui/keys"
 	"github.com/enckse/mayhem/internal/tui/messages"
 )
@@ -24,7 +25,7 @@ type Confirmation struct {
 // NewConfirmation creates a new confirmation model item
 func NewConfirmation() tea.Model {
 	m := Confirmation{
-		customInputType: "delete",
+		customInputType: definitions.IsDelete,
 	}
 
 	return m

@@ -23,5 +23,11 @@ const (
 	TaskDeadlineIndex
 )
 
-// TaskLastIndex is the last known task item (index)
-const TaskLastIndex = TaskDeadlineIndex
+const (
+	// TaskLastIndex is the last known task item (index)
+	TaskLastIndex = TaskDeadlineIndex
+	// IsDelete is a delete command
+	IsDelete = "delete"
+	// IsMove is a move command
+	IsMove = "move"
+)

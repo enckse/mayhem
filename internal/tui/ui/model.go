@@ -154,7 +154,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		switch m.customInputType {
 		// Transfer control to delete confirmation model
-		case "delete":
+		case definitions.IsDelete:
 			switch msg := msg.(type) {
 
 			case messages.Main:
@@ -216,7 +216,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, cmd
 			}
 
-		case "move":
+		case definitions.IsMove:
 			switch msg := msg.(type) {
 
 			case messages.Main:
@@ -503,7 +503,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.stackTable.Focused() {
 				m.preInputFocus = stackViewName
 				m.showCustomInput = true
-				m.customInputType = "delete"
+				m.customInputType = definitions.IsDelete
 				m.customInput = deletion.NewConfirmation()
 				m.stackTable.Blur()
 				m.help = help.Model{}
@@ -516,7 +516,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if len(m.data[stackIndex].Tasks) > 0 {
 					m.preInputFocus = taskViewName
 					m.showCustomInput = true
-					m.customInputType = "delete"
+					m.customInputType = definitions.IsDelete
 					m.customInput = deletion.NewConfirmation()
 					m.taskTable.Blur()
 					m.help = help.Model{}
@@ -564,7 +564,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if len(m.data[stackIndex].Tasks) > 0 {
 					m.preInputFocus = taskViewName
 					m.showCustomInput = true
-					m.customInputType = "move"
+					m.customInputType = definitions.IsMove
 					m.taskTable.Blur()
 
 					opts := []definitions.KeyValue{}
