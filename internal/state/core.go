@@ -12,6 +12,7 @@ import (
 const FileName = "todo."
 
 type (
+	// Store defines the backing store for data
 	Store interface {
 		Save(any)
 		Create(any) error

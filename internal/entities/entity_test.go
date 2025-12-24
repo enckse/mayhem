@@ -26,7 +26,7 @@ func (m *mockDB) Delete(obj any) {
 	m.last = obj
 }
 
-func (m *mockDB) Find(obj any, id uint) {
+func (m *mockDB) Find(obj any, _ uint) {
 	m.last = obj
 }
 
