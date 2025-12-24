@@ -87,7 +87,7 @@ func run() error {
 		return entities.DumpJSON(os.Stdout, ctx)
 	}
 	if isImport {
-		return entities.LoadJSON(ctx, isMerge)
+		return entities.LoadJSON(ctx, isMerge, os.Stdin)
 	}
 
 	model := ui.Initialize(ctx)
@@ -97,7 +97,7 @@ func run() error {
 		return err
 	}
 	if ctx.Config.JSON.Exit {
-		return entities.ToJSON(ctx)
+		return entities.DumpJSONToFile(ctx)
 	}
 	return nil
 }

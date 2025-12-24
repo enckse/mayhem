@@ -30,8 +30,7 @@ func (m *mockDB) Find(obj any, _ uint) {
 	m.last = obj
 }
 
-func (m *mockDB) Stacks(obj any) error {
-	m.last = obj
+func (m *mockDB) Stacks(_ any) error {
 	return m.err
 }
 

@@ -39,5 +39,5 @@ func (d *DBWrapper) Delete(obj any) {
 
 // SyncJSON will sync db state to JSON
 func (d *DBWrapper) SyncJSON(ctx *state.Context) {
-	ToJSON(ctx)
+	DumpJSONToFile(ctx)
 }

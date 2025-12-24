@@ -14,8 +14,8 @@ import (
 )
 
 // LoadJSON will import JSON
-func LoadJSON(ctx *state.Context, merge bool) error {
-	scanner := bufio.NewScanner(os.Stdin)
+func LoadJSON(ctx *state.Context, merge bool, reader io.Reader) error {
+	scanner := bufio.NewScanner(reader)
 	var buf bytes.Buffer
 	for scanner.Scan() {
 		if _, err := buf.WriteString(scanner.Text()); err != nil {
@@ -53,8 +53,8 @@ func LoadJSON(ctx *state.Context, merge bool) error {
 	return nil
 }
 
-// ToJSON will dump entities to JSON
-func ToJSON(ctx *state.Context) error {
+// DumpJSONToFile will dump entities to JSON
+func DumpJSONToFile(ctx *state.Context) error {
 	file, err := os.OpenFile(filepath.Join(ctx.Config.Data.Directory, state.FileName+"json"), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o755)
 	if err != nil {
 		return err
