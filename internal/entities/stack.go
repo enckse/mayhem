@@ -32,6 +32,9 @@ func NewStack(ctx *state.Context) (Stack, error) {
 func FetchStacks(ctx *state.Context) ([]Stack, error) {
 	var stacks []Stack
 	err := ctx.DB.Stacks(&stacks)
+	if err != nil {
+		return stacks, err
+	}
 
 	if len(stacks) == 0 {
 		stack, err := NewStack(ctx)
