@@ -206,7 +206,7 @@ var (
 	TaskDetailsMappings = Map{
 		Edit: key.NewBinding(
 			key.WithKeys("e"),
-			key.WithHelp("'e'", "edit field 📝"),
+			key.WithHelp("'e'", "edit field"),
 		),
 	}
 
@@ -214,15 +214,15 @@ var (
 	StackMappings = Map{
 		New: key.NewBinding(
 			key.WithKeys("n"),
-			key.WithHelp("'n'", "new stack 🌟"),
+			key.WithHelp("'n'", "new stack"),
 		),
 		Edit: key.NewBinding(
 			key.WithKeys("e"),
-			key.WithHelp("'e'", "edit 📝"),
+			key.WithHelp("'e'", "edit"),
 		),
 		Delete: key.NewBinding(
 			key.WithKeys("x"),
-			key.WithHelp("'x'", "delete 🗑"),
+			key.WithHelp("'x'", "delete"),
 		),
 	}
 
@@ -230,23 +230,23 @@ var (
 	TaskMappings = Map{
 		Toggle: key.NewBinding(
 			key.WithKeys("tab"),
-			key.WithHelp("'tab'", "check/uncheck 🔄"),
+			key.WithHelp("'tab'", "check/uncheck"),
 		),
 		New: key.NewBinding(
 			key.WithKeys("n"),
-			key.WithHelp("'n'", "new task 🌟"),
+			key.WithHelp("'n'", "new task"),
 		),
 		Edit: key.NewBinding(
 			key.WithKeys("e"),
-			key.WithHelp("'e'", "edit 📝"),
+			key.WithHelp("'e'", "edit"),
 		),
 		Delete: key.NewBinding(
 			key.WithKeys("x"),
-			key.WithHelp("'x'", "delete 🗑"),
+			key.WithHelp("'x'", "delete"),
 		),
 		Move: key.NewBinding(
 			key.WithKeys("m"),
-			key.WithHelp("'m'", "change stack 📤"),
+			key.WithHelp("'m'", "change stack"),
 		),
 	}
 

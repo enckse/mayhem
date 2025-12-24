@@ -14,14 +14,14 @@ import (
 var (
 	// StackColumns are the table columns for stacks
 	StackColumns = []table.Column{
-		{Title: "       Stacks 🗃", Width: 20},
+		{Title: "       Stacks", Width: 20},
 		{Title: "", Width: 2},
 	}
 	// TaskColumns are the table columns for tasks
 	TaskColumns = []table.Column{
 		{Title: "", Width: 1},
-		{Title: "           Tasks 📄", Width: 30},
-		{Title: "     Deadline 🕑", Width: 20},
+		{Title: "           Tasks", Width: 30},
+		{Title: "     Deadline", Width: 20},
 		{Title: "Priority", Width: 8},
 	}
 )
