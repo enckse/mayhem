@@ -13,5 +13,16 @@ setup:
 $(OBJECT):
 	go build $(GOFLAGS) -ldflags "$(LDFLAGS) -X main.version=$(VERSION)" -o "$(OBJECT)" cmd/mayhem.go
 
+check: $(OBJECT)
+	find tests/ -type f -name "*.db" -delete
+	$(OBJECT) version
+	cat tests/objects.json | XDG_CACHE_HOME=tests/testdata $(OBJECT) import --config tests/settings.toml
+	cat tests/objects.json | sed 's/Section/ZZZ/g' | XDG_CACHE_HOME=tests/testdata $(OBJECT) merge --config tests/settings.toml
+	XDG_CACHE_HOME=tests/testdata $(OBJECT) export --config tests/settings.toml > tests/testdata/results.json
+	diff -u tests/testdata/results.json tests/expected.json
+	diff -u tests/testdata/mayhem/todo.json tests/expected.json
+
 clean:
 	rm -f "$(OBJECT)"
+	find internal/ tests/ -type f -wholename "*testdata*" -delete
+	find internal/ tests/ -type d -empty -delete

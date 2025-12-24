@@ -1,0 +1,7 @@
+[backups]
+directory="backups"
+days=2
+
+[json]
+exit=true
+sync=true
