@@ -12,13 +12,13 @@ import (
 
 // Task defines task-based entities for work
 type Task struct {
-	gorm.Model  `json:"-"`
-	Title       string `gorm:"notnull"`
-	Description string
-	Deadline    time.Time
-	Priority    uint64
-	IsFinished  bool
-	StackID     uint `json:"-"`
+	gorm.Model `json:"-"`
+	Title      string `gorm:"notnull"`
+	Notes      string
+	Deadline   time.Time
+	Priority   uint64
+	IsFinished bool
+	StackID    uint `json:"-"`
 }
 
 // Save will store the task

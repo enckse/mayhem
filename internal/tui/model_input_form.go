@@ -43,7 +43,7 @@ const (
 
 const (
 	taskTitleIndex int = iota
-	taskDescriptionIndex
+	taskNotesIndex
 	taskPriorityIndex
 	taskDeadlineIndex
 )
@@ -71,9 +71,9 @@ var (
 			helpKeys:         textInputKeys,
 			validationPrompt: "Task title field can not be empty❗",
 		},
-		taskDescriptionIndex: {
-			name:     "Description",
-			prompt:   "Task Description",
+		taskNotesIndex: {
+			name:     "Notes",
+			prompt:   "Task Notes",
 			helpKeys: textAreaKeys,
 		},
 		taskPriorityIndex: {
@@ -124,8 +124,8 @@ func initializeInput(selectedTable string, data entities.Entity, fieldIndex int,
 		switch fieldIndex {
 		case taskTitleIndex:
 			targetField.model = initializeTextInput(task.Title, "", 60, goToFormWithVal)
-		case taskDescriptionIndex:
-			targetField.model = initializeTextArea(task.Description)
+		case taskNotesIndex:
+			targetField.model = initializeTextArea(task.Notes)
 		case taskPriorityIndex:
 			opts := []keyVal{
 				{val: "0"},
@@ -199,8 +199,8 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.isNewTask = true
 				}
 
-			case taskDescriptionIndex:
-				task.Description = selectedValue.(string)
+			case taskNotesIndex:
+				task.Notes = selectedValue.(string)
 			case taskPriorityIndex:
 				task.Priority, _ = strconv.ParseUint(selectedValue.(keyVal).val, 10, 64)
 			case taskDeadlineIndex:

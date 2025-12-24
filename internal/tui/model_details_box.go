@@ -23,10 +23,10 @@ type (
 	}
 
 	scrollData struct {
-		title       int
-		description int
-		priority    int
-		deadline    int
+		title    int
+		notes    int
+		priority int
+		deadline int
 	}
 )
 
@@ -99,8 +99,8 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.viewport.GotoBottom()
 				m.End()
 				return m, nil
-			case taskDescriptionIndex:
-				scrollDistance = m.scrollData.description
+			case taskNotesIndex:
+				scrollDistance = m.scrollData.notes
 				m.Previous()
 			case taskPriorityIndex:
 				scrollDistance = m.scrollData.priority
@@ -116,8 +116,8 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch m.focusIndex {
 			case taskTitleIndex:
 				m.Next()
-			case taskDescriptionIndex:
-				scrollDistance = m.scrollData.description
+			case taskNotesIndex:
+				scrollDistance = m.scrollData.notes
 				m.Next()
 			case taskPriorityIndex:
 				scrollDistance = m.scrollData.priority
@@ -187,7 +187,7 @@ func (m *detailsBox) Start() {
 func (m *detailsBox) renderContent() {
 	content := []string{
 		m.titleBlock(),
-		m.descriptionBlock(),
+		m.notesBlock(),
 		m.priorityBlock(),
 		m.deadlineBlock(),
 	}
@@ -220,19 +220,19 @@ func (m *detailsBox) titleBlock() string {
 	return data
 }
 
-func (m *detailsBox) descriptionBlock() string {
+func (m *detailsBox) notesBlock() string {
 	var b strings.Builder
-	isFocused := (m.focusIndex == taskDescriptionIndex)
-	newBlock(&b, "Description", isFocused)
+	isFocused := (m.focusIndex == taskNotesIndex)
+	newBlock(&b, "Notes", isFocused)
 
-	if m.taskData.Description == "" {
+	if m.taskData.Notes == "" {
 		b.WriteString(dash)
 	} else {
-		b.WriteString(m.taskData.Description)
+		b.WriteString(m.taskData.Notes)
 	}
 
 	data := getItemContainerStyle(isFocused).Render(getDetailsItemStyle(isFocused).Render(b.String()))
-	m.scrollData.description = lipgloss.Height(data)
+	m.scrollData.notes = lipgloss.Height(data)
 	return data
 }
 

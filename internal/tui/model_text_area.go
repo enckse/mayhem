@@ -32,7 +32,7 @@ func initializeTextArea(value string) tea.Model {
 	t.SetWidth(getInputFormStyle().GetWidth() - 2)
 	t.SetHeight(4)
 	t.CharLimit = 500
-	t.Placeholder = "Enter task description"
+	t.Placeholder = "Enter task notes"
 	t.ShowLineNumbers = false
 	// We only deal with textarea in focused state, so blurred style is redundant
 	t.FocusedStyle = textarea.Style{Placeholder: placeHolderStyle, Text: textInputStyle}
