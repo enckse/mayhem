@@ -8,12 +8,13 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
 
 	"github.com/enckse/mayhem/internal/state"
 )
 
 // LoadJSON will import JSON
-func LoadJSON(ctx *state.Context) error {
+func LoadJSON(ctx *state.Context, merge bool) error {
 	scanner := bufio.NewScanner(os.Stdin)
 	var buf bytes.Buffer
 	for scanner.Scan() {
@@ -25,13 +26,29 @@ func LoadJSON(ctx *state.Context) error {
 	if err := scanner.Err(); err != nil {
 		return err
 	}
+	var existing []Stack
+	if merge {
+		var err error
+		existing, err = FetchAllStacks(ctx)
+		if err != nil {
+			return err
+		}
+	}
 	var items []Stack
 	if err := json.Unmarshal(buf.Bytes(), &items); err != nil {
 		return err
 	}
 	for _, s := range items {
-		fmt.Println(s.Title)
+		if merge {
+			if slices.ContainsFunc(existing, func(x Stack) bool {
+				return x.Title == s.Title
+			}) {
+				fmt.Printf("[skipped] %s\n", s.Title)
+				continue
+			}
+		}
 		s.Save(ctx)
+		fmt.Printf("[imported] %s\n", s.Title)
 	}
 	return nil
 }

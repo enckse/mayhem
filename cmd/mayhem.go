@@ -24,7 +24,15 @@ func main() {
 func run() error {
 	isExport := false
 	isImport := false
+	isMerge := false
 	for idx, arg := range os.Args {
+		switch idx {
+		case 0:
+			continue
+		case 1:
+		default:
+			return fmt.Errorf("unexpected argument: %s", arg)
+		}
 		if idx == 0 {
 			continue
 		}
@@ -38,9 +46,11 @@ func run() error {
 		case "import":
 			isImport = true
 			continue
+		case "merge":
+			isImport = true
+			isMerge = true
+			continue
 		}
-
-		return fmt.Errorf("invalid arguments: %s", arg)
 	}
 	if isExport && isImport {
 		return errors.New("only one of export/import can be provided")
@@ -55,7 +65,7 @@ func run() error {
 	if isExport && !exists {
 		return errors.New("no database to dump")
 	}
-	if isImport && exists {
+	if isImport && exists && !isMerge {
 		return errors.New("import not supported into existing database")
 	}
 	if !isExport && !isImport {
@@ -70,7 +80,7 @@ func run() error {
 		return entities.DumpJSON(ctx)
 	}
 	if isImport {
-		return entities.LoadJSON(ctx)
+		return entities.LoadJSON(ctx, isMerge)
 	}
 
 	model := tui.InitializeMainModel(ctx)
