@@ -125,7 +125,7 @@ func (s *Screen) EmptyTaskStyle() lipgloss.Style {
 	return lipgloss.NewStyle().
 		AlignHorizontal(lipgloss.Center).
 		AlignVertical(lipgloss.Center).
-		Width(60).
+		Width(TaskTableWidth).
 		Height(s.Table.ViewHeight + 1) // 3 is added to account for header & footer height
 }
 
@@ -139,7 +139,7 @@ func (s *Screen) EmptyDetailsStyle() lipgloss.Style {
 
 // DetailsBoxWidth will get the width for the details box
 func (s *Screen) DetailsBoxWidth() int {
-	return s.Width - (StackTableWidth + TaskTableWidth + 3*2) // each of the 3 boxes have left & right borders
+	return s.Width - (StackTableWidth + TaskTableWidth) // each of the 3 boxes have left & right borders
 }
 
 // DetailsBoxHeight will get the height for the details box
