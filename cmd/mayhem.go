@@ -7,7 +7,6 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/enckse/mayhem/internal/convert"
 	entities "github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
 	tui "github.com/enckse/mayhem/internal/tui"
@@ -52,8 +51,12 @@ func run() error {
 		return err
 	}
 	ctx.Config = cfg
-	if isExport && !state.PathExists(ctx.Config.Database()) {
+	exists := state.PathExists(ctx.Config.Database())
+	if isExport && !exists {
 		return errors.New("no database to dump")
+	}
+	if isImport && exists {
+		return errors.New("import not supported into existing database")
 	}
 	if !isExport && !isImport {
 		if err := ctx.Config.Backup(); err != nil {
@@ -64,7 +67,7 @@ func run() error {
 		return err
 	}
 	if isExport {
-		return convert.DumpJSON(ctx)
+		return entities.DumpJSON(ctx)
 	}
 
 	model := tui.InitializeMainModel(ctx)
@@ -73,8 +76,8 @@ func run() error {
 	if _, err := p.Run(); err != nil {
 		return err
 	}
-	if ctx.Config.Convert.JSON {
-		return convert.ToJSON(ctx)
+	if ctx.Config.JSON.Exit {
+		return entities.ToJSON(ctx)
 	}
 	return nil
 }

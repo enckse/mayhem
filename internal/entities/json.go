@@ -1,5 +1,4 @@
-// Package convert can export to JSON
-package convert
+package entities
 
 import (
 	"encoding/json"
@@ -7,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
 )
 
@@ -27,14 +25,14 @@ func DumpJSON(ctx *state.Context) error {
 }
 
 func handleJSON(dst io.Writer, ctx *state.Context) error {
-	s, err := entities.FetchAllStacks(ctx)
+	s, err := FetchAllStacks(ctx)
 	if err != nil {
 		return err
 	}
-	entities.SortStacks(s)
+	SortStacks(s)
 	for _, item := range s {
 		tasks := item.Tasks
-		entities.SortTasks(tasks)
+		SortTasks(tasks)
 		item.Tasks = tasks
 	}
 	b, err := json.MarshalIndent(s, "", "  ")

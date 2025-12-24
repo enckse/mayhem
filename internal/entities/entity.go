@@ -29,3 +29,10 @@ func InitializeDB(ctx *state.Context) error {
 	ctx.DB = db
 	return nil
 }
+
+func Sync(ctx *state.Context, obj any) {
+	ctx.DB.Save(obj)
+	if ctx.Config.JSON.Sync {
+		ToJSON(ctx)
+	}
+}

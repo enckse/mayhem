@@ -52,7 +52,7 @@ func IncPendingCount(id uint, ctx *state.Context) {
 
 // Save will save the entity
 func (s Stack) Save(ctx *state.Context) Entity {
-	ctx.DB.Save(&s)
+	Sync(ctx, &s)
 	return s
 }
 

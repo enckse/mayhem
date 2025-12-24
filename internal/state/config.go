@@ -20,8 +20,9 @@ type Config struct {
 		Directory string
 		Days      uint
 	}
-	Convert struct {
-		JSON bool
+	JSON struct {
+		Sync bool
+		Exit bool
 	}
 }
 

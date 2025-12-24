@@ -23,7 +23,7 @@ type Task struct {
 
 // Save will store the task
 func (t Task) Save(ctx *state.Context) Entity {
-	ctx.DB.Save(&t)
+	Sync(ctx, &t)
 	return t
 }
 
