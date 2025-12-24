@@ -1,8 +1,8 @@
-package tui
+package keys
 
 import "github.com/charmbracelet/bubbles/key"
 
-type keyMap struct {
+type Map struct {
 	CalendarToggle key.Binding
 	Up             key.Binding
 	Down           key.Binding
@@ -24,8 +24,7 @@ type keyMap struct {
 	Exit           key.Binding
 }
 
-// Keys are the associated key mappings
-var Keys = keyMap{
+var Mappings = Map{
 	CalendarToggle: key.NewBinding(
 		key.WithKeys("c"),
 		key.WithHelp("'c'", "calendar view"),
@@ -102,7 +101,7 @@ var Keys = keyMap{
 
 // ShortHelp returns keybindings to be shown in the mini help view. It's part
 // of the key.Map interface.
-func (k keyMap) ShortHelp() []key.Binding {
+func (k Map) ShortHelp() []key.Binding {
 	return []key.Binding{
 		k.CalendarToggle,
 		k.Toggle,
@@ -127,6 +126,6 @@ func (k keyMap) ShortHelp() []key.Binding {
 
 // FullHelp returns keybindings for the expanded help view. It's part of the
 // key.Map interface.
-func (k keyMap) FullHelp() [][]key.Binding {
+func (k Map) FullHelp() [][]key.Binding {
 	return [][]key.Binding{k.ShortHelp()}
 }

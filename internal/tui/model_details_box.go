@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/enckse/mayhem/internal/entities"
+	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
 type (
@@ -31,14 +32,14 @@ type (
 )
 
 var (
-	taskDetailsKeys = keyMap{
+	taskDetailsKeys = keys.Map{
 		Edit: key.NewBinding(
 			key.WithKeys("e"),
 			key.WithHelp("'e'", "edit field 📝"),
 		),
 	}
 
-	detailsNavigationKeys = keyMap{
+	detailsNavigationKeys = keys.Map{
 		Up: key.NewBinding(
 			key.WithKeys("up", "k"),
 			key.WithHelp("'↑/k'", "up"),
@@ -92,7 +93,7 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 
-		case key.Matches(msg, Keys.Up):
+		case key.Matches(msg, keys.Mappings.Up):
 			var scrollDistance int
 			switch m.focusIndex {
 			case taskTitleIndex:
@@ -111,7 +112,7 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			m.viewport.ScrollUp(scrollDistance)
 
-		case key.Matches(msg, Keys.Down):
+		case key.Matches(msg, keys.Mappings.Down):
 			var scrollDistance int
 			switch m.focusIndex {
 			case taskTitleIndex:
@@ -130,11 +131,11 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			m.viewport.ScrollDown(scrollDistance)
 
-		case key.Matches(msg, Keys.GotoTop):
+		case key.Matches(msg, keys.Mappings.GotoTop):
 			m.viewport.GotoTop()
 			m.Start()
 
-		case key.Matches(msg, Keys.GotoBottom):
+		case key.Matches(msg, keys.Mappings.GotoBottom):
 			m.viewport.GotoBottom()
 			m.End()
 		}

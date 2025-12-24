@@ -9,6 +9,8 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
+	"github.com/enckse/mayhem/internal/tui/help"
+	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
 type (
@@ -22,7 +24,7 @@ type (
 		stackTable      table.Model
 		taskTable       table.Model
 		taskDetails     detailsBox
-		help            helpModel
+		help            help.Model
 		input           inputForm
 		showTasks       bool
 		showDetails     bool
@@ -31,7 +33,7 @@ type (
 		customInput     tea.Model
 		customInputType string
 		showCustomInput bool
-		navigationKeys  keyMap
+		navigationKeys  keys.Map
 		preInputFocus   string // useful for reverting back when input box is closed
 		firstRender     bool
 		prevState       preserveState
@@ -54,7 +56,7 @@ func InitializeMainModel(ctx *state.Context) ModelWrapper {
 		taskTable:      buildTable(taskColumns(), "task"),
 		taskDetails:    detailsBox{}, // we can't build the details box at this stage since we need both stack & task indices for that
 		data:           stacks,
-		help:           initializeHelp(stackKeys),
+		help:           help.NewModel(stackKeys),
 		navigationKeys: tableNavigationKeys,
 		showHelp:       true,
 		context:        ctx,
@@ -90,11 +92,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch m.preInputFocus {
 			case "stack":
 				m.stackTable.Focus()
-				m.help = initializeHelp(stackKeys)
+				m.help = help.NewModel(stackKeys)
 				m.navigationKeys = tableNavigationKeys
 			case "task":
 				m.taskTable.Focus()
-				m.help = initializeHelp(taskKeys)
+				m.help = help.NewModel(taskKeys)
 				m.navigationKeys = tableNavigationKeys
 			case "detail":
 				m.taskDetails.Focus()
@@ -140,10 +142,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				switch m.preInputFocus {
 				case "stack":
 					m.stackTable.Focus()
-					m.help = initializeHelp(stackKeys)
+					m.help = help.NewModel(stackKeys)
 				case "task":
 					m.taskTable.Focus()
-					m.help = initializeHelp(taskKeys)
+					m.help = help.NewModel(taskKeys)
 				}
 
 				if msg.value.(string) == "y" {
@@ -199,7 +201,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case goToMainMsg:
 				m.showCustomInput = false
 				m.taskTable.Focus()
-				m.help = initializeHelp(taskKeys)
+				m.help = help.NewModel(taskKeys)
 
 				response := msg.value.(keyVal)
 
@@ -255,13 +257,13 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		// Inter-table navigation
-		case key.Matches(msg, Keys.Left):
+		case key.Matches(msg, keys.Mappings.Left):
 			if m.stackTable.Focused() {
 				if m.showDetails {
 					m.stackTable.Blur()
 					m.taskTable.Blur()
 					m.taskDetails.Focus()
-					m.help = initializeHelp(taskDetailsKeys)
+					m.help = help.NewModel(taskDetailsKeys)
 					m.navigationKeys = detailsNavigationKeys
 
 				}
@@ -269,27 +271,27 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.stackTable.Focus()
 				m.taskTable.Blur()
 				m.taskDetails.Blur()
-				m.help = initializeHelp(stackKeys)
+				m.help = help.NewModel(stackKeys)
 				m.navigationKeys = tableNavigationKeys
 
 			} else if m.taskDetails.Focused() {
 				m.stackTable.Blur()
 				m.taskTable.Focus()
 				m.taskDetails.Blur()
-				m.help = initializeHelp(taskKeys)
+				m.help = help.NewModel(taskKeys)
 				m.navigationKeys = tableNavigationKeys
 
 			}
 			return m, nil
 
-		case key.Matches(msg, Keys.Right):
+		case key.Matches(msg, keys.Mappings.Right):
 			if m.stackTable.Focused() {
 				if len(m.stackTable.Rows()) > 0 {
 					m.showTasks = true
 					m.stackTable.Blur()
 					m.taskTable.Focus()
 					m.taskDetails.Blur()
-					m.help = initializeHelp(taskKeys)
+					m.help = help.NewModel(taskKeys)
 					m.navigationKeys = tableNavigationKeys
 					return m, nil
 				}
@@ -299,7 +301,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.stackTable.Blur()
 					m.taskTable.Blur()
 					m.taskDetails.Focus()
-					m.help = initializeHelp(taskDetailsKeys)
+					m.help = help.NewModel(taskDetailsKeys)
 					m.navigationKeys = detailsNavigationKeys
 					return m, nil
 				}
@@ -307,7 +309,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.stackTable.Focus()
 				m.taskTable.Blur()
 				m.taskDetails.Blur()
-				m.help = initializeHelp(stackKeys)
+				m.help = help.NewModel(stackKeys)
 				m.navigationKeys = tableNavigationKeys
 				return m, nil
 			}
@@ -320,7 +322,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// When we switch to a new task:
 		//		- Empty details box is shown
-		case key.Matches(msg, Keys.Up):
+		case key.Matches(msg, keys.Mappings.Up):
 			if m.stackTable.Focused() {
 				m.stackTable.MoveUp(1)
 				m.taskTable.SetCursor(0)
@@ -344,7 +346,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, cmd
 			}
 
-		case key.Matches(msg, Keys.Down):
+		case key.Matches(msg, keys.Mappings.Down):
 			if m.stackTable.Focused() {
 				m.stackTable.MoveDown(1)
 				m.taskTable.SetCursor(0)
@@ -368,7 +370,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, cmd
 			}
 
-		case key.Matches(msg, Keys.GotoTop):
+		case key.Matches(msg, keys.Mappings.GotoTop):
 			if m.stackTable.Focused() {
 				m.stackTable.GotoTop()
 				m.taskTable.SetCursor(0)
@@ -392,7 +394,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, cmd
 			}
 
-		case key.Matches(msg, Keys.GotoBottom):
+		case key.Matches(msg, keys.Mappings.GotoBottom):
 			if m.stackTable.Focused() {
 				m.stackTable.GotoBottom()
 				m.taskTable.SetCursor(0)
@@ -416,7 +418,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, cmd
 			}
 
-		case key.Matches(msg, Keys.New):
+		case key.Matches(msg, keys.Mappings.New):
 			if m.stackTable.Focused() {
 				m.preInputFocus = "stack"
 				m.input = initializeInput("stack", entities.Stack{}, 0, m.context)
@@ -442,7 +444,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			return m, nil
 
-		case key.Matches(msg, Keys.Edit):
+		case key.Matches(msg, keys.Mappings.Edit):
 			if m.stackTable.Focused() {
 				if len(m.stackTable.Rows()) == 0 {
 					return m, nil
@@ -455,7 +457,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.stackTable.Blur()
 					m.taskTable.Blur()
 					m.taskDetails.Focus()
-					m.help = initializeHelp(taskDetailsKeys)
+					m.help = help.NewModel(taskDetailsKeys)
 					m.navigationKeys = detailsNavigationKeys
 				}
 				return m, nil
@@ -476,14 +478,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// Actual delete operation happens in showDelete conditional at the start of Update() method
 		// Here we just trigger the delete confirmation step
-		case key.Matches(msg, Keys.Delete):
+		case key.Matches(msg, keys.Mappings.Delete):
 			if m.stackTable.Focused() {
 				m.preInputFocus = "stack"
 				m.showCustomInput = true
 				m.customInputType = "delete"
 				m.customInput = initializeDeleteConfirmation()
 				m.stackTable.Blur()
-				m.help = helpModel{}
+				m.help = help.Model{}
 
 				return m, nil
 
@@ -496,13 +498,13 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.customInputType = "delete"
 					m.customInput = initializeDeleteConfirmation()
 					m.taskTable.Blur()
-					m.help = helpModel{}
+					m.help = help.Model{}
 
 					return m, nil
 				}
 			}
 
-		case key.Matches(msg, Keys.Toggle):
+		case key.Matches(msg, keys.Mappings.Toggle):
 			// Toggle task finish status
 			if m.taskTable.Focused() {
 				stackIndex := m.stackTable.Cursor()
@@ -534,7 +536,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 
-		case key.Matches(msg, Keys.Move):
+		case key.Matches(msg, keys.Mappings.Move):
 			if m.taskTable.Focused() {
 				stackIndex := m.stackTable.Cursor()
 
@@ -554,15 +556,15 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					}
 					m.customInput = initializeListSelector(opts, "", goToMainWithVal)
 
-					m.help = initializeHelp(listSelectorKeys)
+					m.help = help.NewModel(listSelectorKeys)
 					return m, nil
 				}
 			}
-		case key.Matches(msg, Keys.Help):
+		case key.Matches(msg, keys.Mappings.Help):
 			m.showHelp = !m.showHelp
 			return m, nil
 
-		case key.Matches(msg, Keys.Quit, Keys.Exit):
+		case key.Matches(msg, keys.Mappings.Quit, keys.Mappings.Exit):
 			return m, tea.Quit
 		}
 
@@ -632,12 +634,12 @@ func (m *model) View() string {
 			tablesView,
 			inputFormView,
 		)
-		m.help = initializeHelp(m.input.helpKeys)
+		m.help = help.NewModel(m.input.helpKeys)
 	}
 
 	if m.showHelp {
 		if !m.showInput && !m.showCustomInput {
-			navigationHelp := initializeHelp(m.navigationKeys)
+			navigationHelp := help.NewModel(m.navigationKeys)
 			return lipgloss.JoinVertical(lipgloss.Left, tablesView, m.help.View(), navigationHelp.View())
 		}
 		return lipgloss.JoinVertical(lipgloss.Left, tablesView, m.help.View())

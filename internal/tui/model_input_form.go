@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
+	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
 type (
@@ -22,7 +23,7 @@ type (
 		isInvalid     bool
 		invalidPrompt string
 		isNewTask     bool
-		helpKeys      keyMap
+		helpKeys      keys.Map
 		context       *state.Context
 	}
 
@@ -33,7 +34,7 @@ type (
 		isRequired       bool
 		nilValue         string
 		validationPrompt string
-		helpKeys         keyMap
+		helpKeys         keys.Map
 	}
 )
 
@@ -160,10 +161,10 @@ func (m inputForm) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, Keys.Return):
+		case key.Matches(msg, keys.Mappings.Return):
 			return m, goToMainCmd
 
-		case key.Matches(msg, Keys.Exit):
+		case key.Matches(msg, keys.Mappings.Exit):
 			return m, tea.Quit
 		}
 

@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
 const isConfirm = "y"
@@ -33,10 +34,10 @@ func (m deleteConfirmation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 
-		case key.Matches(msg, Keys.Return):
+		case key.Matches(msg, keys.Mappings.Return):
 			return m, goToMainCmd
 
-		case key.Matches(msg, Keys.Quit):
+		case key.Matches(msg, keys.Mappings.Quit):
 			return m, tea.Quit
 
 		default:

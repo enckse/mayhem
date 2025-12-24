@@ -1,28 +1,31 @@
-package tui
+// Package help implements the help view models
+package help
 
 import (
 	"github.com/charmbracelet/bubbles/help"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
-type helpModel struct {
+// Model is the underlying help model
+type Model struct {
 	help help.Model
-	keys keyMap
+	keys keys.Map
 }
 
-func initializeHelp(keys keyMap) helpModel {
-	return helpModel{
+func NewModel(keys keys.Map) Model {
+	return Model{
 		keys: keys,
 		help: help.New(),
 	}
 }
 
-func (m helpModel) Init() tea.Cmd {
+func (m Model) Init() tea.Cmd {
 	return nil
 }
 
-func (m helpModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		// If we set a width on the help menu it can it can gracefully truncate
@@ -33,7 +36,7 @@ func (m helpModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m helpModel) View() string {
+func (m Model) View() string {
 	style := lipgloss.NewStyle().MarginTop(1)
 	return style.Render(m.help.View(m.keys))
 }

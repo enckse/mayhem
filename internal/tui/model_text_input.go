@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
 // textinput.Model doesn't implement tea.Model interface
@@ -14,7 +15,7 @@ type textInput struct {
 	responder func(any) tea.Cmd
 }
 
-var textInputKeys = keyMap{
+var textInputKeys = keys.Map{
 	Enter: key.NewBinding(
 		key.WithKeys("enter"),
 		key.WithHelp("'enter'", "save"),
@@ -52,7 +53,7 @@ func (m textInput) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, Keys.Enter):
+		case key.Matches(msg, keys.Mappings.Enter):
 			return m, m.responder(m.input.Value())
 		}
 	}

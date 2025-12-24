@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
 type (
@@ -20,7 +21,7 @@ type (
 	}
 )
 
-var listSelectorKeys = keyMap{
+var listSelectorKeys = keys.Map{
 	Up: key.NewBinding(
 		key.WithKeys("up", "k"),
 		key.WithHelp("'↑/k'", "up"),
@@ -68,16 +69,16 @@ func (m listSelector) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, Keys.Return):
+		case key.Matches(msg, keys.Mappings.Return):
 			return m, goToMainWithVal(keyVal{})
 
-		case key.Matches(msg, Keys.Quit, Keys.Exit):
+		case key.Matches(msg, keys.Mappings.Quit, keys.Mappings.Exit):
 			return m, tea.Quit
 
-		case key.Matches(msg, Keys.Enter):
+		case key.Matches(msg, keys.Mappings.Enter):
 			return m, m.responder(m.options[m.focusIndex])
 
-		case key.Matches(msg, Keys.Up):
+		case key.Matches(msg, keys.Mappings.Up):
 			if m.focusIndex > 0 {
 				m.focusIndex--
 			} else {
@@ -85,7 +86,7 @@ func (m listSelector) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 
-		case key.Matches(msg, Keys.Down):
+		case key.Matches(msg, keys.Mappings.Down):
 			if m.focusIndex < m.maxIndex {
 				m.focusIndex++
 			} else {

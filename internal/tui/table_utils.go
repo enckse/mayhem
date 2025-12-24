@@ -7,10 +7,11 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	"github.com/enckse/mayhem/internal/entities"
+	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
 var (
-	stackKeys = keyMap{
+	stackKeys = keys.Map{
 		New: key.NewBinding(
 			key.WithKeys("n"),
 			key.WithHelp("'n'", "new stack 🌟"),
@@ -25,7 +26,7 @@ var (
 		),
 	}
 
-	taskKeys = keyMap{
+	taskKeys = keys.Map{
 		Toggle: key.NewBinding(
 			key.WithKeys("tab"),
 			key.WithHelp("'tab'", "check/uncheck 🔄"),
@@ -48,7 +49,7 @@ var (
 		),
 	}
 
-	tableNavigationKeys = keyMap{
+	tableNavigationKeys = keys.Map{
 		Up: key.NewBinding(
 			key.WithKeys("up", "k"),
 			key.WithHelp("'↑/k'", "up"),

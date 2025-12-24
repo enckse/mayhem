@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
 type (
@@ -32,7 +33,7 @@ const (
 )
 
 var (
-	timePickerKeys = keyMap{
+	timePickerKeys = keys.Map{
 		Up: key.NewBinding(
 			key.WithKeys("up", "k"),
 			key.WithHelp("'↑/k'", "increase"),
@@ -105,7 +106,7 @@ func (m timePicker) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 
-		case key.Matches(msg, Keys.Up):
+		case key.Matches(msg, keys.Mappings.Up):
 			switch m.focusIndex {
 			case hourItem:
 				hourDuration, _ := time.ParseDuration("60m")
@@ -122,7 +123,7 @@ func (m timePicker) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return m, nil
 
-		case key.Matches(msg, Keys.Down):
+		case key.Matches(msg, keys.Mappings.Down):
 			switch m.focusIndex {
 			case hourItem:
 				hourDuration, _ := time.ParseDuration("60m")
@@ -139,18 +140,18 @@ func (m timePicker) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return m, nil
 
-		case key.Matches(msg, Keys.Right):
+		case key.Matches(msg, keys.Mappings.Right):
 			if m.focusIndex < len(timeUnitMap)-1 {
 				m.focusIndex++
 			}
 			return m, nil
 
-		case key.Matches(msg, Keys.Left):
+		case key.Matches(msg, keys.Mappings.Left):
 			if m.focusIndex > 0 {
 				m.focusIndex--
 			}
 			return m, nil
-		case key.Matches(msg, Keys.Enter):
+		case key.Matches(msg, keys.Mappings.Enter):
 			return m, goToFormWithVal(m.currTime)
 		}
 	}

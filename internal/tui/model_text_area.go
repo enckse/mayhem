@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textarea"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
 // textarea.Model doesn't implement tea.Model interface
@@ -11,7 +12,7 @@ type textArea struct {
 	input textarea.Model
 }
 
-var textAreaKeys = keyMap{
+var textAreaKeys = keys.Map{
 	Enter: key.NewBinding(
 		key.WithKeys("enter"),
 		key.WithHelp("'enter'", "new line"),
