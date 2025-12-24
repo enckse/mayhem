@@ -29,7 +29,7 @@ type (
 	Form struct {
 		focusIndex    int
 		data          entities.Entity
-		dataType      string
+		formType      FormTable
 		fieldMap      map[int]field
 		isInvalid     bool
 		invalidPrompt string
@@ -98,12 +98,12 @@ var (
 // New will create a new input form
 func New(formTable FormTable, data entities.Entity, fieldIndex int, ctx *state.Context) Form {
 	var m Form
+	m.formType = formTable
 	switch formTable {
 	case StackFormTable:
 		m = Form{
 			data:       data,
 			focusIndex: fieldIndex,
-			dataType:   "stack",
 			fieldMap:   stackFields,
 		}
 
@@ -123,7 +123,6 @@ func New(formTable FormTable, data entities.Entity, fieldIndex int, ctx *state.C
 			data:       data,
 			focusIndex: fieldIndex,
 			fieldMap:   taskFields,
-			dataType:   "task",
 		}
 
 		targetField := m.fieldMap[fieldIndex]
@@ -192,8 +191,8 @@ func (m Form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.isInvalid = false
 
-		switch m.dataType {
-		case "stack":
+		switch m.formType {
+		case StackFormTable:
 			stack := m.data.(entities.Stack)
 
 			switch m.focusIndex {
@@ -203,7 +202,7 @@ func (m Form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			stack.Save(m.context)
 
-		case "task":
+		case TaskFormTable:
 			task := m.data.(entities.Task)
 
 			switch m.focusIndex {
