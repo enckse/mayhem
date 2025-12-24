@@ -1,4 +1,5 @@
-package tui
+// Package details will show detail UI element
+package details
 
 import (
 	"fmt"
@@ -11,16 +12,18 @@ import (
 	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/tui/definitions"
+	"github.com/enckse/mayhem/internal/tui/inputs/timepicker"
 	"github.com/enckse/mayhem/internal/tui/keys"
 )
 
 type (
-	detailsBox struct {
+	// Box is the details box
+	Box struct {
 		taskData          entities.Task
-		viewport          viewport.Model
+		ViewPort          viewport.Model
 		preserveOffset    bool
 		oldViewportOffset int
-		focusIndex        int
+		FocusIndex        int
 		isBoxFocused      bool
 		scrollData        scrollData
 		screen            *display.Screen
@@ -34,64 +37,36 @@ type (
 	}
 )
 
-var (
-	taskDetailsKeys = keys.Map{
-		Edit: key.NewBinding(
-			key.WithKeys("e"),
-			key.WithHelp("'e'", "edit field 📝"),
-		),
-	}
+// NewBox will create a new details box
+func NewBox(screen *display.Screen) Box {
+	return Box{screen: screen}
+}
 
-	detailsNavigationKeys = keys.Map{
-		Up: key.NewBinding(
-			key.WithKeys("up", "k"),
-			key.WithHelp("'↑/k'", "up"),
-		),
-		Down: key.NewBinding(
-			key.WithKeys("down", "j"),
-			key.WithHelp("'↓/j'", "down"),
-		),
-		GotoTop: key.NewBinding(
-			key.WithKeys("g"),
-			key.WithHelp("'g'", "jump to top"),
-		),
-		GotoBottom: key.NewBinding(
-			key.WithKeys("G"),
-			key.WithHelp("'G'", "jump to bottom"),
-		),
-		Help: key.NewBinding(
-			key.WithKeys("?"),
-			key.WithHelp("'?'", "toggle help"),
-		),
-		Quit: key.NewBinding(
-			key.WithKeys("q"),
-			key.WithHelp("'q'", "quit"),
-		),
-	}
-)
-
-func (m *detailsBox) buildDetailsBox(data entities.Task, preserveOffset bool, screen *display.Screen) {
+// Build will construct a new details box
+func (m *Box) Build(data entities.Task, preserveOffset bool, screen *display.Screen) {
 	m.taskData = data
 	m.screen = screen
 
 	// We want to preserve offset when we return to same details view after editing any field
 	// But when going from one task to another, we want to reset the view
 	m.preserveOffset = preserveOffset
-	m.oldViewportOffset = m.viewport.YOffset
-	m.viewport = viewport.New(screen.DetailsBoxWidth(), screen.Table.ViewHeight)
+	m.oldViewportOffset = m.ViewPort.YOffset
+	m.ViewPort = viewport.New(screen.DetailsBoxWidth(), screen.Table.ViewHeight)
 	m.renderContent()
 }
 
-func (m detailsBox) Init() tea.Cmd {
+// Init will init the model
+func (m Box) Init() tea.Cmd {
 	return nil
 }
 
-func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+// Update will update the model
+func (m Box) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if !m.isBoxFocused {
 		return m, nil
 	}
 
-	m.viewport.Width = m.screen.DetailsBoxWidth()
+	m.ViewPort.Width = m.screen.DetailsBoxWidth()
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -99,9 +74,9 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case key.Matches(msg, keys.Mappings.Up):
 			var scrollDistance int
-			switch m.focusIndex {
+			switch m.FocusIndex {
 			case definitions.TaskTitleIndex:
-				m.viewport.GotoBottom()
+				m.ViewPort.GotoBottom()
 				m.End()
 				return m, nil
 			case definitions.TaskNotesIndex:
@@ -114,11 +89,11 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.Previous()
 			}
 
-			m.viewport.ScrollUp(scrollDistance)
+			m.ViewPort.ScrollUp(scrollDistance)
 
 		case key.Matches(msg, keys.Mappings.Down):
 			var scrollDistance int
-			switch m.focusIndex {
+			switch m.FocusIndex {
 			case definitions.TaskTitleIndex:
 				m.Next()
 			case definitions.TaskNotesIndex:
@@ -128,68 +103,76 @@ func (m detailsBox) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				scrollDistance = m.scrollData.priority
 				m.Next()
 			case definitions.TaskDeadlineIndex:
-				m.viewport.GotoTop()
+				m.ViewPort.GotoTop()
 				m.Start()
 				return m, nil
 			}
 
-			m.viewport.ScrollDown(scrollDistance)
+			m.ViewPort.ScrollDown(scrollDistance)
 
 		case key.Matches(msg, keys.Mappings.GotoTop):
-			m.viewport.GotoTop()
+			m.ViewPort.GotoTop()
 			m.Start()
 
 		case key.Matches(msg, keys.Mappings.GotoBottom):
-			m.viewport.GotoBottom()
+			m.ViewPort.GotoBottom()
 			m.End()
 		}
 	}
 	return m, nil
 }
 
-func (m detailsBox) View() string {
-	return lipgloss.JoinVertical(lipgloss.Center, m.screen.DetailsBoxStyle().Render(m.viewport.View()), m.footerView())
+// View will display the model
+func (m Box) View() string {
+	return lipgloss.JoinVertical(lipgloss.Center, m.screen.DetailsBoxStyle().Render(m.ViewPort.View()), m.footerView())
 }
 
-func (m *detailsBox) Focus() {
+// Focus will set box focus
+func (m *Box) Focus() {
 	m.isBoxFocused = true
 }
 
-func (m *detailsBox) Blur() {
+// Blur will set box blur
+func (m *Box) Blur() {
 	m.isBoxFocused = false
 }
 
-func (m detailsBox) Focused() bool {
+// Focused will indicate if focused
+func (m Box) Focused() bool {
 	return m.isBoxFocused
 }
 
-func (m *detailsBox) Next() {
+// Next will move to the next component
+func (m *Box) Next() {
 	length := definitions.TaskLastIndex + 1
-	m.focusIndex = (m.focusIndex + 1) % length
+	m.FocusIndex = (m.FocusIndex + 1) % length
 	m.renderContent()
 }
 
-func (m *detailsBox) End() {
-	m.focusIndex = definitions.TaskLastIndex
+// End will move the end
+func (m *Box) End() {
+	m.FocusIndex = definitions.TaskLastIndex
 	m.renderContent()
 }
 
-func (m *detailsBox) Previous() {
+// Previous will move to the previous component
+func (m *Box) Previous() {
 	length := definitions.TaskLastIndex + 1
-	val := (m.focusIndex - 1) % length
+	val := (m.FocusIndex - 1) % length
 	if val < 0 {
 		val = val + length
 	}
-	m.focusIndex = val
+	m.FocusIndex = val
 	m.renderContent()
 }
 
-func (m *detailsBox) Start() {
-	m.focusIndex = 0
+// Start will move to the first component
+func (m *Box) Start() {
+	m.FocusIndex = 0
 	m.renderContent()
 }
 
-func (m *detailsBox) renderContent() {
+func (m *Box) renderContent() {
 	content := []string{
 		m.titleBlock(),
 		m.notesBlock(),
@@ -198,9 +181,9 @@ func (m *detailsBox) renderContent() {
 	}
 
 	view := lipgloss.JoinVertical(lipgloss.Left, content...)
-	m.viewport.SetContent(view)
+	m.ViewPort.SetContent(view)
 	if m.preserveOffset {
-		m.viewport.SetYOffset(m.oldViewportOffset)
+		m.ViewPort.SetYOffset(m.oldViewportOffset)
 		m.preserveOffset = false
 	}
 }
@@ -214,9 +197,9 @@ func newBlock(b *strings.Builder, title string, isFocus bool) {
 	b.WriteString("\n\n")
 }
 
-func (m *detailsBox) titleBlock() string {
+func (m *Box) titleBlock() string {
 	var b strings.Builder
-	isFocused := (m.focusIndex == definitions.TaskTitleIndex)
+	isFocused := (m.FocusIndex == definitions.TaskTitleIndex)
 	newBlock(&b, "Title", isFocused)
 	b.WriteString(m.taskData.Title)
 
@@ -225,9 +208,9 @@ func (m *detailsBox) titleBlock() string {
 	return data
 }
 
-func (m *detailsBox) notesBlock() string {
+func (m *Box) notesBlock() string {
 	var b strings.Builder
-	isFocused := (m.focusIndex == definitions.TaskNotesIndex)
+	isFocused := (m.FocusIndex == definitions.TaskNotesIndex)
 	newBlock(&b, "Notes", isFocused)
 
 	if m.taskData.Notes == "" {
@@ -241,9 +224,9 @@ func (m *detailsBox) notesBlock() string {
 	return data
 }
 
-func (m *detailsBox) priorityBlock() string {
+func (m *Box) priorityBlock() string {
 	var b strings.Builder
-	isFocused := (m.focusIndex == definitions.TaskPriorityIndex)
+	isFocused := (m.FocusIndex == definitions.TaskPriorityIndex)
 	newBlock(&b, "Priority", isFocused)
 	fmt.Fprintf(&b, "%d", m.taskData.Priority)
 
@@ -252,15 +235,15 @@ func (m *detailsBox) priorityBlock() string {
 	return data
 }
 
-func (m *detailsBox) deadlineBlock() string {
+func (m *Box) deadlineBlock() string {
 	var b strings.Builder
-	isFocused := (m.focusIndex == definitions.TaskDeadlineIndex)
+	isFocused := (m.FocusIndex == definitions.TaskDeadlineIndex)
 	newBlock(&b, "Deadline", isFocused)
 
 	if m.taskData.Deadline.IsZero() {
 		b.WriteString("Not Scheduled")
 	} else {
-		b.WriteString(formatTime(m.taskData.Deadline, true))
+		b.WriteString(timepicker.FormatTime(m.taskData.Deadline, true))
 	}
 
 	data := m.screen.ItemContainerStyle(isFocused).Render(m.screen.DetailsItemStyle(isFocused).Render(b.String()))
@@ -268,8 +251,8 @@ func (m *detailsBox) deadlineBlock() string {
 	return data
 }
 
-func (m *detailsBox) footerView() string {
-	scrollInfoStyle := display.FooterContainerStyle.Width(m.viewport.Width).Align(lipgloss.Right)
-	info := display.FooterInfoStyle.Render(fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
+func (m *Box) footerView() string {
+	scrollInfoStyle := display.FooterContainerStyle.Width(m.ViewPort.Width).Align(lipgloss.Right)
+	info := display.FooterInfoStyle.Render(fmt.Sprintf("%3.f%%", m.ViewPort.ScrollPercent()*100))
 	return scrollInfoStyle.Render(info)
 }

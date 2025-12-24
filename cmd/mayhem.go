@@ -10,7 +10,7 @@ import (
 	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
-	"github.com/enckse/mayhem/internal/tui"
+	"github.com/enckse/mayhem/internal/tui/ui"
 )
 
 var version string
@@ -58,6 +58,7 @@ func run() error {
 	}
 	ctx := &state.Context{}
 	ctx.Screen = display.NewScreen()
+	ctx.State.FinishedTasks = make(map[uint]bool)
 	cfg, err := state.LoadConfig()
 	if err != nil {
 		return err
@@ -85,7 +86,7 @@ func run() error {
 		return entities.LoadJSON(ctx, isMerge)
 	}
 
-	model := tui.InitializeMainModel(ctx)
+	model := ui.Initialize(ctx)
 	p := tea.NewProgram(model.Backing, tea.WithAltScreen())
 
 	if _, err := p.Run(); err != nil {

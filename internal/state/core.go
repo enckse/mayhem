@@ -17,6 +17,9 @@ type Context struct {
 	DB     *gorm.DB
 	Config Config
 	Screen *display.Screen
+	State  struct {
+		FinishedTasks map[uint]bool
+	}
 }
 
 // PathExists will indicate if a path exists (or not)

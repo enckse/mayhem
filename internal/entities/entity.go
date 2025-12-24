@@ -37,3 +37,13 @@ func Sync(ctx *state.Context, obj any) {
 		ToJSON(ctx)
 	}
 }
+
+// FindByIndex will find an entity by an id (from a set)
+func FindByIndex[T interface{ EntityID() uint }](arr []T, id uint) int {
+	for i, val := range arr {
+		if val.EntityID() == id {
+			return i
+		}
+	}
+	return -1
+}

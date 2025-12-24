@@ -1,5 +1,5 @@
-// Package tui has the main control window
-package tui
+// Package ui handles the TUI
+package ui
 
 import (
 	"fmt"
@@ -13,11 +13,13 @@ import (
 	"github.com/enckse/mayhem/internal/state"
 	"github.com/enckse/mayhem/internal/tui/definitions"
 	"github.com/enckse/mayhem/internal/tui/deletion"
+	"github.com/enckse/mayhem/internal/tui/details"
 	"github.com/enckse/mayhem/internal/tui/help"
 	"github.com/enckse/mayhem/internal/tui/inputs"
 	"github.com/enckse/mayhem/internal/tui/inputs/lists"
 	"github.com/enckse/mayhem/internal/tui/keys"
 	"github.com/enckse/mayhem/internal/tui/messages"
+	"github.com/enckse/mayhem/internal/tui/tables"
 )
 
 type (
@@ -30,7 +32,7 @@ type (
 		data            []entities.Stack
 		stackTable      table.Model
 		taskTable       table.Model
-		taskDetails     detailsBox
+		taskDetails     details.Box
 		help            help.Model
 		input           inputs.Form
 		showTasks       bool
@@ -54,18 +56,27 @@ type (
 	}
 )
 
-// InitializeMainModel will startup the core application model
-func InitializeMainModel(ctx *state.Context) ModelWrapper {
+const (
+	stackViewName     = "stack"
+	detailViewName    = "detail"
+	taskViewName      = "task"
+	tasksDataUpdate   = "tasks"
+	stacksDataUpdate  = "stacks"
+	detailsDataUpdate = "details"
+)
+
+// Initialize will startup the core application model
+func Initialize(ctx *state.Context) ModelWrapper {
 	stacks, _ := entities.FetchStacks(ctx)
 
 	m := &model{
-		stackTable: buildTable(stackColumns(), display.StackTableType, ctx.Screen),
-		taskTable:  buildTable(taskColumns(), display.TaskTableType, ctx.Screen),
+		stackTable: tables.New(tables.StackColumns, display.StackTableType, ctx.Screen),
+		taskTable:  tables.New(tables.TaskColumns, display.TaskTableType, ctx.Screen),
 		// we can't build the details box at this stage since we need both stack & task indices for that
-		taskDetails:    detailsBox{screen: ctx.Screen},
+		taskDetails:    details.NewBox(ctx.Screen),
 		data:           stacks,
-		help:           help.NewModel(stackKeys),
-		navigationKeys: tableNavigationKeys,
+		help:           help.NewModel(keys.StackMappings),
+		navigationKeys: keys.TableMappings,
 		showHelp:       true,
 		context:        ctx,
 	}
@@ -98,17 +109,19 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			switch m.preInputFocus {
-			case "stack":
-				m.stackTable.Focus()
-				m.help = help.NewModel(stackKeys)
-				m.navigationKeys = tableNavigationKeys
-			case "task":
-				m.taskTable.Focus()
-				m.help = help.NewModel(taskKeys)
-				m.navigationKeys = tableNavigationKeys
-			case "detail":
+			case stackViewName, taskViewName:
+				if m.preInputFocus == stackViewName {
+
+					m.stackTable.Focus()
+					m.help = help.NewModel(keys.StackMappings)
+				} else {
+					m.taskTable.Focus()
+					m.help = help.NewModel(keys.TaskMappings)
+				}
+				m.navigationKeys = keys.TableMappings
+			case detailViewName:
 				m.taskDetails.Focus()
-				m.navigationKeys = detailsNavigationKeys
+				m.navigationKeys = keys.DetailsMappings
 			}
 
 			m.updateViewDimensions(10)
@@ -148,17 +161,17 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.showCustomInput = false
 
 				switch m.preInputFocus {
-				case "stack":
+				case stackViewName:
 					m.stackTable.Focus()
-					m.help = help.NewModel(stackKeys)
-				case "task":
+					m.help = help.NewModel(keys.StackMappings)
+				case taskViewName:
 					m.taskTable.Focus()
-					m.help = help.NewModel(taskKeys)
+					m.help = help.NewModel(keys.TaskMappings)
 				}
 
 				if msg.Value.(string) == "y" {
 					switch m.preInputFocus {
-					case "stack":
+					case stackViewName:
 						stackIndex := m.stackTable.Cursor()
 						currStack := m.data[stackIndex]
 
@@ -172,7 +185,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						m.refreshData()
 						return m, nil
 
-					case "task":
+					case taskViewName:
 						stackIndex := m.stackTable.Cursor()
 						taskIndex := m.taskTable.Cursor()
 
@@ -209,7 +222,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case messages.Main:
 				m.showCustomInput = false
 				m.taskTable.Focus()
-				m.help = help.NewModel(taskKeys)
+				m.help = help.NewModel(keys.TaskMappings)
 
 				response := msg.Value.(definitions.KeyValue)
 
@@ -271,23 +284,23 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.stackTable.Blur()
 					m.taskTable.Blur()
 					m.taskDetails.Focus()
-					m.help = help.NewModel(taskDetailsKeys)
-					m.navigationKeys = detailsNavigationKeys
+					m.help = help.NewModel(keys.TaskDetailsMappings)
+					m.navigationKeys = keys.DetailsMappings
 
 				}
 			} else if m.taskTable.Focused() {
 				m.stackTable.Focus()
 				m.taskTable.Blur()
 				m.taskDetails.Blur()
-				m.help = help.NewModel(stackKeys)
-				m.navigationKeys = tableNavigationKeys
+				m.help = help.NewModel(keys.StackMappings)
+				m.navigationKeys = keys.TableMappings
 
 			} else if m.taskDetails.Focused() {
 				m.stackTable.Blur()
 				m.taskTable.Focus()
 				m.taskDetails.Blur()
-				m.help = help.NewModel(taskKeys)
-				m.navigationKeys = tableNavigationKeys
+				m.help = help.NewModel(keys.TaskMappings)
+				m.navigationKeys = keys.TableMappings
 
 			}
 			return m, nil
@@ -299,8 +312,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.stackTable.Blur()
 					m.taskTable.Focus()
 					m.taskDetails.Blur()
-					m.help = help.NewModel(taskKeys)
-					m.navigationKeys = tableNavigationKeys
+					m.help = help.NewModel(keys.TaskMappings)
+					m.navigationKeys = keys.TableMappings
 					return m, nil
 				}
 			} else if m.taskTable.Focused() {
@@ -309,16 +322,16 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.stackTable.Blur()
 					m.taskTable.Blur()
 					m.taskDetails.Focus()
-					m.help = help.NewModel(taskDetailsKeys)
-					m.navigationKeys = detailsNavigationKeys
+					m.help = help.NewModel(keys.TaskDetailsMappings)
+					m.navigationKeys = keys.DetailsMappings
 					return m, nil
 				}
 			} else if m.taskDetails.Focused() {
 				m.stackTable.Focus()
 				m.taskTable.Blur()
 				m.taskDetails.Blur()
-				m.help = help.NewModel(stackKeys)
-				m.navigationKeys = tableNavigationKeys
+				m.help = help.NewModel(keys.StackMappings)
+				m.navigationKeys = keys.TableMappings
 				return m, nil
 			}
 
@@ -334,23 +347,23 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.stackTable.Focused() {
 				m.stackTable.MoveUp(1)
 				m.taskTable.SetCursor(0)
-				m.taskDetails.focusIndex = 0
+				m.taskDetails.FocusIndex = 0
 				m.showTasks = false
 				m.showDetails = false
-				m.updateSelectionData("tasks")
+				m.updateSelectionData(tasksDataUpdate)
 				return m, nil
 
 			} else if m.taskTable.Focused() {
 				m.taskTable.MoveUp(1)
-				m.taskDetails.focusIndex = 0
+				m.taskDetails.FocusIndex = 0
 				m.showDetails = false
-				m.updateSelectionData("details")
+				m.updateSelectionData(detailsDataUpdate)
 				return m, nil
 
 			} else if m.taskDetails.Focused() {
 				var t tea.Model
 				t, cmd = m.taskDetails.Update(msg)
-				m.taskDetails = t.(detailsBox)
+				m.taskDetails = t.(details.Box)
 				return m, cmd
 			}
 
@@ -358,23 +371,23 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.stackTable.Focused() {
 				m.stackTable.MoveDown(1)
 				m.taskTable.SetCursor(0)
-				m.taskDetails.focusIndex = 0
+				m.taskDetails.FocusIndex = 0
 				m.showTasks = false
 				m.showDetails = false
-				m.updateSelectionData("tasks")
+				m.updateSelectionData(tasksDataUpdate)
 				return m, nil
 
 			} else if m.taskTable.Focused() {
 				m.taskTable.MoveDown(1)
-				m.taskDetails.focusIndex = 0
+				m.taskDetails.FocusIndex = 0
 				m.showDetails = false
-				m.updateSelectionData("details")
+				m.updateSelectionData(detailsDataUpdate)
 				return m, nil
 
 			} else if m.taskDetails.Focused() {
 				var t tea.Model
 				t, cmd = m.taskDetails.Update(msg)
-				m.taskDetails = t.(detailsBox)
+				m.taskDetails = t.(details.Box)
 				return m, cmd
 			}
 
@@ -382,23 +395,23 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.stackTable.Focused() {
 				m.stackTable.GotoTop()
 				m.taskTable.SetCursor(0)
-				m.taskDetails.focusIndex = 0
+				m.taskDetails.FocusIndex = 0
 				m.showTasks = false
 				m.showDetails = false
-				m.updateSelectionData("tasks")
+				m.updateSelectionData(tasksDataUpdate)
 				return m, nil
 
 			} else if m.taskTable.Focused() {
 				m.taskTable.GotoTop()
-				m.taskDetails.focusIndex = 0
+				m.taskDetails.FocusIndex = 0
 				m.showDetails = false
-				m.updateSelectionData("details")
+				m.updateSelectionData(detailsDataUpdate)
 				return m, nil
 
 			} else if m.taskDetails.Focused() {
 				var t tea.Model
 				t, cmd = m.taskDetails.Update(msg)
-				m.taskDetails = t.(detailsBox)
+				m.taskDetails = t.(details.Box)
 				return m, cmd
 			}
 
@@ -406,33 +419,33 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.stackTable.Focused() {
 				m.stackTable.GotoBottom()
 				m.taskTable.SetCursor(0)
-				m.taskDetails.focusIndex = 0
+				m.taskDetails.FocusIndex = 0
 				m.showTasks = false
 				m.showDetails = false
-				m.updateSelectionData("tasks")
+				m.updateSelectionData(tasksDataUpdate)
 				return m, nil
 
 			} else if m.taskTable.Focused() {
 				m.taskTable.GotoBottom()
-				m.taskDetails.focusIndex = 0
+				m.taskDetails.FocusIndex = 0
 				m.showDetails = false
-				m.updateSelectionData("details")
+				m.updateSelectionData(detailsDataUpdate)
 				return m, nil
 
 			} else if m.taskDetails.Focused() {
 				var t tea.Model
 				t, cmd = m.taskDetails.Update(msg)
-				m.taskDetails = t.(detailsBox)
+				m.taskDetails = t.(details.Box)
 				return m, cmd
 			}
 
 		case key.Matches(msg, keys.Mappings.New):
 			if m.stackTable.Focused() {
-				m.preInputFocus = "stack"
+				m.preInputFocus = stackViewName
 				m.input = inputs.New(inputs.StackFormTable, entities.Stack{}, 0, m.context)
 
 			} else if m.taskTable.Focused() {
-				m.preInputFocus = "task"
+				m.preInputFocus = taskViewName
 				newTask := entities.Task{
 					StackID: m.data[m.stackTable.Cursor()].ID,
 				}
@@ -457,7 +470,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if len(m.stackTable.Rows()) == 0 {
 					return m, nil
 				}
-				m.preInputFocus = "stack"
+				m.preInputFocus = stackViewName
 				m.input = inputs.New(inputs.StackFormTable, m.data[m.stackTable.Cursor()], 0, m.context)
 			} else if m.taskTable.Focused() {
 				if len(m.taskTable.Rows()) > 0 {
@@ -465,13 +478,13 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.stackTable.Blur()
 					m.taskTable.Blur()
 					m.taskDetails.Focus()
-					m.help = help.NewModel(taskDetailsKeys)
-					m.navigationKeys = detailsNavigationKeys
+					m.help = help.NewModel(keys.TaskDetailsMappings)
+					m.navigationKeys = keys.DetailsMappings
 				}
 				return m, nil
 			} else if m.taskDetails.Focused() {
-				m.preInputFocus = "detail"
-				m.input = inputs.New(inputs.TaskFormTable, m.data[m.stackTable.Cursor()].Tasks[m.taskTable.Cursor()], m.taskDetails.focusIndex, m.context)
+				m.preInputFocus = detailViewName
+				m.input = inputs.New(inputs.TaskFormTable, m.data[m.stackTable.Cursor()].Tasks[m.taskTable.Cursor()], m.taskDetails.FocusIndex, m.context)
 			}
 
 			m.stackTable.Blur()
@@ -488,7 +501,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// Here we just trigger the delete confirmation step
 		case key.Matches(msg, keys.Mappings.Delete):
 			if m.stackTable.Focused() {
-				m.preInputFocus = "stack"
+				m.preInputFocus = stackViewName
 				m.showCustomInput = true
 				m.customInputType = "delete"
 				m.customInput = deletion.NewConfirmation()
@@ -501,7 +514,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				stackIndex := m.stackTable.Cursor()
 
 				if len(m.data[stackIndex].Tasks) > 0 {
-					m.preInputFocus = "task"
+					m.preInputFocus = taskViewName
 					m.showCustomInput = true
 					m.customInputType = "delete"
 					m.customInput = deletion.NewConfirmation()
@@ -539,7 +552,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 					// Changing finish status will lead to reordering, so state has to be preserved
 					m.preserveState()
-					m.updateSelectionData("stacks")
+					m.updateSelectionData(stacksDataUpdate)
 					return m, nil
 				}
 			}
@@ -549,7 +562,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				stackIndex := m.stackTable.Cursor()
 
 				if len(m.data[stackIndex].Tasks) > 0 {
-					m.preInputFocus = "task"
+					m.preInputFocus = taskViewName
 					m.showCustomInput = true
 					m.customInputType = "move"
 					m.taskTable.Blur()
@@ -584,7 +597,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.firstRender {
 			// updateSelectionData() is called here instead of being called from Init()
 			// since details box rendering requires screen dimensions, which aren't set at the time of Init()
-			m.updateSelectionData("stacks")
+			m.updateSelectionData(stacksDataUpdate)
 			m.firstRender = false
 		}
 	}
@@ -687,7 +700,7 @@ func (m *model) taskFooter() string {
 func (m *model) refreshData() {
 	stacks, _ := entities.FetchStacks(m.context)
 	m.data = stacks
-	m.updateSelectionData("stacks")
+	m.updateSelectionData(stacksDataUpdate)
 }
 
 // Efficiently update only the required pane
@@ -699,14 +712,14 @@ func (m *model) updateSelectionData(category string) {
 	}
 
 	switch category {
-	case "stacks":
+	case stacksDataUpdate:
 		m.updateStackTableData(retainIndex)
 		m.updateTaskTableData(retainIndex)
 		m.updateDetailsBoxData(true)
-	case "tasks":
+	case tasksDataUpdate:
 		m.updateTaskTableData(retainIndex)
 		m.updateDetailsBoxData(false)
-	case "details":
+	case detailsDataUpdate:
 		m.updateDetailsBoxData(false)
 	default:
 		m.updateStackTableData(retainIndex)
@@ -718,10 +731,10 @@ func (m *model) updateSelectionData(category string) {
 func (m *model) updateStackTableData(retainIndex bool) {
 	// Set stack view data
 	// We pass a slice to stackRows, so the changes (like sorting) that happen there will be reflected in original slice
-	m.stackTable.SetRows(stackRows(m.data))
+	m.stackTable.SetRows(tables.StackRows(m.data))
 
 	if retainIndex {
-		newIndex := findIndex(m.data, m.prevState.stackID)
+		newIndex := entities.FindByIndex(m.data, m.prevState.stackID)
 
 		if newIndex != -1 {
 			m.stackTable.SetCursor(newIndex)
@@ -735,10 +748,10 @@ func (m *model) updateTaskTableData(retainIndex bool) {
 	currStack := m.data[stackIndex]
 
 	// We pass a slice to taskRows, so the changes (like sorting) that happen there will be reflected in original slice
-	m.taskTable.SetRows(taskRows(currStack.Tasks))
+	m.taskTable.SetRows(tables.TaskRows(currStack.Tasks, m.context))
 
 	if retainIndex {
-		newIndex := findIndex(m.data[stackIndex].Tasks, m.prevState.taskID)
+		newIndex := entities.FindByIndex(m.data[stackIndex].Tasks, m.prevState.taskID)
 		if newIndex != -1 {
 			m.taskTable.SetCursor(newIndex)
 		}
@@ -760,7 +773,7 @@ func (m *model) updateDetailsBoxData(preserveOffset bool) {
 		currTask = entities.Task{}
 	}
 
-	m.taskDetails.buildDetailsBox(currTask, preserveOffset, m.context.Screen)
+	m.taskDetails.Build(currTask, preserveOffset, m.context.Screen)
 }
 
 // Changing title, deadline, priority or finish status will lead to table reordering
@@ -781,7 +794,7 @@ func (m *model) updateViewDimensions(offset int) {
 
 	// Details box viewport dimensions & section width are set at the time of box creation,
 	// after that they have to be manually adjusted
-	m.taskDetails.viewport.Width = m.context.Screen.DetailsBoxWidth()
-	m.taskDetails.viewport.Height = m.context.Screen.DetailsBoxHeight()
+	m.taskDetails.ViewPort.Width = m.context.Screen.DetailsBoxWidth()
+	m.taskDetails.ViewPort.Height = m.context.Screen.DetailsBoxHeight()
 	m.updateDetailsBoxData(true)
 }

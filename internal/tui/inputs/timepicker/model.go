@@ -161,11 +161,11 @@ func (m Input) View() string {
 		"-",
 		m.renderUnitCol(yearItem, m.currTime.Year()),
 		" ",
-		m.renderUnitCol(hourItem, FormatHour(m.currTime.Hour())),
+		m.renderUnitCol(hourItem, formatHour(m.currTime.Hour())),
 		":",
 		m.renderUnitCol(minuteItem, m.currTime.Minute()),
 		" ",
-		RenderMidDayInfo(m.currTime.Hour()))
+		renderMidDayInfo(m.currTime.Hour()))
 
 	return lipgloss.JoinVertical(lipgloss.Center,
 		timeValue,
@@ -209,18 +209,35 @@ func (m Input) renderUnitTag(index int) string {
 	return style.Render(value)
 }
 
-// RenderMidDayInfo will show the display string for an hour
-func RenderMidDayInfo(hours int) string {
+func renderMidDayInfo(hours int) string {
 	if hours >= 12 {
 		return "pm"
 	}
 	return "am"
 }
 
-// FormatHour will adjust the hour by 12 hours (as needed)
-func FormatHour(value int) int {
+func formatHour(value int) int {
 	if value > 12 {
 		return value - 12
 	}
 	return value
+}
+
+// FormatTime will format a time for UI display
+func FormatTime(time time.Time, fullDate bool) string {
+	if time.IsZero() {
+		return fmt.Sprintf("%10s", "-")
+	}
+
+	year := fmt.Sprintf("%04d", time.Year())
+	month := fmt.Sprintf("%02d", int(time.Month()))
+	days := fmt.Sprintf("%02d", time.Day())
+	hours := fmt.Sprintf("%02d", formatHour(time.Hour()))
+	minutes := fmt.Sprintf("%02d", time.Minute())
+	midDayInfo := renderMidDayInfo(time.Hour())
+
+	if fullDate {
+		return days + "-" + month + "-" + year + "  " + hours + ":" + minutes + " " + midDayInfo
+	}
+	return hours + ":" + minutes + " " + midDayInfo
 }
