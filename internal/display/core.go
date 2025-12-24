@@ -161,7 +161,7 @@ func (s *Screen) DetailsItemStyle(isSelected bool) lipgloss.Style {
 		Width(s.DetailsBoxWidth() - 2)
 
 	if isSelected {
-		style.Background(detailsSelectionColor)
+		style = style.Background(detailsSelectionColor)
 	}
 
 	return style
@@ -176,7 +176,7 @@ func (s *Screen) ItemContainerStyle(isSelected bool) lipgloss.Style {
 		Width(s.DetailsBoxWidth())
 
 	if isSelected {
-		style.Background(detailsSelectionColor)
+		style = style.Background(detailsSelectionColor)
 	}
 
 	return style

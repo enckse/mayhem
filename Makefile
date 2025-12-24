@@ -13,7 +13,10 @@ setup:
 $(OBJECT):
 	go build $(GOFLAGS) -ldflags "$(LDFLAGS) -X main.version=$(VERSION)" -o "$(OBJECT)" cmd/mayhem.go
 
-check: $(OBJECT)
+unittest:
+	go test ./...
+
+check: unittest $(OBJECT)
 	find tests/ -type f -name "*.db" -delete
 	$(OBJECT) version
 	cat tests/objects.json | XDG_CACHE_HOME=tests/testdata $(OBJECT) import --config tests/settings.toml
