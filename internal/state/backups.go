@@ -11,7 +11,7 @@ import (
 )
 
 // Backup will perform a backup based on the configuration
-func (c Config) Backup(timestamp, threshold time.Time) error {
+func (c Config) Backup(timestamp time.Time) error {
 	db := c.Database()
 	if !PathExists(db) {
 		return nil
@@ -19,8 +19,13 @@ func (c Config) Backup(timestamp, threshold time.Time) error {
 	if err := os.MkdirAll(c.Backups.Directory, os.ModePerm); err != nil {
 		return err
 	}
-	if !threshold.IsZero() {
-		err := filepath.Walk(c.Backups.Directory, func(p string, info fs.FileInfo, err error) error {
+	if c.Backups.Duration != "" {
+		dur, err := time.ParseDuration(c.Backups.Duration)
+		if err != nil {
+			return err
+		}
+		threshold := time.Now().Add(-dur)
+		err = filepath.Walk(c.Backups.Directory, func(p string, info fs.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}

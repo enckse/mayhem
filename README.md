@@ -28,8 +28,10 @@ directory="~/.mayhem"
 # enable backups into a directory (offset from data.directory)
 # backups are taken when mayhem starts
 directory="backups"
-# keeps this many days of backups
-days=3
+# keeps this duration of backups
+duration="72h"
+# control the format of the date, allows controlling how many backups one gets
+format="20060102"
 
 [json]
 # save a JSON export on exit

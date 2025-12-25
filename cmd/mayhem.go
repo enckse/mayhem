@@ -77,11 +77,7 @@ func run() error {
 	}
 	if !isExport && !isImport {
 		if ctx.Config.Backups.Directory != "" {
-			var threshold time.Time
-			if ctx.Config.Backups.Days > 0 {
-				threshold = time.Now().Add(-24 * time.Duration(ctx.Config.Backups.Days) * time.Hour)
-			}
-			if err := ctx.Config.Backup(time.Now(), threshold); err != nil {
+			if err := ctx.Config.Backup(time.Now()); err != nil {
 				return err
 			}
 		}
