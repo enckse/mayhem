@@ -6,12 +6,11 @@ import (
 	"time"
 
 	"github.com/enckse/mayhem/internal/state"
-	"gorm.io/gorm"
 )
 
 // Task defines task-based entities for work
 type Task struct {
-	gorm.Model `json:"-"`
+	EntityBase
 	Title      string `gorm:"notnull"`
 	Notes      string
 	Deadline   time.Time
@@ -29,11 +28,6 @@ func (t Task) Save(store state.Store) Entity {
 // Delete will remove the task
 func (t Task) Delete(store state.Store) {
 	store.Delete(&t)
-}
-
-// EntityID gets the backing entity id
-func (t Task) EntityID() uint {
-	return t.ID
 }
 
 // SortTasks will sort by finished, deadline, title

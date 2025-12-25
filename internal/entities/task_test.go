@@ -7,14 +7,6 @@ import (
 	"github.com/enckse/mayhem/internal/entities"
 )
 
-func TestTaskEntityID(t *testing.T) {
-	e := entities.Task{}
-	e.ID = 1
-	if e.EntityID() != 1 {
-		t.Error("invalid id")
-	}
-}
-
 func TestSaveDeleteTask(t *testing.T) {
 	m := &mockDB{}
 	s := entities.Task{}

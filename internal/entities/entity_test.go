@@ -44,3 +44,11 @@ func TestFindByIndex(t *testing.T) {
 		t.Errorf("invalid index: %d", idx)
 	}
 }
+
+func TestEntityID(t *testing.T) {
+	e := entities.Stack{}
+	e.ID = 1
+	if e.EntityID() != 1 {
+		t.Error("invalid id")
+	}
+}

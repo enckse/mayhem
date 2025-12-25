@@ -6,14 +6,6 @@ import (
 	"github.com/enckse/mayhem/internal/entities"
 )
 
-func TestEntityID(t *testing.T) {
-	e := entities.Stack{}
-	e.ID = 1
-	if e.EntityID() != 1 {
-		t.Error("invalid id")
-	}
-}
-
 func TestNewStack(t *testing.T) {
 	m := &mockDB{}
 	e := entities.NewStack(m)

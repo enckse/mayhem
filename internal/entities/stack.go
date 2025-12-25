@@ -5,14 +5,13 @@ import (
 	"strings"
 
 	"github.com/enckse/mayhem/internal/state"
-	"gorm.io/gorm"
 )
 
 // Stack is a set of tasks, sorted alphabetically
 type Stack struct {
-	gorm.Model `json:"-"`
-	Title      string `gorm:"notnull"`
-	Tasks      []Task
+	EntityBase
+	Title string `gorm:"notnull"`
+	Tasks []Task
 }
 
 // OpenTasks will get the count of unfinished tasks
@@ -25,11 +24,6 @@ func (s Stack) OpenTasks() uint64 {
 		count++
 	}
 	return count
-}
-
-// EntityID gets the backing entity id
-func (s Stack) EntityID() uint {
-	return s.ID
 }
 
 // NewStack will create a new stack
