@@ -38,7 +38,7 @@ func TestBackup(t *testing.T) {
 		t.Errorf("invalid children: %v", children)
 	}
 	cfg.Backups.Format = "2006"
-	cfg.Backups.Duration = "0s"
+	cfg.Backups.Duration = "5h"
 	if err := cfg.Backup(now.Add(1 * time.Second)); err != nil {
 		t.Errorf("unexpected backup error: %v", err)
 	}
