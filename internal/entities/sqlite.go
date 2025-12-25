@@ -1,9 +1,12 @@
 package entities
 
 import (
+	// Using pure-go implementation of GORM driver to avoid CGO issues during cross-compilation
 	"github.com/enckse/mayhem/internal/state"
+	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"gorm.io/gorm/logger"
 )
 
 // DBWrapper is our sqlite backend wrapper
@@ -36,4 +39,19 @@ func (d *DBWrapper) Delete(obj any) {
 // SyncJSON will sync db state to JSON
 func (d *DBWrapper) SyncJSON(ctx *state.Context) {
 	DumpJSONToFile(ctx)
+}
+
+// InitializeDB will setup and ready the backing store
+func InitializeDB(ctx *state.Context) error {
+	db, err := gorm.Open(sqlite.Open(ctx.Config.Database()), &gorm.Config{
+		// Silent mode ensures that errors logs don't interfere with the view
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
+	if err != nil {
+		return err
+	}
+	db.AutoMigrate(&Stack{}, &Task{})
+
+	ctx.DB = &DBWrapper{db}
+	return nil
 }
