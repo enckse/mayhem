@@ -7,7 +7,6 @@ import (
 
 	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/entities"
-	"github.com/enckse/mayhem/internal/state"
 	"github.com/enckse/mayhem/internal/tui/tables"
 )
 
@@ -28,11 +27,10 @@ func TestStackRows(t *testing.T) {
 }
 
 func TestTaskRows(t *testing.T) {
-	ctx := &state.Context{}
 	tasks := []entities.Task{{Title: "xyz", IsFinished: true}, {IsFinished: false}}
 	tasks[0].ID = 0
 	tasks[1].ID = 1
-	s := tables.TaskRows(tasks, ctx)
+	s := tables.TaskRows(tasks)
 	if fmt.Sprintf("%v", s) != "[[✘ xyz          -    0] [▢           -    0]]" {
 		t.Errorf("bad rows: %v", s)
 	}

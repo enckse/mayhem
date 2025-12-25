@@ -729,7 +729,7 @@ func (m *model) updateTaskTableData(retainIndex bool) {
 	currStack := m.data[stackIndex]
 
 	// We pass a slice to taskRows, so the changes (like sorting) that happen there will be reflected in original slice
-	m.taskTable.SetRows(tables.TaskRows(currStack.Tasks, m.context))
+	m.taskTable.SetRows(tables.TaskRows(currStack.Tasks))
 
 	if retainIndex {
 		newIndex := entities.FindByIndex(m.data[stackIndex].Tasks, m.prevState.taskID)

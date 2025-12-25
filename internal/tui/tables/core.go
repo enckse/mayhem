@@ -7,7 +7,6 @@ import (
 	"github.com/charmbracelet/bubbles/table"
 	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/entities"
-	"github.com/enckse/mayhem/internal/state"
 	"github.com/enckse/mayhem/internal/tui/inputs/timepicker"
 )
 
@@ -43,7 +42,7 @@ func StackRows(stacks []entities.Stack) []table.Row {
 }
 
 // TaskRows will generate rows for tasks
-func TaskRows(tasks []entities.Task, ctx *state.Context) []table.Row {
+func TaskRows(tasks []entities.Task) []table.Row {
 	rows := make([]table.Row, len(tasks))
 
 	entities.SortTasks(tasks)
