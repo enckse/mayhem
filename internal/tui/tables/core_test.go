@@ -12,7 +12,16 @@ import (
 )
 
 func TestStackRows(t *testing.T) {
-	s := tables.StackRows([]entities.Stack{{PendingTaskCount: 1000}, {PendingTaskCount: 10}, {Title: "empty"}})
+	var thousandTasks, tenTasks []entities.Task
+	idx := 0
+	for idx <= 1000 {
+		if idx < 10 {
+			tenTasks = append(tenTasks, entities.Task{})
+		}
+		thousandTasks = append(thousandTasks, entities.Task{})
+		idx++
+	}
+	s := tables.StackRows([]entities.Stack{{Tasks: thousandTasks}, {Tasks: tenTasks}, {Title: "empty"}})
 	if fmt.Sprintf("%v", s) != "[[ [99+]] [ [ 10]] [empty      ]]" {
 		t.Errorf("bad rows: %v", s)
 	}

@@ -10,10 +10,21 @@ import (
 
 // Stack is a set of tasks, sorted alphabetically
 type Stack struct {
-	gorm.Model       `json:"-"`
-	Title            string `gorm:"notnull"`
-	PendingTaskCount uint64 `json:"-"`
-	Tasks            []Task
+	gorm.Model `json:"-"`
+	Title      string `gorm:"notnull"`
+	Tasks      []Task
+}
+
+// OpenTasks will get the count of unfinished tasks
+func (s Stack) OpenTasks() uint64 {
+	var count uint64
+	for _, t := range s.Tasks {
+		if t.IsFinished {
+			continue
+		}
+		count++
+	}
+	return count
 }
 
 // EntityID gets the backing entity id
@@ -42,14 +53,6 @@ func FetchStacks(ctx *state.Context) ([]Stack, error) {
 	}
 
 	return stacks, err
-}
-
-// IncrementPendingCount will add to the pending task count
-func IncrementPendingCount(id uint, ctx *state.Context) {
-	stack := Stack{}
-	ctx.DB.Find(&stack, id)
-	stack.PendingTaskCount++
-	stack.Save(ctx)
 }
 
 // Save will save the entity

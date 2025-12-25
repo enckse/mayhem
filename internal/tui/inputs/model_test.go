@@ -26,9 +26,6 @@ func (m *mockDB) Create(_ any) error {
 func (m *mockDB) Delete(_ any) {
 }
 
-func (m *mockDB) Find(_ any, _ uint) {
-}
-
 func (m *mockDB) Stacks(_ any) error {
 	return nil
 }

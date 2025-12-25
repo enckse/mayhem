@@ -25,11 +25,6 @@ func (d *DBWrapper) Stacks(obj any) error {
 	return result.Error
 }
 
-// Find will find an entity in the database
-func (d *DBWrapper) Find(obj any, id uint) {
-	d.db.Find(obj, id)
-}
-
 // Delete will remove an object
 // Unscoped() is used to ensure hard delete, where stack will be removed from db instead of being just marked as "deleted"
 // DB.Unscoped().Delete(&s)

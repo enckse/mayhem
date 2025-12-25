@@ -54,16 +54,6 @@ func TestFetchStacks(t *testing.T) {
 	}
 }
 
-func TestIncrementPendingCount(t *testing.T) {
-	m := &mockDB{}
-	ctx := &state.Context{}
-	ctx.DB = m
-	entities.IncrementPendingCount(100, ctx)
-	if m.id != 100 || m.last == nil {
-		t.Error("invalid increment")
-	}
-}
-
 func TestSaveDelete(t *testing.T) {
 	m := &mockDB{}
 	ctx := &state.Context{}
@@ -84,5 +74,13 @@ func TestSortStacks(t *testing.T) {
 	entities.SortStacks(s)
 	if len(s) != 2 || s[0].Title != "1" || s[1].Title != "X" {
 		t.Errorf("invalid sort: %v", s)
+	}
+}
+
+func TestOpenTasks(t *testing.T) {
+	s := entities.Stack{}
+	s.Tasks = []entities.Task{{}, {}, {}, {IsFinished: true}}
+	if s.OpenTasks() != 3 {
+		t.Error("invalid open task count")
 	}
 }

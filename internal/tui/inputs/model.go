@@ -220,10 +220,6 @@ func (m Form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			task = task.Save(m.context).(entities.Task)
-
-			if m.isNewTask {
-				entities.IncrementPendingCount(task.StackID, m.context)
-			}
 		}
 
 		return m, messages.MainGoToWith("refresh")

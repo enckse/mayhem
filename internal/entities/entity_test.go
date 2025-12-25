@@ -11,7 +11,6 @@ type mockDB struct {
 	last any
 	err  error
 	ctx  *state.Context
-	id   uint
 }
 
 func (m *mockDB) Save(obj any) {
@@ -25,11 +24,6 @@ func (m *mockDB) Create(obj any) error {
 
 func (m *mockDB) Delete(_ any) {
 	m.last = nil
-}
-
-func (m *mockDB) Find(obj any, id uint) {
-	m.last = obj
-	m.id = id
 }
 
 func (m *mockDB) Stacks(_ any) error {

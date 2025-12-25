@@ -35,7 +35,7 @@ func StackRows(stacks []entities.Stack) []table.Row {
 	for i, val := range stacks {
 		row := []string{
 			val.Title,
-			formatCount(val.PendingTaskCount),
+			formatCount(val.OpenTasks()),
 		}
 		rows[i] = row
 	}

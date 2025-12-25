@@ -197,11 +197,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						if len(m.data[stackIndex].Tasks) > 0 {
 							currTask = m.data[stackIndex].Tasks[taskIndex]
 
-							if !currTask.IsFinished {
-								stack := m.data[stackIndex]
-								stack.PendingTaskCount--
-								stack.Save(m.context)
-							}
 							if taskIndex == len(m.taskTable.Rows())-1 {
 								m.taskTable.SetCursor(taskIndex - 1)
 							}
@@ -241,21 +236,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 				currStack := m.data[stackIndex]
 				currTask := currStack.Tasks[taskIndex]
-
 				if currTask.StackID == newStackID {
 					return m, nil
 				}
 
-				// Moving recurring tasks wouldn't have any effect on the stack pending task count
-
-				// Decrease pending task count for old stack
-				if !currTask.IsFinished {
-					currStack.PendingTaskCount--
-					currStack.Save(m.context)
-				}
-
-				// Increase pending task count for new stack
-				entities.IncrementPendingCount(newStackID, m.context)
 				currTask.StackID = newStackID
 				currTask.Save(m.context)
 
@@ -540,15 +524,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					stack := m.data[stackIndex]
 					currTask = stack.Tasks[taskIndex]
 
-					// For recurring tasks we toggle the status of latest recur task entry
 					currTask.IsFinished = !currTask.IsFinished
 					currTask.Save(m.context)
-
-					if currTask.IsFinished {
-						stack.PendingTaskCount--
-					} else {
-						stack.PendingTaskCount++
-					}
 					stack.Save(m.context)
 
 					stack.Tasks[taskIndex] = currTask

@@ -21,7 +21,6 @@ type (
 		Save(any)
 		Create(any) error
 		Stacks(any) error
-		Find(any, uint)
 		Delete(any)
 		SyncJSON(*Context)
 	}
