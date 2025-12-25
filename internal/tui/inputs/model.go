@@ -242,8 +242,7 @@ func (m Form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Form) View() string {
 	var b strings.Builder
 
-	// ADD changes for invalid input case
-
+	// NOTE: add changes for invalid input case
 	b.WriteString(display.HighlightedTextStyle.Render(m.fieldMap[m.focusIndex].prompt))
 
 	if m.isInvalid {
