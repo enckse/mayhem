@@ -198,7 +198,7 @@ func (m Form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				stack.Title = selectedValue.(string)
 			}
 
-			stack.Save(m.context)
+			stack.Save(m.context.DB)
 		} else {
 			task := m.data.(entities.Task)
 
@@ -219,7 +219,7 @@ func (m Form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			}
 
-			task = task.Save(m.context).(entities.Task)
+			task = task.Save(m.context.DB).(entities.Task)
 		}
 
 		return m, messages.MainGoToWith("refresh")

@@ -23,7 +23,6 @@ type Config struct {
 	}
 	JSON struct {
 		Sync bool
-		Exit bool
 	}
 }
 

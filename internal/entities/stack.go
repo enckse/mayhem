@@ -33,15 +33,15 @@ func (s Stack) EntityID() uint {
 }
 
 // NewStack will create a new stack
-func NewStack(ctx *state.Context) Stack {
+func NewStack(store state.Store) Stack {
 	stack := Stack{Title: "New Stack"}
-	ctx.DB.Create(&stack)
+	store.Create(&stack)
 	return stack
 }
 
 // FetchStacks will retrieve all stacks
-func FetchStacks(ctx *state.Context) []Stack {
-	obj := ctx.DB.Fetch()
+func FetchStacks(store state.Store) []Stack {
+	obj := store.Fetch()
 	var stacks []Stack
 	val, ok := obj.([]Stack)
 	if ok {
@@ -49,7 +49,7 @@ func FetchStacks(ctx *state.Context) []Stack {
 	}
 
 	if len(stacks) == 0 {
-		stack := NewStack(ctx)
+		stack := NewStack(store)
 		return []Stack{stack}
 	}
 
@@ -57,14 +57,14 @@ func FetchStacks(ctx *state.Context) []Stack {
 }
 
 // Save will save the entity
-func (s Stack) Save(ctx *state.Context) Entity {
-	Sync(ctx, &s)
+func (s Stack) Save(store state.Store) Entity {
+	store.Save(&s)
 	return s
 }
 
 // Delete will remove the entity
-func (s Stack) Delete(ctx *state.Context) {
-	ctx.DB.Delete(&s)
+func (s Stack) Delete(store state.Store) {
+	store.Delete(&s)
 }
 
 // SortStacks will sort by title

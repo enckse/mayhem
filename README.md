@@ -34,9 +34,7 @@ duration="72h"
 format="20060102"
 
 [json]
-# save a JSON export on exit
-exit=true
-# save a JSON export on save/sync
+# save a JSON export on database change on save/sync
 sync=true
 ```
 

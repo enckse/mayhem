@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/enckse/mayhem/internal/entities"
-	"github.com/enckse/mayhem/internal/state"
 )
 
 func TestTaskEntityID(t *testing.T) {
@@ -18,14 +17,12 @@ func TestTaskEntityID(t *testing.T) {
 
 func TestSaveDeleteTask(t *testing.T) {
 	m := &mockDB{}
-	ctx := &state.Context{}
-	ctx.DB = m
 	s := entities.Task{}
-	s.Save(ctx)
+	s.Save(m)
 	if m.last == nil {
 		t.Error("no save")
 	}
-	s.Delete(ctx)
+	s.Delete(m)
 	if m.last != nil {
 		t.Error("no delete")
 	}

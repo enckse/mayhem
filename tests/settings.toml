@@ -4,5 +4,4 @@ duration="1h"
 format="20060102T150405"
 
 [json]
-exit=true
 sync=true

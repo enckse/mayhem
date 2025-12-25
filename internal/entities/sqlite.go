@@ -2,6 +2,7 @@ package entities
 
 import (
 	"fmt"
+	"path/filepath"
 	"time"
 
 	"github.com/enckse/mayhem/internal/sqlite"
@@ -16,18 +17,29 @@ import (
 
 // DBWrapper is our sqlite backend wrapper
 type DBWrapper struct {
-	db     *gorm.DB
-	errors []string
+	db        *gorm.DB
+	errors    []string
+	saveJSON  bool
+	directory string
 }
 
 // Save will store an entity
 func (d *DBWrapper) Save(obj any) {
 	d.db.Save(obj).Commit()
+	d.doJSON()
+}
+
+func (d *DBWrapper) doJSON() {
+	if d.saveJSON {
+		fileName := filepath.Join(d.directory, state.FileName+"json")
+		d.log("json", DumpJSONToFile(fileName, d))
+	}
 }
 
 // Create will create an entity
 func (d *DBWrapper) Create(obj any) {
 	d.log("create", d.db.Create(obj).Error)
+	d.doJSON()
 }
 
 // Fetch will return the data (in this case always stacks)
@@ -55,11 +67,7 @@ func (d *DBWrapper) Errors() []string {
 // DB.Unscoped().Delete(&s)
 func (d *DBWrapper) Delete(obj any) {
 	d.db.Unscoped().Select(clause.Associations).Delete(obj).Commit()
-}
-
-// SyncJSON will sync db state to JSON
-func (d *DBWrapper) SyncJSON(ctx *state.Context) {
-	d.log("json", DumpJSONToFile(ctx))
+	d.doJSON()
 }
 
 // InitializeDB will setup and ready the backing store
@@ -73,6 +81,11 @@ func InitializeDB(ctx *state.Context) error {
 	}
 	db.AutoMigrate(&Stack{}, &Task{})
 
-	ctx.DB = &DBWrapper{db, []string{}}
+	ctx.DB = &DBWrapper{
+		db:        db,
+		errors:    []string{},
+		saveJSON:  ctx.Config.JSON.Sync,
+		directory: ctx.Config.Data.Directory,
+	}
 	return nil
 }

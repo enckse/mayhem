@@ -15,7 +15,7 @@ func TestDumpJSON(t *testing.T) {
 	ctx := &state.Context{}
 	ctx.DB = m
 	var buf bytes.Buffer
-	if err := entities.DumpJSON(&buf, ctx); err != nil {
+	if err := entities.DumpJSON(&buf, ctx.DB); err != nil {
 		t.Errorf("invalid error: %v", err)
 	}
 	if !strings.Contains(buf.String(), "New Stack") {
@@ -28,14 +28,14 @@ func TestLoadJSON(t *testing.T) {
 	ctx := &state.Context{}
 	ctx.DB = m
 	reader := strings.NewReader("[{\"Title\": \"xyz\"}]")
-	if err := entities.LoadJSON(ctx, false, reader); err != nil {
+	if err := entities.LoadJSON(ctx.DB, false, reader); err != nil {
 		t.Errorf("invalid error: %v", err)
 	}
 	if !strings.Contains(fmt.Sprintf("%v", m.last), "xyz") {
 		t.Error("invalid load")
 	}
 	reader = strings.NewReader("[{\"Title\": \"zzz\"}]")
-	if err := entities.LoadJSON(ctx, true, reader); err != nil {
+	if err := entities.LoadJSON(ctx.DB, true, reader); err != nil {
 		t.Errorf("invalid error: %v", err)
 	}
 	if !strings.Contains(fmt.Sprintf("%v", m.last), "zzz") {

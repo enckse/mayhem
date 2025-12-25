@@ -7,14 +7,13 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"slices"
 
 	"github.com/enckse/mayhem/internal/state"
 )
 
 // LoadJSON will import JSON
-func LoadJSON(ctx *state.Context, merge bool, reader io.Reader) error {
+func LoadJSON(store state.Store, merge bool, reader io.Reader) error {
 	scanner := bufio.NewScanner(reader)
 	var buf bytes.Buffer
 	for scanner.Scan() {
@@ -28,7 +27,7 @@ func LoadJSON(ctx *state.Context, merge bool, reader io.Reader) error {
 	}
 	var existing []Stack
 	if merge {
-		existing = FetchStacks(ctx)
+		existing = FetchStacks(store)
 	}
 	var items []Stack
 	if err := json.Unmarshal(buf.Bytes(), &items); err != nil {
@@ -43,25 +42,25 @@ func LoadJSON(ctx *state.Context, merge bool, reader io.Reader) error {
 				continue
 			}
 		}
-		s.Save(ctx)
+		s.Save(store)
 		fmt.Printf("[imported] %s\n", s.Title)
 	}
 	return nil
 }
 
 // DumpJSONToFile will dump entities to JSON
-func DumpJSONToFile(ctx *state.Context) error {
-	file, err := os.OpenFile(filepath.Join(ctx.Config.Data.Directory, state.FileName+"json"), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o755)
+func DumpJSONToFile(fileName string, store state.Store) error {
+	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o755)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-	return DumpJSON(file, ctx)
+	return DumpJSON(file, store)
 }
 
 // DumpJSON will write the current JSOn state to stdout
-func DumpJSON(dst io.Writer, ctx *state.Context) error {
-	s := FetchStacks(ctx)
+func DumpJSON(dst io.Writer, store state.Store) error {
+	s := FetchStacks(store)
 	SortStacks(s)
 	for _, item := range s {
 		tasks := item.Tasks

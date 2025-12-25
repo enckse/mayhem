@@ -71,7 +71,7 @@ const (
 
 // Initialize will startup the core application model
 func Initialize(ctx *state.Context) ModelWrapper {
-	stacks := entities.FetchStacks(ctx)
+	stacks := entities.FetchStacks(ctx.DB)
 
 	m := &model{
 		stackTable: tables.New(tables.StackColumns, display.StackTableType, ctx.Screen),
@@ -183,7 +183,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 							m.stackTable.SetCursor(stackIndex - 1)
 						}
 
-						currStack.Delete(m.context)
+						currStack.Delete(m.context.DB)
 						m.showTasks = false
 						m.showDetails = false
 						m.refreshData()
@@ -200,7 +200,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 							if taskIndex == len(m.taskTable.Rows())-1 {
 								m.taskTable.SetCursor(taskIndex - 1)
 							}
-							currTask.Delete(m.context)
+							currTask.Delete(m.context.DB)
 							m.refreshData()
 							return m, nil
 						}
@@ -241,7 +241,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 
 				currTask.StackID = newStackID
-				currTask.Save(m.context)
+				currTask.Save(m.context.DB)
 
 				if taskIndex == len(m.taskTable.Rows())-1 {
 					m.taskTable.SetCursor(taskIndex - 1)
@@ -525,8 +525,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					currTask = stack.Tasks[taskIndex]
 
 					currTask.IsFinished = !currTask.IsFinished
-					currTask.Save(m.context)
-					stack.Save(m.context)
+					currTask.Save(m.context.DB)
+					stack.Save(m.context.DB)
 
 					stack.Tasks[taskIndex] = currTask
 					m.data[stackIndex] = stack
@@ -679,7 +679,7 @@ func (m *model) taskFooter() string {
 
 // Pull new data from database
 func (m *model) refreshData() {
-	stacks := entities.FetchStacks(m.context)
+	stacks := entities.FetchStacks(m.context.DB)
 	m.data = stacks
 	m.updateSelectionData(stackDataCategory)
 }

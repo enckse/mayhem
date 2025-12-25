@@ -7,16 +7,8 @@ import (
 
 // Entity is the core DB entity
 type Entity interface {
-	Save(*state.Context) Entity
-	Delete(*state.Context)
-}
-
-// Sync will save to the DB and perform any other sync operations of interest
-func Sync(ctx *state.Context, obj any) {
-	ctx.DB.Save(obj)
-	if ctx.Config.JSON.Sync {
-		ctx.DB.SyncJSON(ctx)
-	}
+	Save(state.Store) Entity
+	Delete(state.Store)
 }
 
 // FindByIndex will find an entity by an id (from a set)

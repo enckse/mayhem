@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/enckse/mayhem/internal/entities"
-	"github.com/enckse/mayhem/internal/state"
 )
 
 func TestEntityID(t *testing.T) {
@@ -17,9 +16,7 @@ func TestEntityID(t *testing.T) {
 
 func TestNewStack(t *testing.T) {
 	m := &mockDB{}
-	ctx := &state.Context{}
-	ctx.DB = m
-	e := entities.NewStack(ctx)
+	e := entities.NewStack(m)
 	if e.Title != "New Stack" {
 		t.Error("invalid stack")
 	}
@@ -27,9 +24,7 @@ func TestNewStack(t *testing.T) {
 
 func TestFetchStacks(t *testing.T) {
 	m := &mockDB{}
-	ctx := &state.Context{}
-	ctx.DB = m
-	s := entities.FetchStacks(ctx)
+	s := entities.FetchStacks(m)
 	if len(s) != 1 {
 		t.Error("invalid stacks")
 	}
@@ -37,14 +32,12 @@ func TestFetchStacks(t *testing.T) {
 
 func TestSaveDelete(t *testing.T) {
 	m := &mockDB{}
-	ctx := &state.Context{}
-	ctx.DB = m
-	s := entities.NewStack(ctx)
-	s.Save(ctx)
+	s := entities.NewStack(m)
+	s.Save(m)
 	if m.last == nil {
 		t.Error("no save")
 	}
-	s.Delete(ctx)
+	s.Delete(m)
 	if m.last != nil {
 		t.Error("no delete")
 	}

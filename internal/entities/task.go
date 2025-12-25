@@ -21,14 +21,14 @@ type Task struct {
 }
 
 // Save will store the task
-func (t Task) Save(ctx *state.Context) Entity {
-	Sync(ctx, &t)
+func (t Task) Save(store state.Store) Entity {
+	store.Save(&t)
 	return t
 }
 
 // Delete will remove the task
-func (t Task) Delete(ctx *state.Context) {
-	ctx.DB.Delete(&t)
+func (t Task) Delete(store state.Store) {
+	store.Delete(&t)
 }
 
 // EntityID gets the backing entity id

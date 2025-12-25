@@ -22,7 +22,6 @@ type (
 		Create(any)
 		Fetch() any
 		Delete(any)
-		SyncJSON(*Context)
 		Errors() []string
 	}
 	// Context is the overall state context
