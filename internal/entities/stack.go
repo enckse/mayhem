@@ -33,18 +33,15 @@ func (s Stack) EntityID() uint {
 }
 
 // NewStack will create a new stack
-func NewStack(ctx *state.Context) (Stack, error) {
+func NewStack(ctx *state.Context) Stack {
 	stack := Stack{Title: "New Stack"}
-	err := ctx.DB.Create(&stack)
-	return stack, err
+	ctx.DB.Create(&stack)
+	return stack
 }
 
 // FetchStacks will retrieve all stacks
-func FetchStacks(ctx *state.Context) ([]Stack, error) {
-	obj, err := ctx.DB.Fetch()
-	if err != nil {
-		return nil, err
-	}
+func FetchStacks(ctx *state.Context) []Stack {
+	obj := ctx.DB.Fetch()
 	var stacks []Stack
 	val, ok := obj.([]Stack)
 	if ok {
@@ -52,11 +49,11 @@ func FetchStacks(ctx *state.Context) ([]Stack, error) {
 	}
 
 	if len(stacks) == 0 {
-		stack, err := NewStack(ctx)
-		return []Stack{stack}, err
+		stack := NewStack(ctx)
+		return []Stack{stack}
 	}
 
-	return stacks, err
+	return stacks
 }
 
 // Save will save the entity

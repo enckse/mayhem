@@ -85,21 +85,27 @@ func run() error {
 	if err := entities.InitializeDB(ctx); err != nil {
 		return err
 	}
-	if isExport {
-		return entities.DumpJSON(os.Stdout, ctx)
-	}
-	if isImport {
-		return entities.LoadJSON(ctx, isMerge, os.Stdin)
-	}
+	err = func() error {
+		if isExport {
+			return entities.DumpJSON(os.Stdout, ctx)
+		}
+		if isImport {
+			return entities.LoadJSON(ctx, isMerge, os.Stdin)
+		}
 
-	model := ui.Initialize(ctx)
-	p := tea.NewProgram(model.Backing, tea.WithAltScreen())
+		model := ui.Initialize(ctx)
+		p := tea.NewProgram(model.Backing, tea.WithAltScreen())
 
-	if _, err := p.Run(); err != nil {
-		return err
+		if _, err := p.Run(); err != nil {
+			return err
+		}
+		if ctx.Config.JSON.Exit {
+			return entities.DumpJSONToFile(ctx)
+		}
+		return nil
+	}()
+	for _, item := range ctx.DB.Errors() {
+		fmt.Fprintf(os.Stderr, "%s\n", item)
 	}
-	if ctx.Config.JSON.Exit {
-		return entities.DumpJSONToFile(ctx)
-	}
-	return nil
+	return err
 }

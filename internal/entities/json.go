@@ -28,11 +28,7 @@ func LoadJSON(ctx *state.Context, merge bool, reader io.Reader) error {
 	}
 	var existing []Stack
 	if merge {
-		var err error
-		existing, err = FetchStacks(ctx)
-		if err != nil {
-			return err
-		}
+		existing = FetchStacks(ctx)
 	}
 	var items []Stack
 	if err := json.Unmarshal(buf.Bytes(), &items); err != nil {
@@ -65,10 +61,7 @@ func DumpJSONToFile(ctx *state.Context) error {
 
 // DumpJSON will write the current JSOn state to stdout
 func DumpJSON(dst io.Writer, ctx *state.Context) error {
-	s, err := FetchStacks(ctx)
-	if err != nil {
-		return err
-	}
+	s := FetchStacks(ctx)
 	SortStacks(s)
 	for _, item := range s {
 		tasks := item.Tasks

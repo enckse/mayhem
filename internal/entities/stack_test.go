@@ -1,7 +1,6 @@
 package entities_test
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/enckse/mayhem/internal/entities"
@@ -20,16 +19,7 @@ func TestNewStack(t *testing.T) {
 	m := &mockDB{}
 	ctx := &state.Context{}
 	ctx.DB = m
-	m.err = errors.New("test")
-	_, err := entities.NewStack(ctx)
-	if err == nil {
-		t.Error("no error")
-	}
-	m.err = nil
-	e, err := entities.NewStack(ctx)
-	if err != nil {
-		t.Errorf("error: %v", err)
-	}
+	e := entities.NewStack(ctx)
 	if e.Title != "New Stack" {
 		t.Error("invalid stack")
 	}
@@ -39,16 +29,7 @@ func TestFetchStacks(t *testing.T) {
 	m := &mockDB{}
 	ctx := &state.Context{}
 	ctx.DB = m
-	m.err = errors.New("test")
-	_, err := entities.FetchStacks(ctx)
-	if err == nil {
-		t.Error("no error")
-	}
-	m.err = nil
-	s, err := entities.FetchStacks(ctx)
-	if err != nil {
-		t.Errorf("error: %v", err)
-	}
+	s := entities.FetchStacks(ctx)
 	if len(s) != 1 {
 		t.Error("invalid stacks")
 	}
@@ -58,7 +39,7 @@ func TestSaveDelete(t *testing.T) {
 	m := &mockDB{}
 	ctx := &state.Context{}
 	ctx.DB = m
-	s, _ := entities.NewStack(ctx)
+	s := entities.NewStack(ctx)
 	s.Save(ctx)
 	if m.last == nil {
 		t.Error("no save")

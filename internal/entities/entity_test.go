@@ -9,7 +9,6 @@ import (
 
 type mockDB struct {
 	last any
-	err  error
 	ctx  *state.Context
 }
 
@@ -17,21 +16,24 @@ func (m *mockDB) Save(obj any) {
 	m.last = obj
 }
 
-func (m *mockDB) Create(obj any) error {
+func (m *mockDB) Create(obj any) {
 	m.last = obj
-	return m.err
 }
 
 func (m *mockDB) Delete(_ any) {
 	m.last = nil
 }
 
-func (m *mockDB) Fetch() (any, error) {
-	return m.last, m.err
+func (m *mockDB) Fetch() any {
+	return m.last
 }
 
 func (m *mockDB) SyncJSON(ctx *state.Context) {
 	m.ctx = ctx
+}
+
+func (m *mockDB) Errors() []string {
+	return nil
 }
 
 func TestSync(t *testing.T) {

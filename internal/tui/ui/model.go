@@ -71,7 +71,7 @@ const (
 
 // Initialize will startup the core application model
 func Initialize(ctx *state.Context) ModelWrapper {
-	stacks, _ := entities.FetchStacks(ctx)
+	stacks := entities.FetchStacks(ctx)
 
 	m := &model{
 		stackTable: tables.New(tables.StackColumns, display.StackTableType, ctx.Screen),
@@ -679,7 +679,7 @@ func (m *model) taskFooter() string {
 
 // Pull new data from database
 func (m *model) refreshData() {
-	stacks, _ := entities.FetchStacks(m.context)
+	stacks := entities.FetchStacks(m.context)
 	m.data = stacks
 	m.updateSelectionData(stackDataCategory)
 }

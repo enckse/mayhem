@@ -19,10 +19,11 @@ type (
 	// Store defines the backing store for data
 	Store interface {
 		Save(any)
-		Create(any) error
-		Fetch() (any, error)
+		Create(any)
+		Fetch() any
 		Delete(any)
 		SyncJSON(*Context)
+		Errors() []string
 	}
 	// Context is the overall state context
 	Context struct {

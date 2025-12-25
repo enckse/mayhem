@@ -19,15 +19,18 @@ type mockDB struct{}
 func (m *mockDB) Save(_ any) {
 }
 
-func (m *mockDB) Create(_ any) error {
-	return nil
+func (m *mockDB) Create(_ any) {
 }
 
 func (m *mockDB) Delete(_ any) {
 }
 
-func (m *mockDB) Fetch() (any, error) {
-	return nil, nil
+func (m *mockDB) Fetch() any {
+	return nil
+}
+
+func (m *mockDB) Errors() []string {
+	return nil
 }
 
 func (m *mockDB) SyncJSON(_ *state.Context) {
