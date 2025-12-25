@@ -5,34 +5,29 @@ import "github.com/charmbracelet/bubbles/key"
 
 // Map is the key binding map definition
 type Map struct {
-	CalendarToggle key.Binding
-	Up             key.Binding
-	Down           key.Binding
-	GotoTop        key.Binding
-	GotoBottom     key.Binding
-	Left           key.Binding
-	Right          key.Binding
-	New            key.Binding
-	Edit           key.Binding
-	Move           key.Binding
-	Enter          key.Binding
-	Save           key.Binding
-	Toggle         key.Binding
-	ReverseToggle  key.Binding
-	Delete         key.Binding
-	Return         key.Binding
-	Help           key.Binding
-	Quit           key.Binding
-	Exit           key.Binding
+	Up            key.Binding
+	Down          key.Binding
+	GotoTop       key.Binding
+	GotoBottom    key.Binding
+	Left          key.Binding
+	Right         key.Binding
+	New           key.Binding
+	Edit          key.Binding
+	Move          key.Binding
+	Enter         key.Binding
+	Save          key.Binding
+	Toggle        key.Binding
+	ReverseToggle key.Binding
+	Delete        key.Binding
+	Return        key.Binding
+	Help          key.Binding
+	Quit          key.Binding
+	Exit          key.Binding
 }
 
 var (
 	// Mappings are actual key bindings across the app
 	Mappings = Map{
-		CalendarToggle: key.NewBinding(
-			key.WithKeys("c"),
-			key.WithHelp("'c'", "calendar view"),
-		),
 		Up: key.NewBinding(
 			key.WithKeys("up", "k"),
 			key.WithHelp("'↑/k'", "move up"),
@@ -291,7 +286,6 @@ var (
 // of the key.Map interface.
 func (k Map) ShortHelp() []key.Binding {
 	return []key.Binding{
-		k.CalendarToggle,
 		k.Toggle,
 		k.ReverseToggle,
 		k.New,
