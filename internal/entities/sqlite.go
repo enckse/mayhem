@@ -1,12 +1,13 @@
 package entities
 
 import (
-	// Using pure-go implementation of GORM driver to avoid CGO issues during cross-compilation
 	"github.com/enckse/mayhem/internal/state"
-	"github.com/glebarez/sqlite"
+	// Using pure-go implementation of GORM driver to avoid CGO issues during cross-compilation
+	"github.com/enckse/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
+	_ "modernc.org/sqlite"
 )
 
 // DBWrapper is our sqlite backend wrapper
