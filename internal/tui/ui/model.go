@@ -446,14 +446,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, keys.Mappings.New):
 			if m.stackTable.Focused() {
 				m.preInputFocus = stackViewName
-				m.input = inputs.New(inputs.StackFormTable, entities.Stack{}, 0, m.context)
+				m.input = inputs.NewStackForm(entities.Stack{}, m.context)
 
 			} else if m.taskTable.Focused() {
 				m.preInputFocus = taskViewName
 				newTask := entities.Task{
 					StackID: m.data[m.stackTable.Cursor()].ID,
 				}
-				m.input = inputs.New(inputs.TaskFormTable, newTask, 0, m.context)
+				m.input = inputs.NewTaskForm(newTask, 0, m.context)
 
 			} else if m.taskDetails.Focused() {
 				return m, nil
@@ -475,7 +475,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, nil
 				}
 				m.preInputFocus = stackViewName
-				m.input = inputs.New(inputs.StackFormTable, m.data[m.stackTable.Cursor()], 0, m.context)
+				m.input = inputs.NewStackForm(m.data[m.stackTable.Cursor()], m.context)
 			} else if m.taskTable.Focused() {
 				if len(m.taskTable.Rows()) > 0 {
 					m.showDetails = true
@@ -488,7 +488,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			} else if m.taskDetails.Focused() {
 				m.preInputFocus = detailViewName
-				m.input = inputs.New(inputs.TaskFormTable, m.data[m.stackTable.Cursor()].Tasks[m.taskTable.Cursor()], m.taskDetails.FocusIndex, m.context)
+				m.input = inputs.NewTaskForm(m.data[m.stackTable.Cursor()].Tasks[m.taskTable.Cursor()], m.taskDetails.FocusIndex, m.context)
 			}
 
 			m.stackTable.Blur()

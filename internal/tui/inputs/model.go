@@ -23,13 +23,11 @@ import (
 )
 
 type (
-	// FormTable are the known form table types
-	FormTable int
 	// Form is an input form
 	Form struct {
 		focusIndex    int
 		data          entities.Entity
-		formType      FormTable
+		isStacks      bool
 		fieldMap      map[int]field
 		isInvalid     bool
 		invalidPrompt string
@@ -47,13 +45,6 @@ type (
 		validationPrompt string
 		helpKeys         keys.Map
 	}
-)
-
-const (
-	// StackFormTable is a stack (collection of tasks) form
-	StackFormTable FormTable = iota
-	// TaskFormTable is a set of tasks
-	TaskFormTable
 )
 
 var (
@@ -95,11 +86,20 @@ var (
 	}
 )
 
-// New will create a new input form
-func New(formTable FormTable, data entities.Entity, fieldIndex int, ctx *state.Context) Form {
+// NewStackForm generates a form for stack managing
+func NewStackForm(data entities.Entity, ctx *state.Context) Form {
+	return newForm(true, data, 0, ctx)
+}
+
+// NewTaskForm generates a form for task handling
+func NewTaskForm(data entities.Entity, fieldIndex int, ctx *state.Context) Form {
+	return newForm(false, data, fieldIndex, ctx)
+}
+
+func newForm(isStack bool, data entities.Entity, fieldIndex int, ctx *state.Context) Form {
 	var m Form
-	switch formTable {
-	case StackFormTable:
+	if isStack {
+
 		m = Form{
 			data:       data,
 			focusIndex: fieldIndex,
@@ -116,8 +116,7 @@ func New(formTable FormTable, data entities.Entity, fieldIndex int, ctx *state.C
 
 		m.helpKeys = targetField.helpKeys
 		m.fieldMap[fieldIndex] = targetField
-
-	case TaskFormTable:
+	} else {
 		m = Form{
 			data:       data,
 			focusIndex: fieldIndex,
@@ -152,7 +151,7 @@ func New(formTable FormTable, data entities.Entity, fieldIndex int, ctx *state.C
 		m.fieldMap[fieldIndex] = targetField
 	}
 
-	m.formType = formTable
+	m.isStacks = isStack
 	m.context = ctx
 	return m
 }
@@ -191,8 +190,7 @@ func (m Form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.isInvalid = false
 
-		switch m.formType {
-		case StackFormTable:
+		if m.isStacks {
 			stack := m.data.(entities.Stack)
 
 			switch m.focusIndex {
@@ -201,8 +199,7 @@ func (m Form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			stack.Save(m.context)
-
-		case TaskFormTable:
+		} else {
 			task := m.data.(entities.Task)
 
 			switch m.focusIndex {
