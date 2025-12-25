@@ -35,4 +35,19 @@ func TestBackup(t *testing.T) {
 	if len(children) != 2 {
 		t.Errorf("invalid children: %v", children)
 	}
+	cfg.Backups.Format = "2006"
+	if err := cfg.Backup(now.Add(1*time.Second), now); err != nil {
+		t.Errorf("unexpected backup error: %v", err)
+	}
+	children, _ = os.ReadDir(cfg.Backups.Directory)
+	if len(children) != 3 {
+		t.Errorf("invalid children: %v", children)
+	}
+	if err := cfg.Backup(now.Add(1*time.Second), now); err != nil {
+		t.Errorf("unexpected backup error: %v", err)
+	}
+	children, _ = os.ReadDir(cfg.Backups.Directory)
+	if len(children) != 3 {
+		t.Errorf("invalid children: %v", children)
+	}
 }

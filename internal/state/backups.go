@@ -37,7 +37,11 @@ func (c Config) Backup(timestamp, threshold time.Time) error {
 			return err
 		}
 	}
-	target := timestamp.Format("20060102T150405")
+	format := c.Backups.Format
+	if format == "" {
+		format = "20060102T150405"
+	}
+	target := timestamp.Format(c.Backups.Format)
 	target = filepath.Join(c.Backups.Directory, fmt.Sprintf("%s.%s", target, databaseName))
 	if PathExists(target) {
 		return nil

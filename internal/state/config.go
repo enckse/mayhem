@@ -18,6 +18,7 @@ type Config struct {
 	}
 	Backups struct {
 		Directory string
+		Format    string
 		Days      uint
 	}
 	JSON struct {
