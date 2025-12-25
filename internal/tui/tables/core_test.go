@@ -29,7 +29,6 @@ func TestStackRows(t *testing.T) {
 
 func TestTaskRows(t *testing.T) {
 	ctx := &state.Context{}
-	ctx.State.FinishedTasks = make(map[uint]bool)
 	tasks := []entities.Task{{Title: "xyz", IsFinished: true}, {IsFinished: false}}
 	tasks[0].ID = 0
 	tasks[1].ID = 1
