@@ -2,13 +2,16 @@ Mayhem
 ===
 
 A fork of [mayhem](https://github.com/BOTbkcd/mayhem) with some cut features
-and generally simplified layout.
+and generally simplified layout. It uses a local, updated, and modified version of the
+[pure Go sqlite driver](https://github.com/glebarez/sqlite)
 
 - No recurring tasks
 - No steps
 - Control over database storage
 - Auto-saving to JSON
 - Import/export via JSON
+
+[![build](https://github.com/enckse/mayhem/actions/workflows/build.yml/badge.svg)](https://github.com/enckse/mayhem/actions/workflows/build.yml)
 
 ## usage
 
