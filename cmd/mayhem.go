@@ -63,7 +63,6 @@ func run() error {
 	}
 	ctx := &state.Context{}
 	ctx.Screen = display.NewScreen()
-	ctx.State.FinishedTasks = make(map[uint]bool)
 	cfg, err := state.LoadConfig(configFile)
 	if err != nil {
 		return err

@@ -29,9 +29,6 @@ type (
 		DB     Store
 		Config Config
 		Screen *display.Screen
-		State  struct {
-			FinishedTasks map[uint]bool
-		}
 	}
 )
 

@@ -46,11 +46,6 @@ func StackRows(stacks []entities.Stack) []table.Row {
 func TaskRows(tasks []entities.Task, ctx *state.Context) []table.Row {
 	rows := make([]table.Row, len(tasks))
 
-	// We perform this step earlier since we need the deadline & finish status data before sorting
-	for _, val := range tasks {
-		ctx.State.FinishedTasks[val.ID] = val.IsFinished
-	}
-
 	entities.SortTasks(tasks)
 
 	var prefix string
@@ -58,8 +53,7 @@ func TaskRows(tasks []entities.Task, ctx *state.Context) []table.Row {
 
 	for i, val := range tasks {
 		deadline = timepicker.FormatTime(val.Deadline, true)
-
-		if ctx.State.FinishedTasks[val.ID] {
+		if val.IsFinished {
 			prefix = "✘"
 		} else {
 			prefix = "▢"
