@@ -20,7 +20,7 @@ type (
 	Store interface {
 		Save(any)
 		Create(any) error
-		Stacks(any) error
+		Fetch() (any, error)
 		Delete(any)
 		SyncJSON(*Context)
 	}

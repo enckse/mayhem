@@ -19,10 +19,11 @@ func (d *DBWrapper) Create(obj any) error {
 	return d.db.Create(obj).Error
 }
 
-// Stacks will get the stacks and preload tasks
-func (d *DBWrapper) Stacks(obj any) error {
-	result := d.db.Model(&Stack{}).Preload("Tasks").Find(obj)
-	return result.Error
+// Fetch will return the data (in this case always stacks)
+func (d *DBWrapper) Fetch() (any, error) {
+	var stacks []Stack
+	result := d.db.Model(&Stack{}).Preload("Tasks").Find(&stacks)
+	return stacks, result.Error
 }
 
 // Delete will remove an object

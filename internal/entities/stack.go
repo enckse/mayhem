@@ -41,10 +41,14 @@ func NewStack(ctx *state.Context) (Stack, error) {
 
 // FetchStacks will retrieve all stacks
 func FetchStacks(ctx *state.Context) ([]Stack, error) {
-	var stacks []Stack
-	err := ctx.DB.Stacks(&stacks)
+	obj, err := ctx.DB.Fetch()
 	if err != nil {
-		return stacks, err
+		return nil, err
+	}
+	var stacks []Stack
+	val, ok := obj.([]Stack)
+	if ok {
+		stacks = val
 	}
 
 	if len(stacks) == 0 {

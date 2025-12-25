@@ -26,8 +26,8 @@ func (m *mockDB) Create(_ any) error {
 func (m *mockDB) Delete(_ any) {
 }
 
-func (m *mockDB) Stacks(_ any) error {
-	return nil
+func (m *mockDB) Fetch() (any, error) {
+	return nil, nil
 }
 
 func (m *mockDB) SyncJSON(_ *state.Context) {
