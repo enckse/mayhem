@@ -82,7 +82,7 @@ func run() error {
 			if ctx.Config.Backups.Days > 0 {
 				threshold = time.Now().Add(-24 * time.Duration(ctx.Config.Backups.Days) * time.Hour)
 			}
-			if err := ctx.Config.Backup(threshold); err != nil {
+			if err := ctx.Config.Backup(time.Now(), threshold); err != nil {
 				return err
 			}
 		}
