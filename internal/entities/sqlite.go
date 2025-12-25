@@ -1,12 +1,12 @@
 package entities
 
 import (
-	"github.com/enckse/mayhem/internal/state"
-	// Using pure-go implementation of GORM driver to avoid CGO issues during cross-compilation
 	"github.com/enckse/mayhem/internal/sqlite"
+	"github.com/enckse/mayhem/internal/state"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
+	// Using pure-go implementation of GORM driver to avoid CGO issues during cross-compilation
 	_ "modernc.org/sqlite"
 )
 

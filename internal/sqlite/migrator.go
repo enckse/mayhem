@@ -11,10 +11,12 @@ import (
 	"gorm.io/gorm/schema"
 )
 
+// Migrator defines the migration component
 type Migrator struct {
 	migrator.Migrator
 }
 
+// RunWithoutForeignKey will set the foreign_keys pragma
 func (m *Migrator) RunWithoutForeignKey(fc func() error) error {
 	var enabled int
 	m.DB.Raw("PRAGMA foreign_keys").Scan(&enabled)
@@ -26,14 +28,16 @@ func (m *Migrator) RunWithoutForeignKey(fc func() error) error {
 	return fc()
 }
 
+// HasTable indicates if a table exists
 func (m Migrator) HasTable(value interface{}) bool {
 	var count int
-	m.Migrator.RunWithValue(value, func(stmt *gorm.Statement) error {
+	m.RunWithValue(value, func(stmt *gorm.Statement) error {
 		return m.DB.Raw("SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?", stmt.Table).Row().Scan(&count)
 	})
 	return count > 0
 }
 
+// DropTable will drop a table
 func (m Migrator) DropTable(values ...interface{}) error {
 	return m.RunWithoutForeignKey(func() error {
 		values = m.ReorderModels(values, false)
@@ -51,13 +55,15 @@ func (m Migrator) DropTable(values ...interface{}) error {
 	})
 }
 
+// GetTables will get the underlying tables
 func (m Migrator) GetTables() (tableList []string, err error) {
 	return tableList, m.DB.Raw("SELECT name FROM sqlite_master where type=?", "table").Scan(&tableList).Error
 }
 
+// HasColumn will indicate if a column exists
 func (m Migrator) HasColumn(value interface{}, name string) bool {
 	var count int
-	m.Migrator.RunWithValue(value, func(stmt *gorm.Statement) error {
+	m.RunWithValue(value, func(stmt *gorm.Statement) error {
 		if stmt.Schema != nil {
 			if field := stmt.Schema.LookUpField(name); field != nil {
 				name = field.DBName
@@ -75,6 +81,7 @@ func (m Migrator) HasColumn(value interface{}, name string) bool {
 	return count > 0
 }
 
+// AlterColumn will change/alter a column
 func (m Migrator) AlterColumn(value interface{}, name string) error {
 	return m.RunWithoutForeignKey(func() error {
 		return m.recreateTable(value, nil, func(ddl *ddl, stmt *gorm.Statement) (*ddl, []interface{}, error) {
@@ -154,6 +161,7 @@ func (m Migrator) ColumnTypes(value interface{}) ([]gorm.ColumnType, error) {
 	return columnTypes, execErr
 }
 
+// DropColumn will remove a column
 func (m Migrator) DropColumn(value interface{}, name string) error {
 	return m.recreateTable(value, nil, func(ddl *ddl, stmt *gorm.Statement) (*ddl, []interface{}, error) {
 		if field := stmt.Schema.LookUpField(name); field != nil {
@@ -165,31 +173,33 @@ func (m Migrator) DropColumn(value interface{}, name string) error {
 	})
 }
 
+// CreateConstraint will create a constraint
 func (m Migrator) CreateConstraint(value interface{}, name string) error {
 	return m.RunWithValue(value, func(stmt *gorm.Statement) error {
 		constraint, table := m.GuessConstraintInterfaceAndTable(stmt, name)
 
 		return m.recreateTable(value, &table,
-			func(ddl *ddl, stmt *gorm.Statement) (*ddl, []interface{}, error) {
+			func(ddl *ddl, _ *gorm.Statement) (*ddl, []interface{}, error) {
 				var (
 					constraintName   string
-					constraintSql    string
+					constraintSQL    string
 					constraintValues []interface{}
 				)
 
 				if constraint != nil {
 					constraintName = constraint.GetName()
-					constraintSql, constraintValues = constraint.Build()
+					constraintSQL, constraintValues = constraint.Build()
 				} else {
 					return nil, nil, nil
 				}
 
-				ddl.addConstraint(constraintName, constraintSql)
+				ddl.addConstraint(constraintName, constraintSQL)
 				return ddl, constraintValues, nil
 			})
 	})
 }
 
+// DropConstraint will drop a constraint
 func (m Migrator) DropConstraint(value interface{}, name string) error {
 	return m.RunWithValue(value, func(stmt *gorm.Statement) error {
 		constraint, table := m.GuessConstraintInterfaceAndTable(stmt, name)
@@ -198,13 +208,14 @@ func (m Migrator) DropConstraint(value interface{}, name string) error {
 		}
 
 		return m.recreateTable(value, &table,
-			func(ddl *ddl, stmt *gorm.Statement) (*ddl, []interface{}, error) {
+			func(ddl *ddl, _ *gorm.Statement) (*ddl, []interface{}, error) {
 				ddl.removeConstraint(name)
 				return ddl, nil, nil
 			})
 	})
 }
 
+// HasConstraint will check if a constraint exists
 func (m Migrator) HasConstraint(value interface{}, name string) bool {
 	var count int64
 	m.RunWithValue(value, func(stmt *gorm.Statement) error {
@@ -224,12 +235,14 @@ func (m Migrator) HasConstraint(value interface{}, name string) bool {
 	return count > 0
 }
 
+// CurrentDatabase will get the current database name
 func (m Migrator) CurrentDatabase() (name string) {
 	var null interface{}
 	m.DB.Raw("PRAGMA database_list").Row().Scan(&null, &name, &null)
-	return
+	return name
 }
 
+// BuildIndexOptions will generate and build index options
 func (m Migrator) BuildIndexOptions(opts []schema.IndexOption, stmt *gorm.Statement) (results []interface{}) {
 	for _, opt := range opts {
 		str := stmt.Quote(opt.DBName)
@@ -246,9 +259,10 @@ func (m Migrator) BuildIndexOptions(opts []schema.IndexOption, stmt *gorm.Statem
 		}
 		results = append(results, clause.Expr{SQL: str})
 	}
-	return
+	return results
 }
 
+// CreateIndex will generate an index
 func (m Migrator) CreateIndex(value interface{}, name string) error {
 	return m.RunWithValue(value, func(stmt *gorm.Statement) error {
 		if stmt.Schema != nil {
@@ -278,6 +292,7 @@ func (m Migrator) CreateIndex(value interface{}, name string) error {
 	})
 }
 
+// HasIndex will indicate if an index exists
 func (m Migrator) HasIndex(value interface{}, name string) bool {
 	var count int
 	m.RunWithValue(value, func(stmt *gorm.Statement) error {
@@ -297,6 +312,7 @@ func (m Migrator) HasIndex(value interface{}, name string) bool {
 	return count > 0
 }
 
+// RenameIndex will rename an index
 func (m Migrator) RenameIndex(value interface{}, oldName, newName string) error {
 	return m.RunWithValue(value, func(stmt *gorm.Statement) error {
 		var sql string
@@ -311,6 +327,7 @@ func (m Migrator) RenameIndex(value interface{}, oldName, newName string) error 
 	})
 }
 
+// DropIndex will remove an index
 func (m Migrator) DropIndex(value interface{}, name string) error {
 	return m.RunWithValue(value, func(stmt *gorm.Statement) error {
 		if stmt.Schema != nil {
@@ -323,6 +340,7 @@ func (m Migrator) DropIndex(value interface{}, name string) error {
 	})
 }
 
+// Index defines an index
 type Index struct {
 	Seq     int
 	Name    string

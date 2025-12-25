@@ -18,8 +18,8 @@ func TestErrorTranslator(t *testing.T) {
 
 	db, err := gorm.Open(&Dialector{DSN: InMemoryDSN}, &gorm.Config{
 		Logger:         logger.Default.LogMode(logger.Silent),
-		TranslateError: true})
-
+		TranslateError: true,
+	})
 	if err != nil {
 		t.Errorf("Expected Open to succeed; got error: %v", err)
 	}

@@ -57,8 +57,8 @@ func parseDDL(strs ...string) (*ddl, error) {
 
 			for idx := 0; idx < ddlBodyRunesLen; idx++ {
 				var (
-					next rune = 0
-					c         = ddlBodyRunes[idx]
+					next rune
+					c    = ddlBodyRunes[idx]
 				)
 				if idx+1 < ddlBodyRunesLen {
 					next = ddlBodyRunes[idx+1]
@@ -172,10 +172,10 @@ func parseDDL(strs ...string) (*ddl, error) {
 					result.columns = append(result.columns, columnType)
 				}
 			}
-		} else if matches := indexRegexp.FindStringSubmatch(str); len(matches) > 0 {
-			// don't report Unique by UniqueIndex
 		} else {
-			return nil, errors.New("invalid DDL")
+			if matches := indexRegexp.FindStringSubmatch(str); len(matches) <= 0 {
+				return nil, errors.New("invalid DDL")
+			}
 		}
 	}
 
@@ -217,7 +217,7 @@ func (d *ddl) renameTable(dst, src string) error {
 	return nil
 }
 
-func (d *ddl) addConstraint(name string, sql string) {
+func (d *ddl) addConstraint(name, sql string) {
 	reg := regexp.MustCompile("^CONSTRAINT [\"`]?" + regexp.QuoteMeta(name) + "[\"` ]")
 
 	for i := 0; i < len(d.fields); i++ {
@@ -236,17 +236,6 @@ func (d *ddl) removeConstraint(name string) bool {
 	for i := 0; i < len(d.fields); i++ {
 		if reg.MatchString(d.fields[i]) {
 			d.fields = append(d.fields[:i], d.fields[i+1:]...)
-			return true
-		}
-	}
-	return false
-}
-
-func (d *ddl) hasConstraint(name string) bool {
-	reg := regexp.MustCompile("^CONSTRAINT [\"`]?" + regexp.QuoteMeta(name) + "[\"` ]")
-
-	for _, f := range d.fields {
-		if reg.MatchString(f) {
 			return true
 		}
 	}

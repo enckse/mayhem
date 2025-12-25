@@ -1,3 +1,4 @@
+// Package sqlite provides a pure go sqlite driver
 package sqlite
 
 import (
@@ -5,34 +6,36 @@ import (
 	"database/sql"
 	"strconv"
 
-	"gorm.io/gorm/callbacks"
-
-	sqlite3 "modernc.org/sqlite/lib"
-
 	"gorm.io/gorm"
+	"gorm.io/gorm/callbacks"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/migrator"
 	"gorm.io/gorm/schema"
+	sqlite3 "modernc.org/sqlite/lib"
 )
 
 // DriverName is the default driver name for SQLite.
 const DriverName = "sqlite"
 
+// Dialector is the database dialect for gorm+sql
 type Dialector struct {
 	DriverName string
 	DSN        string
 	Conn       gorm.ConnPool
 }
 
+// Open will open the database
 func Open(dsn string) gorm.Dialector {
 	return &Dialector{DSN: dsn}
 }
 
+// Name will get the name of the necessary driver
 func (dialector Dialector) Name() string {
 	return "sqlite"
 }
 
+// Initialize will initialize the dialector
 func (dialector Dialector) Initialize(db *gorm.DB) (err error) {
 	if dialector.DriverName == "" {
 		dialector.DriverName = DriverName
@@ -69,9 +72,10 @@ func (dialector Dialector) Initialize(db *gorm.DB) (err error) {
 	for k, v := range dialector.ClauseBuilders() {
 		db.ClauseBuilders[k] = v
 	}
-	return
+	return err
 }
 
+// ClauseBuilders provides a clause builder
 func (dialector Dialector) ClauseBuilders() map[string]clause.ClauseBuilder {
 	return map[string]clause.ClauseBuilder{
 		"INSERT": func(c clause.Clause, builder clause.Builder) {
@@ -121,6 +125,7 @@ func (dialector Dialector) ClauseBuilders() map[string]clause.ClauseBuilder {
 	}
 }
 
+// DefaultValueOf will get the default value of a field
 func (dialector Dialector) DefaultValueOf(field *schema.Field) clause.Expression {
 	if field.AutoIncrement {
 		return clause.Expr{SQL: "NULL"}
@@ -130,6 +135,7 @@ func (dialector Dialector) DefaultValueOf(field *schema.Field) clause.Expression
 	return clause.Expr{SQL: "DEFAULT"}
 }
 
+// Migrator will get the underlying migrator
 func (dialector Dialector) Migrator(db *gorm.DB) gorm.Migrator {
 	return Migrator{migrator.Migrator{Config: migrator.Config{
 		DB:                          db,
@@ -138,10 +144,12 @@ func (dialector Dialector) Migrator(db *gorm.DB) gorm.Migrator {
 	}}}
 }
 
-func (dialector Dialector) BindVarTo(writer clause.Writer, stmt *gorm.Statement, v interface{}) {
+// BindVarTo will bind a variable (parameterized SQL)
+func (dialector Dialector) BindVarTo(writer clause.Writer, _ *gorm.Statement, _ interface{}) {
 	writer.WriteByte('?')
 }
 
+// QuoteTo will provide quoting
 func (dialector Dialector) QuoteTo(writer clause.Writer, str string) {
 	var (
 		underQuoted, selfQuoted bool
@@ -171,11 +179,11 @@ func (dialector Dialector) QuoteTo(writer clause.Writer, str string) {
 				writer.WriteString("`")
 				underQuoted = true
 				if selfQuoted = continuousBacktick > 0; selfQuoted {
-					continuousBacktick -= 1
+					continuousBacktick--
 				}
 			}
 
-			for ; continuousBacktick > 0; continuousBacktick -= 1 {
+			for ; continuousBacktick > 0; continuousBacktick-- {
 				writer.WriteString("``")
 			}
 
@@ -190,10 +198,12 @@ func (dialector Dialector) QuoteTo(writer clause.Writer, str string) {
 	writer.WriteString("`")
 }
 
+// Explain will get the explanation text
 func (dialector Dialector) Explain(sql string, vars ...interface{}) string {
 	return logger.ExplainSQL(sql, nil, `"`, vars...)
 }
 
+// DataTypeOf will get the data type of a field
 func (dialector Dialector) DataTypeOf(field *schema.Field) string {
 	switch field.DataType {
 	case schema.Bool:
@@ -203,9 +213,8 @@ func (dialector Dialector) DataTypeOf(field *schema.Field) string {
 			// doesn't check `PrimaryKey`, to keep backward compatibility
 			// https://www.sqlite.org/autoinc.html
 			return "integer PRIMARY KEY AUTOINCREMENT"
-		} else {
-			return "integer"
 		}
+		return "integer"
 	case schema.Float:
 		return "real"
 	case schema.String:
@@ -214,9 +223,8 @@ func (dialector Dialector) DataTypeOf(field *schema.Field) string {
 		// Distinguish between schema.Time and tag time
 		if val, ok := field.TagSettings["TYPE"]; ok {
 			return val
-		} else {
-			return "datetime"
 		}
+		return "datetime"
 	case schema.Bytes:
 		return "blob"
 	}
@@ -224,16 +232,19 @@ func (dialector Dialector) DataTypeOf(field *schema.Field) string {
 	return string(field.DataType)
 }
 
-func (dialectopr Dialector) SavePoint(tx *gorm.DB, name string) error {
+// SavePoint will create a savepoint
+func (dialector Dialector) SavePoint(tx *gorm.DB, name string) error {
 	tx.Exec("SAVEPOINT " + name)
 	return nil
 }
 
-func (dialectopr Dialector) RollbackTo(tx *gorm.DB, name string) error {
+// RollbackTo will rollback to a savepoint
+func (dialector Dialector) RollbackTo(tx *gorm.DB, name string) error {
 	tx.Exec("ROLLBACK TO SAVEPOINT " + name)
 	return nil
 }
 
+// Translate will translate an underlying error
 func (dialector Dialector) Translate(err error) error {
 	switch terr := err.(type) {
 	case interface{ Code() int }:
