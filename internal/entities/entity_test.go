@@ -11,7 +11,7 @@ type mockDB struct {
 	last any
 	err  error
 	ctx  *state.Context
-	id uint
+	id   uint
 }
 
 func (m *mockDB) Save(obj any) {

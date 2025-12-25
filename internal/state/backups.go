@@ -11,10 +11,7 @@ import (
 )
 
 // Backup will perform a backup based on the configuration
-func (c Config) Backup() error {
-	if c.Backups.Directory == "" {
-		return nil
-	}
+func (c Config) Backup(threshold time.Time) error {
 	db := c.Database()
 	if !PathExists(db) {
 		return nil
@@ -22,8 +19,7 @@ func (c Config) Backup() error {
 	if err := os.MkdirAll(c.Backups.Directory, os.ModePerm); err != nil {
 		return err
 	}
-	if c.Backups.Days > 0 {
-		threshold := time.Now().Add(-24 * time.Duration(c.Backups.Days) * time.Hour)
+	if !threshold.IsZero() {
 		err := filepath.Walk(c.Backups.Directory, func(p string, info fs.FileInfo, err error) error {
 			if err != nil {
 				return err

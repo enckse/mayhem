@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/enckse/mayhem/internal/display"
@@ -76,8 +77,14 @@ func run() error {
 		return errors.New("import not supported into existing database")
 	}
 	if !isExport && !isImport {
-		if err := ctx.Config.Backup(); err != nil {
-			return err
+		if ctx.Config.Backups.Directory != "" {
+			var threshold time.Time
+			if ctx.Config.Backups.Days > 0 {
+				threshold = time.Now().Add(-24 * time.Duration(ctx.Config.Backups.Days) * time.Hour)
+			}
+			if err := ctx.Config.Backup(threshold); err != nil {
+				return err
+			}
 		}
 	}
 	if err := entities.InitializeDB(ctx); err != nil {
