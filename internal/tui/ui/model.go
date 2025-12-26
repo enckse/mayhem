@@ -389,54 +389,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, cmd
 			}
 
-		case key.Matches(msg, keys.Mappings.GotoTop):
-			if m.stackTable.Focused() {
-				m.stackTable.GotoTop()
-				m.taskTable.SetCursor(0)
-				m.taskDetails.FocusIndex = 0
-				m.showTasks = false
-				m.showDetails = false
-				m.updateSelectionData(taskDataCategory)
-				return m, nil
-
-			} else if m.taskTable.Focused() {
-				m.taskTable.GotoTop()
-				m.taskDetails.FocusIndex = 0
-				m.showDetails = false
-				m.updateSelectionData(detailDataCategory)
-				return m, nil
-
-			} else if m.taskDetails.Focused() {
-				var t tea.Model
-				t, cmd = m.taskDetails.Update(msg)
-				m.taskDetails = t.(details.Box)
-				return m, cmd
-			}
-
-		case key.Matches(msg, keys.Mappings.GotoBottom):
-			if m.stackTable.Focused() {
-				m.stackTable.GotoBottom()
-				m.taskTable.SetCursor(0)
-				m.taskDetails.FocusIndex = 0
-				m.showTasks = false
-				m.showDetails = false
-				m.updateSelectionData(taskDataCategory)
-				return m, nil
-
-			} else if m.taskTable.Focused() {
-				m.taskTable.GotoBottom()
-				m.taskDetails.FocusIndex = 0
-				m.showDetails = false
-				m.updateSelectionData(detailDataCategory)
-				return m, nil
-
-			} else if m.taskDetails.Focused() {
-				var t tea.Model
-				t, cmd = m.taskDetails.Update(msg)
-				m.taskDetails = t.(details.Box)
-				return m, cmd
-			}
-
 		case key.Matches(msg, keys.Mappings.New):
 			if m.stackTable.Focused() {
 				m.preInputFocus = stackViewName

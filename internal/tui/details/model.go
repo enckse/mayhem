@@ -109,13 +109,6 @@ func (m Box) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			m.ViewPort.ScrollDown(scrollDistance)
 
-		case key.Matches(msg, keys.Mappings.GotoTop):
-			m.ViewPort.GotoTop()
-			m.Start()
-
-		case key.Matches(msg, keys.Mappings.GotoBottom):
-			m.ViewPort.GotoBottom()
-			m.End()
 		}
 	}
 	return m, nil
