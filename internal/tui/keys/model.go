@@ -154,6 +154,10 @@ var (
 			key.WithKeys("esc"),
 			key.WithHelp("'esc'", "return"),
 		),
+		Delete: key.NewBinding(
+			key.WithKeys("x"),
+			key.WithHelp("'x'", "delete"),
+		),
 	}
 	// TextAreaInputMappings are for text areas
 	TextAreaInputMappings = Map{

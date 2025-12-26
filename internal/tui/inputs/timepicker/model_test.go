@@ -22,7 +22,7 @@ func TestInput(t *testing.T) {
 		val := (k + 1) + (int(time.Now().Unix()) % 100)
 		for val > 0 {
 			obj.Update(v)
-			for _, m := range []tea.KeyMsg{{Runes: []rune{'k'}}, {Runes: []rune{'j'}}} {
+			for _, m := range []tea.KeyMsg{{Type: tea.KeyRunes, Runes: []rune{'k'}}, {Type: tea.KeyRunes, Runes: []rune{'j'}}} {
 				upDown := (int(time.Now().Unix()) % 100)
 				for upDown > 0 {
 					obj.Update(m)
@@ -40,5 +40,10 @@ func TestInput(t *testing.T) {
 	v := obj.View()
 	if !strings.Contains(v, "YYYY") {
 		t.Error("invalid view")
+	}
+	_, val = obj.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'x'}})
+	_, ok = val().(messages.Form)
+	if !ok {
+		t.Error("invalid results")
 	}
 }

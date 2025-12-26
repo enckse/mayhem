@@ -131,6 +131,9 @@ func (m Input) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, keys.Mappings.Enter):
 			return m, messages.FormGoToWith(m.currTime)
+		case key.Matches(msg, keys.Mappings.Delete):
+			m.currTime = time.Time{}
+			return m, messages.FormGoToWith(m.currTime)
 		}
 	}
 	return m, nil
