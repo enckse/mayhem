@@ -10,7 +10,7 @@ import (
 func TestConfigDatabase(t *testing.T) {
 	c := state.Config{}
 	c.Data.Directory = "xyz"
-	if c.Database() != "xyz/todo.db" {
+	if c.Database() != "xyz/todo.json" {
 		t.Errorf("invalid datbase file: %s", c.Database())
 	}
 }

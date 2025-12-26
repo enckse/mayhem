@@ -9,7 +9,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-const databaseName = FileName + "db"
+const databaseName = FileName + "json"
 
 // Config is the overall configuration file
 type Config struct {
