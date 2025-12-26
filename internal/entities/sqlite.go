@@ -21,6 +21,7 @@ type DBWrapper struct {
 	errors    []string
 	saveJSON  bool
 	directory string
+	maxErrors int
 }
 
 // Save will store an entity
@@ -54,6 +55,9 @@ func (d *DBWrapper) log(category string, err error) {
 	if err == nil {
 		return
 	}
+	if d.maxErrors > 0 && len(d.errors) > d.maxErrors {
+		d.errors = d.errors[1:]
+	}
 	d.errors = append(d.errors, fmt.Sprintf("[%s] %s: %v", time.Now().Format("2006-01-02T15:04:05"), category, err))
 }
 
@@ -86,6 +90,7 @@ func InitializeDB(ctx *state.Context) error {
 		errors:    []string{},
 		saveJSON:  ctx.Config.JSON.Sync,
 		directory: ctx.Config.Data.Directory,
+		maxErrors: int(ctx.Config.Log.Lines),
 	}
 	return nil
 }

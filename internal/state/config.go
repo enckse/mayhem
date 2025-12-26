@@ -16,6 +16,9 @@ type Config struct {
 	Data struct {
 		Directory string
 	}
+	Log struct {
+		Lines uint
+	}
 	Display struct {
 		Finished struct {
 			Since string
