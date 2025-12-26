@@ -54,8 +54,8 @@ type (
 
 	preserveState struct {
 		retainState bool
-		stackID     uint
-		taskID      uint
+		stackID     string
+		taskID      string
 	}
 	dataCategory int
 )
@@ -440,13 +440,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, keys.Mappings.New):
 			if m.stackTable.Focused() {
 				m.preInputFocus = stackViewName
-				m.input = inputs.NewStackForm(entities.Stack{}, m.context)
+				stack := entities.NewStack(m.context.DB)
+				stack.Title = ""
+				m.input = inputs.NewStackForm(stack, m.context)
 
 			} else if m.taskTable.Focused() {
 				m.preInputFocus = taskViewName
-				newTask := entities.Task{
-					StackID: m.data[m.stackTable.Cursor()].ID,
-				}
+				newTask := entities.NewTask()
+				newTask.StackID = m.data[m.stackTable.Cursor()].ID
 				m.input = inputs.NewTaskForm(newTask, 0, m.context)
 
 			} else if m.taskDetails.Focused() {
@@ -534,7 +535,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					stack := m.data[stackIndex]
 					currTask = stack.Tasks[taskIndex]
 
-					currTask.IsFinished = !currTask.IsFinished
+					if currTask.Finished.IsZero() {
+						currTask.Finished = time.Now()
+					} else {
+						currTask.Finished = time.Time{}
+					}
 					currTask.Save(m.context.DB)
 					stack.Save(m.context.DB)
 
@@ -770,7 +775,7 @@ func (m *model) updateDetailsBoxData(preserveOffset bool) {
 	if len(m.data[stackIndex].Tasks) > 0 {
 		currTask = m.data[stackIndex].Tasks[taskIndex]
 	} else {
-		currTask = entities.Task{}
+		currTask = entities.NewTask()
 	}
 
 	m.taskDetails.Build(currTask, preserveOffset)

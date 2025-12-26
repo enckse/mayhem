@@ -6,6 +6,7 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/enckse/mayhem/internal/backend"
 	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
@@ -16,16 +17,19 @@ import (
 
 type mockDB struct{}
 
-func (m *mockDB) Save(_ any) {
+func (m *mockDB) Add(string, any) {
 }
 
-func (m *mockDB) Create(_ any) {
+func (m *mockDB) AddChild(string, string, any) {
 }
 
-func (m *mockDB) Delete(_ any) {
+func (m *mockDB) Remove(string) {
 }
 
-func (m *mockDB) Fetch() any {
+func (m *mockDB) RemoveChild(string, string) {
+}
+
+func (m *mockDB) Get() []backend.Data {
 	return nil
 }
 
@@ -33,7 +37,7 @@ func (m *mockDB) Errors() []string {
 	return nil
 }
 
-func (m *mockDB) SyncJSON(_ *state.Context) {
+func (m *mockDB) Log(_ string, _ error) {
 }
 
 func TestStackForm(t *testing.T) {

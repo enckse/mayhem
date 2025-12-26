@@ -3,7 +3,7 @@ package definitions
 
 // KeyValue is a simple key/value object
 type KeyValue struct {
-	Key   uint
+	Key   string
 	Value string
 }
 

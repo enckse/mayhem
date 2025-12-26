@@ -2,6 +2,3 @@
 directory="backups"
 duration="1h"
 format="20060102T150405"
-
-[json]
-sync=true

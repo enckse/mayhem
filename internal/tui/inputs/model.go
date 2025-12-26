@@ -31,7 +31,6 @@ type (
 		fieldMap      map[int]field
 		isInvalid     bool
 		invalidPrompt string
-		isNewTask     bool
 		helpKeys      keys.Map
 		context       *state.Context
 	}
@@ -137,7 +136,7 @@ func newForm(isStack bool, data entities.Entity, fieldIndex int, ctx *state.Cont
 				{Value: "1"},
 				{Value: "2"},
 				{Value: "3"},
-				{Value: "4"},
+				{Value: entities.MaxPriority},
 			}
 			targetField.model = lists.NewSelector(opts, fmt.Sprintf("%d", task.Priority), messages.FormGoToWith)
 		case definitions.TaskDeadlineIndex:
@@ -205,11 +204,6 @@ func (m Form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch m.focusIndex {
 			case definitions.TaskTitleIndex:
 				task.Title = selectedValue.(string)
-
-				if task.CreatedAt.IsZero() {
-					m.isNewTask = true
-				}
-
 			case definitions.TaskNotesIndex:
 				task.Notes = selectedValue.(string)
 			case definitions.TaskPriorityIndex:

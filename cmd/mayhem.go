@@ -2,7 +2,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -11,8 +10,8 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/enckse/mayhem/internal/backend"
 	"github.com/enckse/mayhem/internal/display"
-	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
 	"github.com/enckse/mayhem/internal/tui/ui"
 )
@@ -27,10 +26,6 @@ func main() {
 }
 
 func run() error {
-	isExport := false
-	isImport := false
-	isMerge := false
-	forceImport := false
 	verbose := false
 	args := os.Args
 	var configFile string
@@ -42,13 +37,6 @@ func run() error {
 			case "version":
 				fmt.Fprintf(os.Stderr, "%s\n", version)
 				return nil
-			case "export":
-				isExport = true
-			case "import":
-				isImport = true
-			case "merge":
-				isImport = true
-				isMerge = true
 			}
 			if len(args) > 1 {
 				args = args[1:]
@@ -57,23 +45,13 @@ func run() error {
 		set := flag.NewFlagSet("cli", flag.ExitOnError)
 		cfgFile := set.String("config", "", "configuration file")
 		isVerbose := set.Bool("verbose", false, "enable verbose output")
-		var force *bool
-		if isImport {
-			force = set.Bool("overwrite", false, "force import to overwrite current data")
-		}
 		if err := set.Parse(args); err != nil {
 			return err
-		}
-		if force != nil {
-			forceImport = *force
 		}
 		if isVerbose != nil {
 			verbose = *isVerbose
 		}
 		configFile = *cfgFile
-	}
-	if isExport && isImport {
-		return errors.New("only one of export/import can be provided")
 	}
 	ctx := &state.Context{}
 	ctx.Screen = display.NewScreen()
@@ -82,36 +60,13 @@ func run() error {
 		return err
 	}
 	ctx.Config = cfg
-	exists := state.PathExists(ctx.Config.Database())
-	if isExport && !exists {
-		return errors.New("no database to dump")
-	}
-	if isImport && exists && !isMerge {
-		if !forceImport {
-			return errors.New("import not supported into existing database")
-		}
-		if err := os.Remove(ctx.Config.Database()); err != nil {
+	if ctx.Config.Backups.Directory != "" {
+		if err := ctx.Config.Backup(time.Now()); err != nil {
 			return err
 		}
 	}
-	if !isExport && !isImport {
-		if ctx.Config.Backups.Directory != "" {
-			if err := ctx.Config.Backup(time.Now()); err != nil {
-				return err
-			}
-		}
-	}
-	if err := entities.InitializeDB(ctx); err != nil {
-		return err
-	}
+	ctx.DB = backend.NewMemoryBased(ctx.Config.Database(), ctx.Config.Data.Pretty, ctx.Config.Log.Lines)
 	err = func() error {
-		if isExport {
-			return entities.DumpJSON(os.Stdout, ctx.DB)
-		}
-		if isImport {
-			return entities.LoadJSON(ctx.DB, isMerge, os.Stdin)
-		}
-
 		model := ui.Initialize(ctx)
 		p := tea.NewProgram(model.Backing, tea.WithAltScreen())
 

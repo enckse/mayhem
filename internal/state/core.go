@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/enckse/mayhem/internal/backend"
 	"github.com/enckse/mayhem/internal/display"
 )
 
@@ -16,17 +17,9 @@ const (
 )
 
 type (
-	// Store defines the backing store for data
-	Store interface {
-		Save(any)
-		Create(any)
-		Fetch() any
-		Delete(any)
-		Errors() []string
-	}
 	// Context is the overall state context
 	Context struct {
-		DB     Store
+		DB     backend.Store
 		Config Config
 		Screen *display.Screen
 	}

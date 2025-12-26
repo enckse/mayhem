@@ -28,10 +28,9 @@ func TestStackRows(t *testing.T) {
 }
 
 func TestTaskRows(t *testing.T) {
-	tasks := []entities.Task{{Title: "xyz", IsFinished: true}, {IsFinished: false}}
-	tasks[0].ID = 0
-	tasks[1].ID = 1
-	tasks[1].UpdatedAt = time.Now()
+	tasks := []entities.Task{{Title: "xyz", Finished: time.Now()}, {Finished: time.Time{}}}
+	tasks[0].ID = "0"
+	tasks[1].ID = "1"
 	s := tables.TaskRows(tasks, time.Time{})
 	if fmt.Sprintf("%v", s) != "[[▢           -    0] [✘ xyz          -    0]]" {
 		t.Errorf("bad rows: %v", s)

@@ -15,6 +15,7 @@ const databaseName = FileName + "db"
 type Config struct {
 	Data struct {
 		Directory string
+		Pretty    bool
 	}
 	Log struct {
 		Lines uint
@@ -28,9 +29,6 @@ type Config struct {
 		Directory string
 		Format    string
 		Duration  string
-	}
-	JSON struct {
-		Sync bool
 	}
 }
 

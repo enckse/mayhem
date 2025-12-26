@@ -54,9 +54,9 @@ func TaskRows(tasks []entities.Task, since time.Time) []table.Row {
 	filtered := !since.IsZero()
 	for _, val := range tasks {
 		deadline = timepicker.FormatTime(val.Deadline, true)
-		if val.IsFinished {
+		if !val.Finished.IsZero() {
 			if filtered {
-				if val.UpdatedAt.Before(since) {
+				if val.Finished.Before(since) {
 					continue
 				}
 			}

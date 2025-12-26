@@ -1,24 +1,26 @@
 package entities
 
 import (
+	"errors"
 	"slices"
 	"strings"
 
-	"github.com/enckse/mayhem/internal/state"
+	"github.com/enckse/mayhem/internal/backend"
+	"github.com/google/uuid"
 )
 
 // Stack is a set of tasks, sorted alphabetically
 type Stack struct {
-	EntityBase
-	Title string `gorm:"notnull"`
-	Tasks []Task
+	ID    string
+	Title string
+	Tasks []Task `json:"-"`
 }
 
 // OpenTasks will get the count of unfinished tasks
 func (s Stack) OpenTasks() uint64 {
 	var count uint64
 	for _, t := range s.Tasks {
-		if t.IsFinished {
+		if !t.Finished.IsZero() {
 			continue
 		}
 		count++
@@ -27,19 +29,29 @@ func (s Stack) OpenTasks() uint64 {
 }
 
 // NewStack will create a new stack
-func NewStack(store state.Store) Stack {
+func NewStack(store backend.Store) Stack {
 	stack := Stack{Title: "New Stack"}
-	store.Create(&stack)
+	stack.ID = uuid.NewString()
+	store.Add(stack.ID, stack)
 	return stack
 }
 
 // FetchStacks will retrieve all stacks
-func FetchStacks(store state.Store) []Stack {
-	obj := store.Fetch()
+func FetchStacks(store backend.Store) []Stack {
 	var stacks []Stack
-	val, ok := obj.([]Stack)
-	if ok {
-		stacks = val
+	for _, item := range store.Get() {
+		c, ok := item.Node.(Stack)
+		if !ok {
+			continue
+		}
+		c.Tasks = []Task{}
+		for _, t := range item.Children {
+			task, ok := t.Node.(Task)
+			if ok {
+				c.Tasks = append(c.Tasks, task)
+			}
+		}
+		stacks = append(stacks, c)
 	}
 
 	if len(stacks) == 0 {
@@ -50,15 +62,24 @@ func FetchStacks(store state.Store) []Stack {
 	return stacks
 }
 
+// EntityID will get the entity ID for the object
+func (s Stack) EntityID() string {
+	return s.ID
+}
+
 // Save will save the entity
-func (s Stack) Save(store state.Store) Entity {
-	store.Save(&s)
+func (s Stack) Save(store backend.Store) Entity {
+	if strings.TrimSpace(s.Title) == "" {
+		store.Log("stack", errors.New("no title"))
+		return s
+	}
+	store.Add(s.ID, s)
 	return s
 }
 
 // Delete will remove the entity
-func (s Stack) Delete(store state.Store) {
-	store.Delete(&s)
+func (s Stack) Delete(store backend.Store) {
+	store.Remove(s.ID)
 }
 
 // SortStacks will sort by title

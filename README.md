@@ -2,14 +2,11 @@ Mayhem
 ===
 
 A fork of [mayhem](https://github.com/BOTbkcd/mayhem) with some cut features
-and generally simplified layout. It uses a local, updated, and modified version of the
-[pure Go sqlite driver](https://github.com/glebarez/sqlite)
+and generally simplified layout.
 
 - No recurring tasks
 - No steps
-- Control over database storage
-- Auto-saving to JSON
-- Import/export via JSON
+- JSON backing storage (for easier management)
 
 [![build](https://github.com/enckse/mayhem/actions/workflows/build.yml/badge.svg)](https://github.com/enckse/mayhem/actions/workflows/build.yml)
 
@@ -23,6 +20,8 @@ and generally simplified layout. It uses a local, updated, and modified version 
 [data]
 # override the location where data is stored
 directory="~/.mayhem"
+# save the data in a pretty (e.g. JSON pretty) indented/format
+pretty=true
 
 [display]
 # display finished tasks that have been updated since
@@ -36,10 +35,6 @@ directory="backups"
 duration="72h"
 # control the format of the date, allows controlling how many backups one gets
 format="20060102"
-
-[json]
-# save a JSON export on database change on save/sync
-sync=true
 ```
 
 ### usage
