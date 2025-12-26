@@ -30,8 +30,8 @@ func NewMemoryBased(file string, pretty bool, maxErrors uint) *MemoryBased {
 	}
 }
 
-// Load will load the config file state from disk
-func (m *MemoryBased) Load() error {
+// Load will load data into a memory backed store from file
+func Load[P, C any](m *MemoryBased) error {
 	if m.file == "" {
 		return nil
 	}
@@ -44,11 +44,32 @@ func (m *MemoryBased) Load() error {
 	decoder := json.NewDecoder(file)
 	decoder.DisallowUnknownFields()
 
-	var data Map
+	type raw struct {
+		Node     json.RawMessage
+		Children map[string]raw
+	}
+	var data map[string]raw
 	if err := decoder.Decode(&data); err != nil {
 		return err
 	}
-	m.data = data
+	for k, v := range data {
+		var parent P
+		if err := json.Unmarshal(v.Node, &parent); err != nil {
+			return err
+		}
+		children := make(Map)
+		if v.Children != nil {
+			for ck, cv := range v.Children {
+				var child C
+				if err := json.Unmarshal(cv.Node, &child); err != nil {
+					return err
+				}
+				m.children[ck] = k
+				children[ck] = Data{Node: child}
+			}
+		}
+		m.data[k] = Data{Node: parent, Children: children}
+	}
 	return nil
 }
 

@@ -204,20 +204,29 @@ func testJSON(t *testing.T, pretty bool) {
 
 func TestLoad(t *testing.T) {
 	dir := "testdata"
+	type parent *int
+	type child *int
 	const data = `{"1":{"Node":null,"Children":{"4":{"Node":6,"Children":null}}},"2":{"Node":1,"Children":{"2":{"Node":5,"Children":null},"x":{"Node":5,"Children":null}}}}`
 	os.MkdirAll(dir, os.ModePerm)
 	path := filepath.Join(dir, "load.invalid.json")
 	m := backend.NewMemoryBased(path, false, 0)
-	if err := m.Load(); err == nil {
+	if err := backend.Load[parent, child](m); err == nil {
 		t.Error("invalid load")
 	}
 	path = filepath.Join(dir, "load.json")
 	os.WriteFile(path, []byte(data), 0o644)
 	m = backend.NewMemoryBased(path, false, 0)
-	if err := m.Load(); err != nil {
+	if err := backend.Load[parent, child](m); err != nil {
 		t.Error("invalid load")
 	}
 	if len(m.Get()) != 2 {
 		t.Error("invalid get")
+	}
+	m.AddChild("2", "4", 6)
+	b, _ := os.ReadFile(path)
+	s := strings.TrimSpace(string(b))
+	// Make sure MOVE still works
+	if s != `{"1":{"Node":null,"Children":{}},"2":{"Node":1,"Children":{"2":{"Node":5,"Children":null},"4":{"Node":6,"Children":null},"x":{"Node":5,"Children":null}}}}` {
+		t.Errorf("invalid output: %s", s)
 	}
 }

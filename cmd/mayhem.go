@@ -12,6 +12,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/enckse/mayhem/internal/backend"
 	"github.com/enckse/mayhem/internal/display"
+	"github.com/enckse/mayhem/internal/entities"
 	"github.com/enckse/mayhem/internal/state"
 	"github.com/enckse/mayhem/internal/tui/ui"
 )
@@ -68,7 +69,7 @@ func run() error {
 	file := ctx.Config.Database()
 	storage := backend.NewMemoryBased(file, ctx.Config.Data.Pretty, ctx.Config.Log.Lines)
 	if state.PathExists(file) {
-		if err := storage.Load(); err != nil {
+		if err := backend.Load[entities.Stack, entities.Task](storage); err != nil {
 			return err
 		}
 	}
