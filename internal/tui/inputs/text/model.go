@@ -48,7 +48,7 @@ func (m Input) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, keys.Mappings.Enter):
+		case key.Matches(msg, keys.Mappings.Save):
 			return m, m.responder(m.input.Value())
 		}
 	}

@@ -12,8 +12,8 @@ type Map struct {
 	New     key.Binding
 	Edit    key.Binding
 	Move    key.Binding
-	Enter   key.Binding
 	Save    key.Binding
+	NewLine key.Binding
 	Toggle  key.Binding
 	Delete  key.Binding
 	Return  key.Binding
@@ -28,19 +28,19 @@ var (
 	Mappings = Map{
 		Up: key.NewBinding(
 			key.WithKeys("up", "k"),
-			key.WithHelp("'↑/k'", "move up"),
+			key.WithHelp("'↑/k'", "up"),
 		),
 		Down: key.NewBinding(
 			key.WithKeys("down", "j"),
-			key.WithHelp("'↓/j'", "move down"),
+			key.WithHelp("'↓/j'", "down"),
 		),
 		Left: key.NewBinding(
 			key.WithKeys("left", "h"),
-			key.WithHelp("'←/h'", "move left"),
+			key.WithHelp("'←/h'", "left"),
 		),
 		Right: key.NewBinding(
 			key.WithKeys("right", "l"),
-			key.WithHelp("'→/l'", "move right"),
+			key.WithHelp("'→/l'", "right"),
 		),
 		New: key.NewBinding(
 			key.WithKeys("n"),
@@ -54,9 +54,9 @@ var (
 			key.WithKeys("m"),
 			key.WithHelp("'m'", "move"),
 		),
-		Enter: key.NewBinding(
+		NewLine: key.NewBinding(
 			key.WithKeys("enter"),
-			key.WithHelp("'enter'", "enter"),
+			key.WithHelp("'enter'", "new line"),
 		),
 		Toggle: key.NewBinding(
 			key.WithKeys("tab"),
@@ -86,181 +86,77 @@ var (
 			key.WithKeys("f"),
 			key.WithHelp("'f'", "toggle filters"),
 		),
-	}
-
-	// TextInputMappings are for form text fields
-	TextInputMappings = Map{
-		Enter: key.NewBinding(
-			key.WithKeys("enter"),
-			key.WithHelp("'enter'", "save"),
-		),
-		Return: key.NewBinding(
-			key.WithKeys("esc"),
-			key.WithHelp("'esc'", "return"),
-		),
-	}
-	// ListSelectorMappings are for list selections
-	ListSelectorMappings = Map{
-		Up: key.NewBinding(
-			key.WithKeys("up", "k"),
-			key.WithHelp("'↑/k'", "up"),
-		),
-		Down: key.NewBinding(
-			key.WithKeys("down", "j"),
-			key.WithHelp("'↓/j'", "down"),
-		),
-		Enter: key.NewBinding(
-			key.WithKeys("enter"),
-			key.WithHelp("'enter'", "save"),
-		),
-		Return: key.NewBinding(
-			key.WithKeys("esc"),
-			key.WithHelp("'esc'", "return"),
-		),
-	}
-	// TimePickerMappings are for the time picker
-	TimePickerMappings = Map{
-		Up: key.NewBinding(
-			key.WithKeys("up", "k"),
-			key.WithHelp("'↑/k'", "increase"),
-		),
-		Down: key.NewBinding(
-			key.WithKeys("down", "j"),
-			key.WithHelp("'↓/j'", "decrease"),
-		),
-		Left: key.NewBinding(
-			key.WithKeys("left", "h"),
-			key.WithHelp("'←/h'", "move left"),
-		),
-		Right: key.NewBinding(
-			key.WithKeys("right", "l"),
-			key.WithHelp("'→/l'", "move right"),
-		),
-		Enter: key.NewBinding(
-			key.WithKeys("enter"),
-			key.WithHelp("'enter'", "save"),
-		),
-		Return: key.NewBinding(
-			key.WithKeys("esc"),
-			key.WithHelp("'esc'", "return"),
-		),
-		Delete: key.NewBinding(
-			key.WithKeys("x"),
-			key.WithHelp("'x'", "delete"),
-		),
-	}
-	// TextAreaInputMappings are for text areas
-	TextAreaInputMappings = Map{
-		Enter: key.NewBinding(
-			key.WithKeys("enter"),
-			key.WithHelp("'enter'", "new line"),
-		),
 		Save: key.NewBinding(
 			key.WithKeys("ctrl+s"),
 			key.WithHelp("'ctrl+s'", "save"),
 		),
-		Return: key.NewBinding(
-			key.WithKeys("esc"),
-			key.WithHelp("'esc'", "return"),
-		),
+	}
+
+	// TextInputMappings are for form text fields
+	TextInputMappings = Map{
+		Save:   Mappings.Save,
+		Return: Mappings.Return,
+	}
+	// ListSelectorMappings are for list selections
+	ListSelectorMappings = Map{
+		Up:     Mappings.Up,
+		Down:   Mappings.Down,
+		Save:   Mappings.Save,
+		Return: Mappings.Return,
+	}
+	// TimePickerMappings are for the time picker
+	TimePickerMappings = Map{
+		Up:     Mappings.Up,
+		Down:   Mappings.Down,
+		Left:   Mappings.Left,
+		Right:  Mappings.Right,
+		Save:   Mappings.Save,
+		Return: Mappings.Return,
+		Delete: Mappings.Delete,
+	}
+	// TextAreaInputMappings are for text areas
+	TextAreaInputMappings = Map{
+		NewLine: Mappings.NewLine,
+		Save:    Mappings.Save,
+		Return:  Mappings.Return,
 	}
 	// DetailsMappings handle moving through the details screen
 	DetailsMappings = Map{
-		Up: key.NewBinding(
-			key.WithKeys("up", "k"),
-			key.WithHelp("'↑/k'", "up"),
-		),
-		Down: key.NewBinding(
-			key.WithKeys("down", "j"),
-			key.WithHelp("'↓/j'", "down"),
-		),
-		Help: key.NewBinding(
-			key.WithKeys("?"),
-			key.WithHelp("'?'", "toggle help"),
-		),
-		Quit: key.NewBinding(
-			key.WithKeys("q"),
-			key.WithHelp("'q'", "quit"),
-		),
+		Up:   Mappings.Up,
+		Down: Mappings.Down,
+		Help: Mappings.Help,
+		Quit: Mappings.Quit,
 	}
 	// TaskDetailsMappings manage editing a task
 	TaskDetailsMappings = Map{
-		Edit: key.NewBinding(
-			key.WithKeys("e"),
-			key.WithHelp("'e'", "edit field"),
-		),
+		Edit: Mappings.Edit,
 	}
 
 	// StackMappings navigate the stack
 	StackMappings = Map{
-		New: key.NewBinding(
-			key.WithKeys("n"),
-			key.WithHelp("'n'", "new stack"),
-		),
-		Edit: key.NewBinding(
-			key.WithKeys("e"),
-			key.WithHelp("'e'", "edit"),
-		),
-		Delete: key.NewBinding(
-			key.WithKeys("x"),
-			key.WithHelp("'x'", "delete"),
-		),
+		New:    Mappings.New,
+		Edit:   Mappings.Edit,
+		Delete: Mappings.Delete,
 	}
 
 	// TaskMappings navigate the tasks
 	TaskMappings = Map{
-		Toggle: key.NewBinding(
-			key.WithKeys("tab"),
-			key.WithHelp("'tab'", "check/uncheck"),
-		),
-		New: key.NewBinding(
-			key.WithKeys("n"),
-			key.WithHelp("'n'", "new task"),
-		),
-		Edit: key.NewBinding(
-			key.WithKeys("e"),
-			key.WithHelp("'e'", "edit"),
-		),
-		Delete: key.NewBinding(
-			key.WithKeys("x"),
-			key.WithHelp("'x'", "delete"),
-		),
-		Move: key.NewBinding(
-			key.WithKeys("m"),
-			key.WithHelp("'m'", "change stack"),
-		),
-		Filters: key.NewBinding(
-			key.WithKeys("f"),
-			key.WithHelp("'f'", "toggle filters on/off"),
-		),
+		Toggle:  Mappings.Toggle,
+		New:     Mappings.New,
+		Edit:    Mappings.Edit,
+		Delete:  Mappings.Delete,
+		Move:    Mappings.Move,
+		Filters: Mappings.Filters,
 	}
 
 	// TableMappings navigate a table
 	TableMappings = Map{
-		Up: key.NewBinding(
-			key.WithKeys("up", "k"),
-			key.WithHelp("'↑/k'", "up"),
-		),
-		Down: key.NewBinding(
-			key.WithKeys("down", "j"),
-			key.WithHelp("'↓/j'", "down"),
-		),
-		Left: key.NewBinding(
-			key.WithKeys("left", "h"),
-			key.WithHelp("'←/h'", "left"),
-		),
-		Right: key.NewBinding(
-			key.WithKeys("right", "l"),
-			key.WithHelp("'→/l'", "right"),
-		),
-		Help: key.NewBinding(
-			key.WithKeys("?"),
-			key.WithHelp("'?'", "toggle help"),
-		),
-		Quit: key.NewBinding(
-			key.WithKeys("q"),
-			key.WithHelp("'q'", "quit"),
-		),
+		Up:    Mappings.Up,
+		Down:  Mappings.Down,
+		Left:  Mappings.Left,
+		Right: Mappings.Right,
+		Help:  Mappings.Help,
+		Quit:  Mappings.Quit,
 	}
 )
 
@@ -271,7 +167,7 @@ func (k Map) ShortHelp() []key.Binding {
 		k.Toggle,
 		k.New,
 		k.Edit,
-		k.Enter,
+		k.NewLine,
 		k.Save,
 		k.Delete,
 		k.Move,

@@ -15,7 +15,7 @@ func TestInput(t *testing.T) {
 	if !strings.Contains(obj.View(), "» abc") {
 		t.Errorf("invalid view: %s", obj.View())
 	}
-	_, cmd := obj.Update(tea.KeyMsg{Type: tea.KeyEnter})
+	_, cmd := obj.Update(tea.KeyMsg{Type: tea.KeyCtrlS})
 	if _, ok := cmd().(messages.Main); !ok {
 		t.Error("invalid result")
 	}

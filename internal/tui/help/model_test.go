@@ -15,7 +15,7 @@ func TestModel(t *testing.T) {
 		t.Error("invalid init")
 	}
 	m.Update(tea.WindowSizeMsg{Width: 1})
-	if !strings.Contains(m.View(), "'enter' enter") {
+	if !strings.Contains(m.View(), "'ctrl+s'") {
 		t.Error("view failed")
 	}
 }

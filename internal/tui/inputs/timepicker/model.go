@@ -129,7 +129,7 @@ func (m Input) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.focusIndex--
 			}
 			return m, nil
-		case key.Matches(msg, keys.Mappings.Enter):
+		case key.Matches(msg, keys.Mappings.Save):
 			return m, messages.FormGoToWith(m.currTime)
 		case key.Matches(msg, keys.Mappings.Delete):
 			m.currTime = time.Time{}

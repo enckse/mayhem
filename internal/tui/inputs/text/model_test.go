@@ -14,7 +14,7 @@ func TestInput(t *testing.T) {
 	if obj.Init() == nil {
 		t.Error("invalid result")
 	}
-	_, c := obj.Update(tea.KeyMsg{Type: tea.KeyEnter})
+	_, c := obj.Update(tea.KeyMsg{Type: tea.KeyCtrlS})
 	if c == nil {
 		t.Error("invalid result")
 	}

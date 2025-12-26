@@ -32,7 +32,7 @@ func TestInput(t *testing.T) {
 			val--
 		}
 	}
-	_, val := obj.Update(tea.KeyMsg{Type: tea.KeyEnter})
+	_, val := obj.Update(tea.KeyMsg{Type: tea.KeyCtrlS})
 	_, ok := val().(messages.Form)
 	if !ok {
 		t.Error("invalid results")

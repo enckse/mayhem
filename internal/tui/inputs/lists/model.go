@@ -57,7 +57,7 @@ func (m Selector) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, keys.Mappings.Quit, keys.Mappings.Exit):
 			return m, tea.Quit
 
-		case key.Matches(msg, keys.Mappings.Enter):
+		case key.Matches(msg, keys.Mappings.Save):
 			return m, m.responder(m.options[m.focusIndex])
 
 		case key.Matches(msg, keys.Mappings.Up):
