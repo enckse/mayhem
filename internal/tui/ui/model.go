@@ -48,7 +48,8 @@ type (
 		firstRender     bool
 		prevState       preserveState
 		context         *state.Context
-		filterSince     time.Time
+		filterSince     time.Duration
+		canFilter       bool
 	}
 
 	preserveState struct {
@@ -85,12 +86,13 @@ func Initialize(ctx *state.Context) ModelWrapper {
 		navigationKeys: keys.TableMappings,
 		showHelp:       true,
 		context:        ctx,
+		canFilter:      true,
 	}
 
 	if ctx.Config.Display.Finished.Since != "" {
 		parsed, err := time.ParseDuration(ctx.Config.Display.Finished.Since)
 		if err == nil {
-			m.filterSince = time.Now().Add(-parsed)
+			m.filterSince = parsed
 		}
 	}
 	m.stackTable.Focus()
@@ -545,7 +547,12 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, nil
 				}
 			}
-
+		case key.Matches(msg, keys.Mappings.Filters):
+			if m.taskTable.Focused() {
+				m.canFilter = !m.canFilter
+				m.updateSelectionData(stackDataCategory)
+				return m, nil
+			}
 		case key.Matches(msg, keys.Mappings.Move):
 			if m.taskTable.Focused() {
 				stackIndex := m.stackTable.Cursor()
@@ -737,7 +744,11 @@ func (m *model) updateTaskTableData(retainIndex bool) {
 	currStack := m.data[stackIndex]
 
 	// We pass a slice to taskRows, so the changes (like sorting) that happen there will be reflected in original slice
-	m.taskTable.SetRows(tables.TaskRows(currStack.Tasks, m.filterSince))
+	var filter time.Time
+	if m.canFilter {
+		filter = time.Now().Add(-m.filterSince)
+	}
+	m.taskTable.SetRows(tables.TaskRows(currStack.Tasks, filter))
 
 	if retainIndex {
 		newIndex := entities.FindByIndex(m.data[stackIndex].Tasks, m.prevState.taskID)

@@ -23,6 +23,7 @@ type Map struct {
 	Help          key.Binding
 	Quit          key.Binding
 	Exit          key.Binding
+	Filters       key.Binding
 }
 
 var (
@@ -95,6 +96,10 @@ var (
 		Exit: key.NewBinding(
 			key.WithKeys("ctrl+c"),
 			key.WithHelp("'ctrl+c'", "exit"),
+		),
+		Filters: key.NewBinding(
+			key.WithKeys("f"),
+			key.WithHelp("'f'", "toggle filters on/off"),
 		),
 	}
 
@@ -247,6 +252,10 @@ var (
 			key.WithKeys("m"),
 			key.WithHelp("'m'", "change stack"),
 		),
+		Filters: key.NewBinding(
+			key.WithKeys("f"),
+			key.WithHelp("'f'", "toggle filters on/off"),
+		),
 	}
 
 	// TableMappings navigate a table
@@ -307,6 +316,7 @@ func (k Map) ShortHelp() []key.Binding {
 		k.Right,
 		k.Help,
 		k.Quit,
+		k.Filters,
 	}
 }
 
