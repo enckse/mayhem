@@ -29,6 +29,7 @@ func run() error {
 	isExport := false
 	isImport := false
 	isMerge := false
+	forceImport := false
 	args := os.Args
 	var configFile string
 	if len(args) > 1 {
@@ -53,8 +54,15 @@ func run() error {
 		}
 		set := flag.NewFlagSet("cli", flag.ExitOnError)
 		cfgFile := set.String("config", "", "configuration file")
+		var force *bool
+		if isImport {
+			force = set.Bool("force", false, "force import")
+		}
 		if err := set.Parse(args); err != nil {
 			return err
+		}
+		if force != nil {
+			forceImport = *force
 		}
 		configFile = *cfgFile
 	}
@@ -73,7 +81,12 @@ func run() error {
 		return errors.New("no database to dump")
 	}
 	if isImport && exists && !isMerge {
-		return errors.New("import not supported into existing database")
+		if !forceImport {
+			return errors.New("import not supported into existing database")
+		}
+		if err := os.Remove(ctx.Config.Database()); err != nil {
+			return err
+		}
 	}
 	if !isExport && !isImport {
 		if ctx.Config.Backups.Directory != "" {
