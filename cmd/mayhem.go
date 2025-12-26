@@ -56,7 +56,7 @@ func run() error {
 		cfgFile := set.String("config", "", "configuration file")
 		var force *bool
 		if isImport {
-			force = set.Bool("force", false, "force import")
+			force = set.Bool("overwrite", false, "force import to overwrite current data")
 		}
 		if err := set.Parse(args); err != nil {
 			return err
