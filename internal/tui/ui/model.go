@@ -659,6 +659,12 @@ func (m *model) View() string {
 		m.help = help.NewModel(m.input.HelpKeys())
 	}
 
+	var errorsText string
+	if cnt := len(m.context.DB.Errors()); cnt > 0 {
+		errorsText = fmt.Sprintf("%d errors logged...", cnt)
+	}
+
+	tablesView = lipgloss.JoinVertical(lipgloss.Left, tablesView, errorsText)
 	if m.showHelp {
 		if !m.showInput && !m.showCustomInput {
 			navigationHelp := help.NewModel(m.navigationKeys)
