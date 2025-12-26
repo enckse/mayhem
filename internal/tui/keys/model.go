@@ -64,7 +64,7 @@ var (
 		),
 		Delete: key.NewBinding(
 			key.WithKeys("x"),
-			key.WithHelp("'x'", "delete 🗑"),
+			key.WithHelp("'x'", "delete"),
 		),
 		Return: key.NewBinding(
 			key.WithKeys("esc"),
@@ -84,7 +84,7 @@ var (
 		),
 		Filters: key.NewBinding(
 			key.WithKeys("f"),
-			key.WithHelp("'f'", "toggle filters on/off"),
+			key.WithHelp("'f'", "toggle filters"),
 		),
 	}
 
