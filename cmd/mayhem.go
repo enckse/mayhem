@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -30,6 +31,7 @@ func run() error {
 	isImport := false
 	isMerge := false
 	forceImport := false
+	verbose := false
 	args := os.Args
 	var configFile string
 	if len(args) > 1 {
@@ -54,6 +56,7 @@ func run() error {
 		}
 		set := flag.NewFlagSet("cli", flag.ExitOnError)
 		cfgFile := set.String("config", "", "configuration file")
+		isVerbose := set.Bool("verbose", false, "enable verbose output")
 		var force *bool
 		if isImport {
 			force = set.Bool("overwrite", false, "force import to overwrite current data")
@@ -63,6 +66,9 @@ func run() error {
 		}
 		if force != nil {
 			forceImport = *force
+		}
+		if isVerbose != nil {
+			verbose = *isVerbose
 		}
 		configFile = *cfgFile
 	}
@@ -114,8 +120,20 @@ func run() error {
 		}
 		return nil
 	}()
-	for _, item := range ctx.DB.Errors() {
-		fmt.Fprintf(os.Stderr, "%s\n", item)
+
+	errors := ctx.DB.Errors()
+	if len(errors) > 0 {
+		f, err := os.OpenFile(filepath.Join(ctx.Config.Data.Directory, "log.txt"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		for _, item := range errors {
+			if verbose {
+				fmt.Fprintf(os.Stderr, "%s\n", item)
+			}
+			fmt.Fprintf(f, "%s\n", item)
+		}
 	}
 	return err
 }
