@@ -24,7 +24,7 @@ type Task struct {
 	Deadline time.Time
 	Priority uint64
 	Finished time.Time
-	StackID  string `json:"-"`
+	StackID  string
 }
 
 // NewTask will create a new task
