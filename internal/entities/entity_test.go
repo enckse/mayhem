@@ -17,7 +17,7 @@ func (m *mockDB) Add(_ string, obj any) {
 	m.last = obj
 }
 
-func (m *mockDB) AddChild(_ string, _ string, obj any) {
+func (m *mockDB) AddChild(_, _ string, obj any) {
 	m.last = obj
 }
 

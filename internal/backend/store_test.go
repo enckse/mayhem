@@ -2,6 +2,9 @@ package backend_test
 
 import (
 	"errors"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/enckse/mayhem/internal/backend"
@@ -160,5 +163,61 @@ func TestRemoveChild(t *testing.T) {
 	}
 	if len(m.Get()[0].Children) != 0 {
 		t.Error("invalid remove")
+	}
+}
+
+func TestAsJSON(t *testing.T) {
+	testJSON(t, false)
+	testJSON(t, true)
+}
+
+func testJSON(t *testing.T, pretty bool) {
+	path := "testdata"
+	os.MkdirAll(path, os.ModePerm)
+	path = filepath.Join(path, "data.json")
+	m := backend.NewMemoryBased(path, pretty, 0)
+	m.Add("1", nil)
+	m.Add("2", 1)
+	m.AddChild("1", "2", nil)
+	m.AddChild("2", "x", 5)
+	m.AddChild("2", "2", 5)
+	m.AddChild("1", "3", 5)
+	m.AddChild("1", "4", 5)
+	m.AddChild("1", "4", 6)
+	m.RemoveChild("1", "3")
+	if len(m.Errors()) != 0 {
+		t.Error("invalid op")
+	}
+	b, _ := os.ReadFile(path)
+	s := strings.TrimSpace(string(b))
+	if pretty {
+		parts := strings.Split(s, "\n")
+		if parts[0] != "{" {
+			t.Errorf("invalid pretty output: %s", parts[0])
+		}
+	} else {
+		if s != `{"1":{"Node":null,"Children":{"4":{"Node":6,"Children":null}}},"2":{"Node":1,"Children":{"2":{"Node":5,"Children":null},"x":{"Node":5,"Children":null}}}}` {
+			t.Error("invalid output")
+		}
+	}
+}
+
+func TestLoad(t *testing.T) {
+	dir := "testdata"
+	const data = `{"1":{"Node":null,"Children":{"4":{"Node":6,"Children":null}}},"2":{"Node":1,"Children":{"2":{"Node":5,"Children":null},"x":{"Node":5,"Children":null}}}}`
+	os.MkdirAll(dir, os.ModePerm)
+	path := filepath.Join(dir, "load.invalid.json")
+	m := backend.NewMemoryBased(path, false, 0)
+	if err := m.Load(); err == nil {
+		t.Error("invalid load")
+	}
+	path = filepath.Join(dir, "load.json")
+	os.WriteFile(path, []byte(data), 0o644)
+	m = backend.NewMemoryBased(path, false, 0)
+	if err := m.Load(); err != nil {
+		t.Error("invalid load")
+	}
+	if len(m.Get()) != 2 {
+		t.Error("invalid get")
 	}
 }

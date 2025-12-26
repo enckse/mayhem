@@ -1,8 +1,10 @@
 package backend
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 )
@@ -28,6 +30,28 @@ func NewMemoryBased(file string, pretty bool, maxErrors uint) *MemoryBased {
 	}
 }
 
+// Load will load the config file state from disk
+func (m *MemoryBased) Load() error {
+	if m.file == "" {
+		return nil
+	}
+	file, err := os.Open(m.file)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
+	decoder.DisallowUnknownFields()
+
+	var data Map
+	if err := decoder.Decode(&data); err != nil {
+		return err
+	}
+	m.data = data
+	return nil
+}
+
 // Errors will get the list of errors
 func (m *MemoryBased) Errors() []string {
 	return m.errors
@@ -49,6 +73,9 @@ func (m *MemoryBased) Add(id string, data any) {
 		return nil
 	}()
 	m.Log("add", err)
+	if err == nil {
+		m.sync()
+	}
 }
 
 // AddChild will add a child entity
@@ -76,6 +103,9 @@ func (m *MemoryBased) AddChild(parent, id string, data any) {
 		return nil
 	}()
 	m.Log("addchild", err)
+	if err == nil {
+		m.sync()
+	}
 }
 
 // Remove will remove an entity
@@ -85,6 +115,9 @@ func (m *MemoryBased) Remove(id string) {
 		return nil
 	}()
 	m.Log("remove", err)
+	if err == nil {
+		m.sync()
+	}
 }
 
 // RemoveChild will remove a child entity
@@ -97,6 +130,9 @@ func (m *MemoryBased) RemoveChild(parent, id string) {
 		return nil
 	}()
 	m.Log("removechild", err)
+	if err == nil {
+		m.sync()
+	}
 }
 
 // Get will return the backing data
@@ -117,4 +153,30 @@ func (m *MemoryBased) Log(cat string, err error) {
 	if m.maxErrors > 0 && len(m.errors) > m.maxErrors {
 		m.errors = m.errors[1:]
 	}
+}
+
+func (m *MemoryBased) sync() {
+	if m.file == "" {
+		return
+	}
+	err := func() error {
+		tmpFile := m.file + ".tmp"
+		defer func() {
+			os.Remove(tmpFile)
+		}()
+		file, err := os.OpenFile(tmpFile, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0o644)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		encoder := json.NewEncoder(file)
+		if m.pretty {
+			encoder.SetIndent("", "  ")
+		}
+		if err := encoder.Encode(m.data); err != nil {
+			return err
+		}
+		return os.Rename(tmpFile, m.file)
+	}()
+	m.Log("sync", err)
 }

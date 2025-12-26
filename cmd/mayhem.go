@@ -65,7 +65,14 @@ func run() error {
 			return err
 		}
 	}
-	ctx.DB = backend.NewMemoryBased(ctx.Config.Database(), ctx.Config.Data.Pretty, ctx.Config.Log.Lines)
+	file := ctx.Config.Database()
+	storage := backend.NewMemoryBased(file, ctx.Config.Data.Pretty, ctx.Config.Log.Lines)
+	if state.PathExists(file) {
+		if err := storage.Load(); err != nil {
+			return err
+		}
+	}
+	ctx.DB = storage
 	err = func() error {
 		model := ui.Initialize(ctx)
 		p := tea.NewProgram(model.Backing, tea.WithAltScreen())
