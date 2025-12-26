@@ -23,7 +23,7 @@ func TestSaveDeleteTask(t *testing.T) {
 func TestSortTasks(t *testing.T) {
 	s := []entities.Task{{Title: "X00", IsFinished: true, Deadline: time.Now()}, {Title: "X01", IsFinished: false, Deadline: time.Now()}, {Title: "X10", IsFinished: true}, {Title: "X11", IsFinished: false}}
 	entities.SortTasks(s)
-	if len(s) != 4 || s[0].Title != "X10" || s[1].Title != "X00" || s[2].Title != "X11" || s[3].Title != "X01" {
+	if len(s) != 4 || s[0].Title != "X01" || s[1].Title != "X11" || s[2].Title != "X00" || s[3].Title != "X10" {
 		t.Errorf("invalid sort: %v", s)
 	}
 }

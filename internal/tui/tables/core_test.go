@@ -31,7 +31,7 @@ func TestTaskRows(t *testing.T) {
 	tasks[0].ID = 0
 	tasks[1].ID = 1
 	s := tables.TaskRows(tasks)
-	if fmt.Sprintf("%v", s) != "[[✘ xyz          -    0] [▢           -    0]]" {
+	if fmt.Sprintf("%v", s) != "[[▢           -    0] [✘ xyz          -    0]]" {
 		t.Errorf("bad rows: %v", s)
 	}
 }

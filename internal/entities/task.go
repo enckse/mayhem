@@ -34,10 +34,16 @@ func (t Task) Delete(store state.Store) {
 func SortTasks(t []Task) {
 	slices.SortFunc(t, func(x, y Task) int {
 		if x.IsFinished && !y.IsFinished {
-			return -1
+			return 1
 		}
 		if !x.IsFinished && y.IsFinished {
+			return -1
+		}
+		if x.Deadline.IsZero() && !y.Deadline.IsZero() {
 			return 1
+		}
+		if !x.Deadline.IsZero() && y.Deadline.IsZero() {
+			return -1
 		}
 		if val := x.Deadline.Compare(y.Deadline); val != 0 {
 			return val
