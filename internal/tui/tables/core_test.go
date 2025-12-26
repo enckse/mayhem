@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/enckse/mayhem/internal/display"
 	"github.com/enckse/mayhem/internal/entities"
@@ -30,8 +31,13 @@ func TestTaskRows(t *testing.T) {
 	tasks := []entities.Task{{Title: "xyz", IsFinished: true}, {IsFinished: false}}
 	tasks[0].ID = 0
 	tasks[1].ID = 1
-	s := tables.TaskRows(tasks)
+	tasks[1].UpdatedAt = time.Now()
+	s := tables.TaskRows(tasks, time.Time{})
 	if fmt.Sprintf("%v", s) != "[[▢           -    0] [✘ xyz          -    0]]" {
+		t.Errorf("bad rows: %v", s)
+	}
+	s = tables.TaskRows(tasks, time.Now())
+	if fmt.Sprintf("%v", s) != "[[▢           -    0]]" {
 		t.Errorf("bad rows: %v", s)
 	}
 }

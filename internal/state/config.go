@@ -16,6 +16,11 @@ type Config struct {
 	Data struct {
 		Directory string
 	}
+	Display struct {
+		Finished struct {
+			Since string
+		}
+	}
 	Backups struct {
 		Directory string
 		Format    string

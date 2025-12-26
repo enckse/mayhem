@@ -3,6 +3,7 @@ package ui
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
@@ -47,6 +48,7 @@ type (
 		firstRender     bool
 		prevState       preserveState
 		context         *state.Context
+		filterSince     time.Time
 	}
 
 	preserveState struct {
@@ -85,6 +87,12 @@ func Initialize(ctx *state.Context) ModelWrapper {
 		context:        ctx,
 	}
 
+	if ctx.Config.Display.Finished.Since != "" {
+		parsed, err := time.ParseDuration(ctx.Config.Display.Finished.Since)
+		if err == nil {
+			m.filterSince = time.Now().Add(-parsed)
+		}
+	}
 	m.stackTable.Focus()
 	m.taskTable.Blur()
 	m.taskDetails.Blur()
@@ -729,7 +737,7 @@ func (m *model) updateTaskTableData(retainIndex bool) {
 	currStack := m.data[stackIndex]
 
 	// We pass a slice to taskRows, so the changes (like sorting) that happen there will be reflected in original slice
-	m.taskTable.SetRows(tables.TaskRows(currStack.Tasks))
+	m.taskTable.SetRows(tables.TaskRows(currStack.Tasks, m.filterSince))
 
 	if retainIndex {
 		newIndex := entities.FindByIndex(m.data[stackIndex].Tasks, m.prevState.taskID)

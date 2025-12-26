@@ -24,6 +24,10 @@ and generally simplified layout. It uses a local, updated, and modified version 
 # override the location where data is stored
 directory="~/.mayhem"
 
+[display]
+# display finished tasks that have been updated since
+finished.since= "48h"
+
 [backups]
 # enable backups into a directory (offset from data.directory)
 # backups are taken when mayhem starts

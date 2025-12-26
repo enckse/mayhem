@@ -3,6 +3,7 @@ package tables
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/charmbracelet/bubbles/table"
 	"github.com/enckse/mayhem/internal/display"
@@ -42,17 +43,23 @@ func StackRows(stacks []entities.Stack) []table.Row {
 }
 
 // TaskRows will generate rows for tasks
-func TaskRows(tasks []entities.Task) []table.Row {
-	rows := make([]table.Row, len(tasks))
+func TaskRows(tasks []entities.Task, since time.Time) []table.Row {
+	var rows []table.Row
 
 	entities.SortTasks(tasks)
 
 	var prefix string
 	var deadline string
 
-	for i, val := range tasks {
+	filtered := !since.IsZero()
+	for _, val := range tasks {
 		deadline = timepicker.FormatTime(val.Deadline, true)
 		if val.IsFinished {
+			if filtered {
+				if val.UpdatedAt.Before(since) {
+					continue
+				}
+			}
 			prefix = "✘"
 		} else {
 			prefix = "▢"
@@ -65,7 +72,7 @@ func TaskRows(tasks []entities.Task) []table.Row {
 			fmt.Sprintf("   %d", val.Priority),
 		}
 
-		rows[i] = row
+		rows = append(rows, row)
 	}
 
 	return rows
