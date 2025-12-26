@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -11,22 +12,23 @@ import (
 
 // MemoryBased is a memory-based backend (that can sync to JSON file)
 type MemoryBased struct {
-	data      Map
-	children  map[string]string
-	errors    []string
-	maxErrors int
-	pretty    bool
-	file      string
+	data     Map
+	children map[string]string
+	logger   io.Writer
+	pretty   bool
+	file     string
+	errored  bool
 }
 
 // NewMemoryBased will create a new memory-based backend
-func NewMemoryBased(file string, pretty bool, maxErrors uint) *MemoryBased {
+func NewMemoryBased(file string, pretty bool, logger io.Writer) *MemoryBased {
 	return &MemoryBased{
-		data:      make(Map),
-		maxErrors: int(maxErrors),
-		pretty:    pretty,
-		file:      file,
-		children:  make(map[string]string),
+		data:     make(Map),
+		pretty:   pretty,
+		file:     file,
+		children: make(map[string]string),
+		logger:   logger,
+		errored:  false,
 	}
 }
 
@@ -73,9 +75,9 @@ func Load[P, C any](m *MemoryBased) error {
 	return nil
 }
 
-// Errors will get the list of errors
-func (m *MemoryBased) Errors() []string {
-	return m.errors
+// Errored indicates if errors were logged
+func (m *MemoryBased) Errored() bool {
+	return m.errored
 }
 
 // Add will add a new entity
@@ -170,10 +172,8 @@ func (m *MemoryBased) Log(cat string, err error) {
 	if err == nil {
 		return
 	}
-	m.errors = append(m.errors, fmt.Sprintf("[%s] %s: %v", time.Now().Format("2006-01-02T15:04:05"), cat, err))
-	if m.maxErrors > 0 && len(m.errors) > m.maxErrors {
-		m.errors = m.errors[1:]
-	}
+	m.errored = true
+	fmt.Fprintf(m.logger, "[%s] %s: %v\n", time.Now().Format("2006-01-02T15:04:05"), cat, err)
 }
 
 func (m *MemoryBased) sync() {

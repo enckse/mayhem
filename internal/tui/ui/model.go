@@ -660,8 +660,8 @@ func (m *model) View() string {
 	}
 
 	var errorsText string
-	if cnt := len(m.context.DB.Errors()); cnt > 0 {
-		errorsText = fmt.Sprintf("%d errors logged...", cnt)
+	if m.context.DB.Errored() {
+		errorsText = "[errors logged]"
 	}
 
 	tablesView = lipgloss.JoinVertical(lipgloss.Left, tablesView, errorsText)

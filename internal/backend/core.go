@@ -16,7 +16,7 @@ type (
 		Remove(string)
 		RemoveChild(string, string)
 		Get() []Data
-		Errors() []string
+		Errored() bool
 		Log(string, error)
 	}
 )

@@ -17,9 +17,6 @@ type Config struct {
 		Directory string
 		Pretty    bool
 	}
-	Log struct {
-		Lines uint
-	}
 	Display struct {
 		Finished struct {
 			Since string

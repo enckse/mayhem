@@ -33,8 +33,8 @@ func (m *mockDB) Get() []backend.Data {
 	return m.data
 }
 
-func (m *mockDB) Errors() []string {
-	return nil
+func (m *mockDB) Errored() bool {
+	return false
 }
 
 func (m *mockDB) Log(cat string, _ error) {
