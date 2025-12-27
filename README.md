@@ -6,7 +6,7 @@ and generally simplified layout.
 
 - No recurring tasks
 - No steps
-- JSON backing storage (for easier management)
+- JSON backing storage (use with other tools, hand edit, etc.)
 
 [![build](https://github.com/enckse/mayhem/actions/workflows/build.yml/badge.svg)](https://github.com/enckse/mayhem/actions/workflows/build.yml)
 
@@ -40,18 +40,6 @@ format="20060102"
 ### usage
 
 Run `mayhem` and follow the navigation keys/help
-
-#### import/export
-
-To import (or use `merge` instead to load into an existing mayhem database)
-```
-cat my_tasks.json | mayhem import
-```
-
-To export (save result as JSON syncing)
-```
-mayhem export > my_tasks.json
-```
 
 ## build
 
