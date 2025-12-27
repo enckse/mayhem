@@ -16,6 +16,7 @@ type Config struct {
 	Data struct {
 		Directory string
 		Pretty    bool
+		Lock      bool
 	}
 	Display struct {
 		Finished struct {

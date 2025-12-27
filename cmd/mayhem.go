@@ -56,6 +56,17 @@ func run() error {
 		return err
 	}
 	ctx.Config = cfg
+	if cfg.Data.Lock {
+		lockFile := filepath.Join(ctx.Config.Data.Directory, "lockfile")
+		if state.PathExists(lockFile) {
+			return fmt.Errorf("locked: %s exists", lockFile)
+		}
+		lock := fmt.Sprintf("%d %s", os.Getpid(), time.Now().String())
+		if err := os.WriteFile(lockFile, []byte(lock), 0o644); err != nil {
+			return err
+		}
+		defer os.Remove(lockFile)
+	}
 	if ctx.Config.Backups.Directory != "" {
 		if err := ctx.Config.Backup(time.Now()); err != nil {
 			return err
