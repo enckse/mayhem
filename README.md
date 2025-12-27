@@ -7,6 +7,8 @@ and generally simplified layout.
 - No recurring tasks
 - No steps
 - JSON backing storage (use with other tools, hand edit, etc.)
+- Standardized key bindings
+- Cleaned up UI
 
 [![build](https://github.com/enckse/mayhem/actions/workflows/build.yml/badge.svg)](https://github.com/enckse/mayhem/actions/workflows/build.yml)
 
