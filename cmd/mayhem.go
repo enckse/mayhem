@@ -5,8 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -65,6 +67,14 @@ func run() error {
 		if err := os.WriteFile(lockFile, []byte(lock), 0o644); err != nil {
 			return err
 		}
+		sigs := make(chan os.Signal, 1)
+
+		signal.Notify(sigs, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
+		go func() {
+			<-sigs
+			os.Remove(lockFile)
+			os.Exit(0)
+		}()
 		defer os.Remove(lockFile)
 	}
 	if ctx.Config.Backups.Directory != "" {
