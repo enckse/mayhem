@@ -58,7 +58,7 @@ func run() error {
 		return err
 	}
 	ctx.Config = cfg
-	if cfg.Data.Lock {
+	if !cfg.Data.NoLock {
 		lockFile := filepath.Join(ctx.Config.Data.Directory, "lockfile")
 		if state.PathExists(lockFile) {
 			return fmt.Errorf("locked: %s exists", lockFile)
